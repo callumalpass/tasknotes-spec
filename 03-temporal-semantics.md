@@ -65,7 +65,18 @@ Example:
 
 ## 3.6 Local calendar-day evaluation
 
-When calculating day-level concepts (for example overdue/day grouping/calendar day cells), implementations MUST evaluate against local calendar-day boundaries of the active runtime timezone unless explicitly configured otherwise.
+### 3.6.1 Active runtime timezone
+
+For day-level semantics, the active runtime timezone is:
+
+1. configured collection `runtime_timezone` if provided, otherwise
+2. the process/system local timezone.
+
+Implementations MUST make the effective timezone discoverable.
+
+### 3.6.2 Local calendar-day rules
+
+When calculating day-level concepts (for example overdue/day grouping/calendar day cells), implementations MUST evaluate against local calendar-day boundaries of the active runtime timezone.
 
 This requirement prevents off-by-one day drift in positive and negative UTC offsets.
 
@@ -116,17 +127,27 @@ Writers MUST:
 
 ### 3.11.1 Timestamp format
 
-`time_entries.start_time` and `time_entries.end_time` MUST be datetime instants in canonical form on write.
+`time_entries.startTime` and `time_entries.endTime` MUST be datetime instants in canonical form on write.
 
 ### 3.11.2 Range validity
 
-If both times exist, `end_time` MUST be greater than or equal to `start_time`.
+If both times exist, `endTime` MUST be greater than or equal to `startTime`.
 
 ### 3.11.3 Duration handling
 
 If duration is present, implementations SHOULD treat it as derived and MAY rewrite or remove stale duration values during normalization.
 
-## 3.12 Example: local-day overdue evaluation
+## 3.12 reminder temporal semantics
+
+Reminder time fields are governed by §10.3 and MUST follow canonical datetime and duration formats from this section.
+
+Rules:
+
+- `reminders[].absoluteTime` MUST be a canonical datetime on write.
+- `reminders[].offset` MUST be a valid ISO 8601 duration string.
+- relative reminder base conversion for date-only values MUST use `reminders.date_only_anchor_time` from §9, or `00:00` local time if unset.
+
+## 3.13 Example: local-day overdue evaluation
 
 Assume local timezone `America/Los_Angeles` and local date `2026-02-20`.
 
@@ -148,7 +169,7 @@ status: open
 
 Task B is not overdue at start of day; it becomes overdue on `2026-02-21` local day.
 
-## 3.13 Example: preserving granularity
+## 3.14 Example: preserving granularity
 
 Before update:
 
@@ -168,7 +189,7 @@ priority: high
 
 Non-conforming behavior would silently rewrite `due` to a datetime.
 
-## 3.14 Example: canonical datetime write
+## 3.15 Example: canonical datetime write
 
 Input:
 

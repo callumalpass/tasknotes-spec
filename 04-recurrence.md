@@ -15,12 +15,14 @@ If `recurrence` is absent or empty, the task is non-recurring.
 ### 4.3.1 Required format
 
 `recurrence` MUST be an RFC 5545 RRULE-compatible string.
+It MAY include a `DTSTART` prefix.
 
 Examples:
 
 - `FREQ=DAILY`
 - `FREQ=WEEKLY;BYDAY=MO,WE,FR`
 - `FREQ=MONTHLY;BYMONTHDAY=1`
+- `DTSTART:20260220;FREQ=WEEKLY;BYDAY=FR`
 
 ### 4.3.2 Invalid rule handling
 
@@ -34,6 +36,22 @@ Invalid recurrence rules MUST produce a validation error in strict mode and SHOU
 - `completion`
 
 If missing, implementations SHOULD default to `scheduled` unless collection configuration defines another default.
+
+### 4.4.1 Recurrence seed precedence
+
+When recurrence generation requires a seed/start date, implementations MUST resolve it in this order:
+
+1. `DTSTART` embedded in `recurrence`,
+2. semantic `scheduled`,
+3. semantic `date_created`.
+
+If no seed can be resolved, recurrence materialization MUST fail deterministically and validation MUST report an error.
+
+### 4.4.2 Anchor progression behavior
+
+For `recurrence_anchor=scheduled`, progression is based on the scheduled chain and `DTSTART` MUST remain fixed after it is set.
+
+For `recurrence_anchor=completion`, complete-instance operations MUST advance progression by updating `DTSTART` to the completion target date.
 
 ## 4.5 Instance state fields
 
@@ -51,6 +69,7 @@ Implementations MUST enforce:
 1. Items in instance lists are valid date values.
 2. No date appears in both lists simultaneously.
 3. Duplicate dates are normalized (set semantics) or rejected deterministically.
+4. Validators MUST NOT reject an instance date solely because it is not an RRULE-generated occurrence.
 
 ## 4.7 Instance completion semantics
 
@@ -124,7 +143,7 @@ For non-recurring tasks, completion uses base status semantics (§5).
 
 Implementations MUST define which status values are treated as complete for non-recurring tasks.
 
-The completed-status set MUST be configurable or schema-driven and MUST NOT rely on a hardcoded single literal.
+The completed-status list MUST be configurable or schema-driven and MUST NOT rely on a hardcoded single literal.
 
 ## 4.14 Example: complete then skip same day
 
@@ -168,6 +187,7 @@ recurrenceAnchor: completion
 ```
 
 If implementation supports next-occurrence materialization, it MUST compute next occurrence relative to completion progression when anchor is `completion`, not solely by scheduled chain.
+Implementations using `DTSTART` progression MUST update `DTSTART` to the completion date for this mode.
 
 ## 4.17 Validation examples
 

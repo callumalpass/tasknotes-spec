@@ -21,10 +21,13 @@ If `tasknotes.yaml` is missing, implementations MAY fall back to defaults in per
 
 | Key | Type | Description |
 |---|---|---|
+| `runtime_timezone` | string | IANA timezone for day-level semantics |
 | `task_detection` | object | task file identification rules |
 | `defaults` | object | role defaults used during create |
 | `status` | object | status set and completed-value semantics |
 | `validation` | object | strict/permissive behavior |
+| `dependencies` | object | dependency behavior policy |
+| `reminders` | object | reminder behavior policy |
 | `compatibility` | object | legacy alias/behavior switches |
 
 ## 9.5 spec_version behavior
@@ -35,6 +38,13 @@ Implementations in strict mode MUST reject unsupported major versions.
 
 Implementations in permissive mode MAY proceed with warning when major version differs.
 
+### 9.5.1 runtime_timezone behavior
+
+If `runtime_timezone` is configured, it MUST be a valid IANA timezone identifier and MUST be used for day-level semantics.
+
+If `runtime_timezone` is absent, implementations MUST use system local timezone.
+The effective timezone MUST be discoverable.
+
 ## 9.6 mapping schema
 
 `mapping` MUST map semantic roles (from §2) to string storage keys.
@@ -43,6 +53,7 @@ Minimum required roles in mapping:
 
 - `title`
 - `status`
+- `completed_date`
 - `date_created`
 - `date_modified`
 
@@ -60,6 +71,8 @@ mapping:
   complete_instances: completeInstances
   skipped_instances: skippedInstances
   time_entries: timeEntries
+  blocked_by: blockedBy
+  reminders: reminders
 ```
 
 ## 9.7 task_detection schema
@@ -102,7 +115,14 @@ defaults:
   status: open
   priority: normal
   recurrence_anchor: scheduled
+  reminders:
+    - id: due_minus_1d
+      type: relative
+      relatedTo: due
+      offset: -P1D
 ```
+
+`defaults.reminders` behavior is defined in §10.3.9.
 
 ## 9.9 status schema
 
@@ -120,8 +140,10 @@ status:
 Rules:
 
 - `default` MUST be one of `values`.
+- `completed_values` MUST be a non-empty list.
 - Each `completed_values` entry MUST be in `values`.
-- Non-recurring completion MUST use this set, not hardcoded literals.
+- Non-recurring completion MUST use this list, not hardcoded literals.
+- When a complete operation does not provide an explicit target status, writers MUST use the first entry of `completed_values`.
 
 ## 9.10 validation schema
 
@@ -138,7 +160,40 @@ Rules:
 - `mode` MUST be `strict` or `permissive`.
 - `reject_unknown_fields=true` enforces closed-schema behavior for mapped roles.
 
-## 9.11 compatibility schema
+## 9.11 dependencies schema
+
+Example:
+
+```yaml
+dependencies:
+  default_reltype: FINISHTOSTART
+  treat_missing_target_as_blocked: true
+  enforce_unique_uid: true
+```
+
+Rules:
+
+- `default_reltype` MUST be one of the allowed reltype values in §10.2.
+- `treat_missing_target_as_blocked` controls runtime blocked evaluation for unresolved targets.
+- `enforce_unique_uid=true` enforces uniqueness at validation/write time.
+
+## 9.12 reminders schema
+
+Example:
+
+```yaml
+reminders:
+  date_only_anchor_time: "00:00"
+  apply_defaults_when_explicit: false
+```
+
+Rules:
+
+- `date_only_anchor_time` MUST be `HH:MM` 24-hour local time format.
+- `date_only_anchor_time` is used by §10.3.4 for relative reminders against date-only bases.
+- `apply_defaults_when_explicit=false` means explicit input reminders replace default-reminder application at create time.
+
+## 9.13 compatibility schema
 
 Example:
 
@@ -154,10 +209,11 @@ Rules:
 - Compatibility flags MUST default to conservative behavior in new collections.
 - Enabled compatibility flags SHOULD be disclosed in conformance output (§7).
 
-## 9.12 Complete configuration example
+## 9.14 Complete configuration example
 
 ```yaml
 spec_version: 0.1.0-draft
+runtime_timezone: America/Los_Angeles
 
 mapping:
   title: title
@@ -173,6 +229,8 @@ mapping:
   complete_instances: completeInstances
   skipped_instances: skippedInstances
   time_entries: timeEntries
+  blocked_by: blockedBy
+  reminders: reminders
 
 task_detection:
   path_glob: tasks/**/*.md
@@ -181,6 +239,11 @@ defaults:
   status: open
   priority: normal
   recurrence_anchor: scheduled
+  reminders:
+    - id: due_minus_1d
+      type: relative
+      relatedTo: due
+      offset: -P1D
 
 status:
   values: [open, in-progress, done, cancelled]
@@ -191,12 +254,21 @@ validation:
   mode: strict
   reject_unknown_fields: false
 
+dependencies:
+  default_reltype: FINISHTOSTART
+  treat_missing_target_as_blocked: true
+  enforce_unique_uid: true
+
+reminders:
+  date_only_anchor_time: "00:00"
+  apply_defaults_when_explicit: false
+
 compatibility:
   read_aliases: true
   legacy_duration_field: true
 ```
 
-## 9.13 Configuration errors
+## 9.15 Configuration errors
 
 Configuration validation MUST report structured errors with key path context.
 
@@ -205,3 +277,5 @@ Examples:
 - missing `mapping.title`
 - `status.default` not present in `status.values`
 - unsupported `validation.mode`
+- invalid `dependencies.default_reltype`
+- invalid `reminders.date_only_anchor_time`

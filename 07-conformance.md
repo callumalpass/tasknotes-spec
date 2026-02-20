@@ -20,7 +20,7 @@ Required capabilities:
 
 - task identification and loading
 - semantic-role mapping and canonical writes (§2)
-- required role support (`title`, `status`, `date_created`, `date_modified`)
+- required role support (`title`, `status`, `completed_date`, `date_created`, `date_modified`)
 - create, update, delete operations (§5)
 - non-recurring complete/uncomplete (§5)
 - temporal parsing/canonical serialization basics (§3)
@@ -31,7 +31,7 @@ Required capabilities:
 Additional required capabilities:
 
 - RRULE-compatible recurrence parsing/validation
-- recurrence anchor semantics
+- recurrence anchor semantics, including seed precedence and completion-anchor progression
 - complete/uncomplete instance
 - skip/unskip instance
 - instance-list invariants and effective state resolution
@@ -39,14 +39,16 @@ Additional required capabilities:
 
 ### 7.3.3 Profile: `extended`
 
-Additional optional-domain capabilities (if supported by implementation):
+Additional required capabilities:
 
-- `blocked_by` semantics and validation
-- `reminders` semantics and validation
+- dependency schema support (`blocked_by`)
+- reminder schema support (`reminders`)
+- dependency operations and validation per §10.2
+- reminder operations and validation per §10.3
 - batch operations with structured per-item outcomes
-- reference-aware rename behavior
+- reference-aware rename behavior (including dependency UID references)
 
-If `extended` is claimed, all declared extended features MUST conform to documented semantics.
+If `extended` is claimed, all of the above MUST conform to documented semantics.
 
 ## 7.4 Conformance claim format
 
@@ -84,9 +86,11 @@ A deviation entry SHOULD include:
 Implementations SHOULD expose machine-readable capability metadata, including:
 
 - profiles
+- effective runtime timezone
 - enabled compatibility modes
 - configurable status sets
 - supported mapping aliases
+- dependency and reminder support flags
 
 ## 7.7 Strictness disclosure
 
@@ -102,8 +106,9 @@ If only permissive mode exists, documentation MUST state that strict write-time 
 | non-recurring complete | required | required | required |
 | recurring instance complete/skip | - | required | required |
 | RRULE validation | - | required | required |
-| reminders | - | - | optional/required if claimed |
-| dependencies | - | - | optional/required if claimed |
+| dependency schema and ops | - | - | required |
+| reminder schema and ops | - | - | required |
+| rename updates dependency UIDs | - | - | required |
 
 ## 7.9 Future test suite
 

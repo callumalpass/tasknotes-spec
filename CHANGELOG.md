@@ -14,3 +14,5 @@ Initial standalone draft of `tasknotes-spec` including:
 - conformance profiles
 - compatibility and migration policy
 - collection configuration schema (`tasknotes.yaml`)
+- full dependency (`blocked_by`) semantics
+- full reminder (`reminders`) semantics

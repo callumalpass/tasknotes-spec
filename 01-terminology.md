@@ -61,6 +61,7 @@ A **target date** is the calendar date to which a recurrence instance operation 
 ## 1.13 Recurrence rule
 
 A **recurrence rule** is an RFC 5545 RRULE-compatible string stored in the recurrence semantic role.
+It MAY include an explicit `DTSTART` prefix.
 
 ## 1.14 Recurrence anchor
 
@@ -81,9 +82,10 @@ A **recurrence rule** is an RFC 5545 RRULE-compatible string stored in the recur
 
 **Effective status** is the status presented for a given date context after applying recurrence instance state.
 
-## 1.18 Completed-status set
+## 1.18 Completed-status list
 
-The **completed-status set** is the configured set of status values treated as completed for non-recurring completion semantics.
+The **completed-status list** is the configured ordered list of status values treated as completed for non-recurring completion semantics.
+When a single value must be chosen deterministically, the first list entry is used unless explicit operation input overrides it.
 
 ## 1.19 Idempotent operation
 

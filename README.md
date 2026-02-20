@@ -16,6 +16,7 @@ The specification focuses on:
 - Task data model and field semantics
 - Date, datetime, and timezone rules
 - Recurrence and per-instance completion semantics
+- Dependencies and reminders semantics
 - Operation semantics and write side-effects
 - Validation and conformance expectations
 
@@ -43,6 +44,7 @@ This specification provides a precise contract so independent tools can make com
 | §7 | `07-conformance.md` | Conformance profiles and claims |
 | §8 | `08-compatibility-and-migrations.md` | Migration and compatibility policy |
 | §9 | `09-configuration.md` | `tasknotes.yaml` schema and collection configuration |
+| §10 | `10-dependencies-and-reminders.md` | Dependency and reminder semantics |
 | Changelog | `CHANGELOG.md` | Spec release history |
 
 ## Conformance model

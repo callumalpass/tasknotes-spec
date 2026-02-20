@@ -32,6 +32,7 @@ This specification defines a stable contract for:
 - Defining collection configuration (`tasknotes.yaml`).
 - Interpreting date and datetime values consistently.
 - Applying recurrence and per-instance completion/skip behavior.
+- Defining dependency and reminder behavior.
 - Executing write operations with predictable side-effects.
 - Validating task records and reporting issues.
 
@@ -57,7 +58,7 @@ Task state is represented in user-visible files. Derived indexes and caches are 
 
 ### 0.6.2 Deterministic semantics
 
-Equivalent inputs MUST produce equivalent persisted outputs under the same configuration.
+Equivalent inputs MUST produce equivalent persisted outputs under the same configuration and active runtime timezone.
 
 ### 0.6.3 Explicit mapping
 

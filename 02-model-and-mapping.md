@@ -18,10 +18,12 @@ Conforming implementations MUST support these semantic roles:
 |---|---|---|
 | `title` | string | yes |
 | `status` | string/enum | yes |
+| `completed_date` | date | support required (value required only for completed non-recurring tasks) |
 | `date_created` | datetime | yes |
 | `date_modified` | datetime | yes |
 
-If storage omits a required role, validation MUST report an error (see §6).
+If storage omits a role marked `yes`, validation MUST report an error (see §6).
+For operation-required roles, validation and operation rules in §5 and §6 apply.
 
 ## 2.3 Common semantic roles
 
@@ -32,7 +34,6 @@ Implementations conforming beyond minimal scope SHOULD support:
 | `priority` | string/enum | configurable values |
 | `due` | date or datetime | see §3 |
 | `scheduled` | date or datetime | see §3 |
-| `completed_date` | date | non-recurring completion |
 | `tags` | list<string> | free tags |
 | `contexts` | list<string> | commonly prefixed with `@` |
 | `projects` | list<link-or-string> | project references |
@@ -42,6 +43,8 @@ Implementations conforming beyond minimal scope SHOULD support:
 | `recurrence_anchor` | enum | `scheduled` or `completion` |
 | `complete_instances` | list<date> | recurring completion state |
 | `skipped_instances` | list<date> | recurring skip state |
+| `blocked_by` | list<object> | dependency records, see §10 |
+| `reminders` | list<object> | reminder records, see §10 |
 
 Optional extended roles are defined in §7 profiles.
 
@@ -87,6 +90,7 @@ Implementations SHOULD accept these aliases on read for interoperability:
 | `completed_date` | `completedDate` | `completed_date` |
 | `time_entries` | `timeEntries` | `time_entries` |
 | `time_estimate` | `timeEstimate` | `time_estimate` |
+| `blocked_by` | `blockedBy` | `blocked_by` |
 
 This table is compatibility guidance, not a requirement to choose camelCase or snake_case as canonical.
 
@@ -96,19 +100,43 @@ This table is compatibility guidance, not a requirement to choose camelCase or s
 
 `time_entries` items MUST be objects with:
 
-- `start_time` datetime (required)
-- `end_time` datetime (optional)
+- `startTime` datetime (required)
+- `endTime` datetime (optional)
 - `description` string (optional)
 
 An implementation MAY accept `duration` on read for backward compatibility, but canonical duration is derived from start/end.
+
+Nested key names in `time_entries` are fixed by this specification and are not independently configurable in `mapping`.
 
 ### 2.6.2 projects
 
 `projects` SHOULD be represented as links when link semantics are supported, but plain strings MAY be accepted.
 
+### 2.6.3 blocked_by
+
+`blocked_by` items MUST be objects with:
+
+- `uid` link-or-string task reference (required)
+- `reltype` enum (required; default allowed by §10 when omitted)
+- `gap` ISO 8601 duration string (optional)
+
+Detailed semantics are defined in §10.
+
+### 2.6.4 reminders
+
+`reminders` items MUST be objects with:
+
+- `id` string (required)
+- `type` enum `absolute|relative` (required)
+- relative-only fields: `relatedTo`, `offset`
+- absolute-only fields: `absoluteTime`
+- `description` string (optional)
+
+Detailed semantics are defined in §10.
+
 ## 2.7 Unknown fields
 
-Unknown frontmatter keys MUST be preserved by default during updates, complete/uncomplete, skip/unskip, and archive operations.
+Unknown frontmatter keys MUST be preserved by default during updates, complete/uncomplete, skip/unskip, dependency mutations, reminder mutations, and archive operations.
 
 Unknown fields MAY be removed only when:
 
@@ -132,6 +160,8 @@ mapping:
   skipped_instances: skippedInstances
   time_estimate: timeEstimate
   time_entries: timeEntries
+  blocked_by: blockedBy
+  reminders: reminders
 ```
 
 ## 2.9 Example task record
@@ -146,6 +176,18 @@ recurrence: FREQ=WEEKLY;BYDAY=FR
 recurrenceAnchor: scheduled
 completeInstances: [2026-02-13]
 skippedInstances: []
+blockedBy:
+  - uid: "[[prepare-metrics]]"
+    reltype: FINISHTOSTART
+    gap: P1D
+reminders:
+  - id: rem_day_before
+    type: relative
+    relatedTo: due
+    offset: -P1D
+  - id: rem_start
+    type: absolute
+    absoluteTime: 2026-02-20T09:00:00Z
 dateCreated: 2026-01-10T09:30:00Z
 dateModified: 2026-02-20T08:02:11Z
 ---

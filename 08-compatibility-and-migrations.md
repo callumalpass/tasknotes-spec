@@ -80,7 +80,30 @@ Recommended resolution policy:
 
 Policy choice MUST be documented.
 
-## 8.7 Divergence register
+## 8.7 Dependency migration
+
+When migrating legacy dependency data, implementations SHOULD:
+
+- normalize dependency key names to mapped canonical key,
+- ensure each entry has `uid` and canonical `reltype`,
+- normalize legacy string/path references into configured canonical reference style,
+- remove duplicate dependency entries by policy.
+
+If historical data omits `reltype`, migration MAY apply `dependencies.default_reltype` and SHOULD report count of inferred values.
+
+## 8.8 Reminder migration
+
+When migrating legacy reminder data, implementations SHOULD:
+
+- normalize reminder key names,
+- normalize `type` values to canonical enum (`absolute` or `relative`),
+- normalize `relatedTo` values to canonical enum (`due` or `scheduled`),
+- normalize `absoluteTime` to canonical UTC ISO `Z`,
+- validate and normalize offsets to ISO 8601 duration syntax.
+
+If reminder `id` values are missing, migration MAY generate IDs and MUST report generated count.
+
+## 8.9 Divergence register
 
 Implementations SHOULD maintain a divergence register with columns:
 
@@ -90,7 +113,7 @@ Implementations SHOULD maintain a divergence register with columns:
 - migration strategy
 - deprecation timeline
 
-## 8.8 Deprecation policy
+## 8.10 Deprecation policy
 
 For any behavior deprecated by the specification:
 
@@ -99,15 +122,17 @@ For any behavior deprecated by the specification:
 3. provide migration tooling where feasible,
 4. remove deprecated behavior only in a version aligned with compatibility commitments.
 
-## 8.9 Data safety requirements
+## 8.11 Data safety requirements
 
 Migrations MUST NOT:
 
 - silently drop unknown fields,
 - silently convert valid date-only fields to datetime,
-- silently rewrite recurrence semantics without explicit policy.
+- silently rewrite recurrence semantics without explicit policy,
+- silently drop unresolved dependency entries,
+- silently delete reminders unless explicitly requested.
 
-## 8.10 Suggested migration report format
+## 8.12 Suggested migration report format
 
 ```yaml
 spec_version_from: 0.1.0-draft
@@ -117,13 +142,16 @@ files_changed: 67
 warnings:
   alias_conflict_ignored: 3
   instance_state_overlap_resolved: 2
+  unresolved_dependency_target: 4
 changes:
   normalized_datetime_fields: 41
   alias_keys_removed: 29
   instance_overlaps_fixed: 2
+  inferred_dependency_reltype: 5
+  generated_reminder_ids: 8
 ```
 
-## 8.11 Compatibility statement example
+## 8.13 Compatibility statement example
 
 ```text
 Compatibility mode: legacy-aliases=true, legacy-timeentry-duration=true
