@@ -32,6 +32,7 @@ This specification defines a stable contract for:
 - Defining collection configuration (`tasknotes.yaml`).
 - Interpreting date and datetime values consistently.
 - Applying recurrence and per-instance completion/skip behavior.
+- Parsing and resolving links consistently across task fields.
 - Defining dependency and reminder behavior.
 - Executing write operations with predictable side-effects.
 - Validating task records and reporting issues.

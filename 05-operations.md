@@ -137,6 +137,7 @@ Dependency operations MUST follow §10.2.
 Add dependency MUST:
 
 - validate dependency entry schema,
+- parse and resolve `uid` per §11,
 - enforce duplicate and self-reference rules,
 - preserve existing non-target dependency entries,
 - update `date_modified` on change.
@@ -198,7 +199,7 @@ If implementation supports link/reference updating, it MUST:
 
 - update resolvable references deterministically,
 - report unresolved or ambiguous updates,
-- update dependency `uid` references consistently with normal links.
+- update dependency `uid` and `projects` references consistently with normal links.
 
 If implementation does not support reference updates, this limitation MUST be disclosed in conformance claim.
 

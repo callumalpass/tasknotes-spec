@@ -16,3 +16,4 @@ Initial standalone draft of `tasknotes-spec` including:
 - collection configuration schema (`tasknotes.yaml`)
 - full dependency (`blocked_by`) semantics
 - full reminder (`reminders`) semantics
+- explicit links chapter and link-resolution rules for projects/dependencies

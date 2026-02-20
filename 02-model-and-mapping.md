@@ -36,14 +36,14 @@ Implementations conforming beyond minimal scope SHOULD support:
 | `scheduled` | date or datetime | see §3 |
 | `tags` | list<string> | free tags |
 | `contexts` | list<string> | commonly prefixed with `@` |
-| `projects` | list<link-or-string> | project references |
+| `projects` | list<link-or-string> | project references, see §11 |
 | `time_estimate` | integer >= 0 | minutes |
 | `time_entries` | list<object> | see §2.6 |
 | `recurrence` | string | RRULE-compatible |
 | `recurrence_anchor` | enum | `scheduled` or `completion` |
 | `complete_instances` | list<date> | recurring completion state |
 | `skipped_instances` | list<date> | recurring skip state |
-| `blocked_by` | list<object> | dependency records, see §10 |
+| `blocked_by` | list<object> | dependency records, see §10 and §11 |
 | `reminders` | list<object> | reminder records, see §10 |
 
 Optional extended roles are defined in §7 profiles.
@@ -111,6 +111,7 @@ Nested key names in `time_entries` are fixed by this specification and are not i
 ### 2.6.2 projects
 
 `projects` SHOULD be represented as links when link semantics are supported, but plain strings MAY be accepted.
+When interpreted as links, parsing and resolution MUST follow §11.
 
 ### 2.6.3 blocked_by
 
@@ -120,7 +121,7 @@ Nested key names in `time_entries` are fixed by this specification and are not i
 - `reltype` enum (required; default allowed by §10 when omitted)
 - `gap` ISO 8601 duration string (optional)
 
-Detailed semantics are defined in §10.
+Detailed semantics are defined in §10. `uid` parsing and resolution MUST follow §11.
 
 ### 2.6.4 reminders
 

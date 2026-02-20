@@ -26,6 +26,7 @@ If `tasknotes.yaml` is missing, implementations MAY fall back to defaults in per
 | `defaults` | object | role defaults used during create |
 | `status` | object | status set and completed-value semantics |
 | `validation` | object | strict/permissive behavior |
+| `links` | object | link parsing/resolution behavior |
 | `dependencies` | object | dependency behavior policy |
 | `reminders` | object | reminder behavior policy |
 | `compatibility` | object | legacy alias/behavior switches |
@@ -169,6 +170,7 @@ dependencies:
   default_reltype: FINISHTOSTART
   treat_missing_target_as_blocked: true
   enforce_unique_uid: true
+  require_resolved_uid_on_write: false
 ```
 
 Rules:
@@ -176,8 +178,26 @@ Rules:
 - `default_reltype` MUST be one of the allowed reltype values in §10.2.
 - `treat_missing_target_as_blocked` controls runtime blocked evaluation for unresolved targets.
 - `enforce_unique_uid=true` enforces uniqueness at validation/write time.
+- `require_resolved_uid_on_write=true` requires dependency UID resolution success for add/update operations.
 
-## 9.12 reminders schema
+## 9.12 links schema
+
+Example:
+
+```yaml
+links:
+  extensions: [".md"]
+  unresolved_default_severity: warning
+  update_references_on_rename: true
+```
+
+Rules:
+
+- `extensions` defines extension trial order for extensionless targets.
+- `unresolved_default_severity` MUST be `warning` or `error`.
+- `update_references_on_rename=true` enables rename-time link rewrite behavior when supported.
+
+## 9.13 reminders schema
 
 Example:
 
@@ -193,7 +213,7 @@ Rules:
 - `date_only_anchor_time` is used by §10.3.4 for relative reminders against date-only bases.
 - `apply_defaults_when_explicit=false` means explicit input reminders replace default-reminder application at create time.
 
-## 9.13 compatibility schema
+## 9.14 compatibility schema
 
 Example:
 
@@ -209,7 +229,7 @@ Rules:
 - Compatibility flags MUST default to conservative behavior in new collections.
 - Enabled compatibility flags SHOULD be disclosed in conformance output (§7).
 
-## 9.14 Complete configuration example
+## 9.15 Complete configuration example
 
 ```yaml
 spec_version: 0.1.0-draft
@@ -258,6 +278,12 @@ dependencies:
   default_reltype: FINISHTOSTART
   treat_missing_target_as_blocked: true
   enforce_unique_uid: true
+  require_resolved_uid_on_write: false
+
+links:
+  extensions: [".md"]
+  unresolved_default_severity: warning
+  update_references_on_rename: true
 
 reminders:
   date_only_anchor_time: "00:00"
@@ -268,7 +294,7 @@ compatibility:
   legacy_duration_field: true
 ```
 
-## 9.15 Configuration errors
+## 9.16 Configuration errors
 
 Configuration validation MUST report structured errors with key path context.
 
@@ -278,4 +304,5 @@ Examples:
 - `status.default` not present in `status.values`
 - unsupported `validation.mode`
 - invalid `dependencies.default_reltype`
+- invalid `links.unresolved_default_severity`
 - invalid `reminders.date_only_anchor_time`

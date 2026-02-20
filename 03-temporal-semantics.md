@@ -63,6 +63,19 @@ Example:
 - input `2026-02-20T08:00:00-05:00`
 - canonical write `2026-02-20T13:00:00Z`
 
+### 3.5.3 Implementation guidance: UTC-anchor strategy (non-normative)
+
+Because date-only fields are human-readable (`YYYY-MM-DD`) while implementations often compute using datetime objects, a common strategy is to use a UTC-midnight anchor for date-only internals.
+
+Recommended approach:
+
+1. Parse date-only values to a UTC-midnight anchor instant for internal computations.
+2. Format date-only values from UTC calendar components when writing `YYYY-MM-DD`.
+3. Keep date-only roles as date-only on write unless an explicit conversion operation is requested.
+4. Evaluate user-facing day semantics (today, overdue, day grouping) using local calendar-day boundaries per §3.6.
+
+Implementations MAY use different internal representations as long as all normative requirements in this section are preserved.
+
 ## 3.6 Local calendar-day evaluation
 
 ### 3.6.1 Active runtime timezone
@@ -105,6 +118,7 @@ Implementations MUST:
 
 - preserve stored granularity unless explicit conversion is requested,
 - avoid silently converting date to datetime during unrelated writes,
+- require documented explicit policy for date-to-datetime conversion operations,
 - apply consistent coercion policy in filters and status calculations.
 
 ## 3.9 Completion date semantics
@@ -206,3 +220,25 @@ timeEntries:
   - startTime: 2026-02-20T08:30:00Z
     endTime: 2026-02-20T09:00:00Z
 ```
+
+## 3.16 Example: UTC-anchor roundtrip for date-only field
+
+Input:
+
+```yaml
+due: 2026-02-20
+```
+
+Internal computation anchor:
+
+```text
+2026-02-20T00:00:00Z
+```
+
+After unrelated update, conforming write:
+
+```yaml
+due: 2026-02-20
+```
+
+Non-conforming behavior would rewrite `due` as a datetime or shift it to another day based on local offset.

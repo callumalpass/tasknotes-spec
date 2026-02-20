@@ -27,6 +27,7 @@ If `reltype` is omitted on read in compatibility mode, implementations MAY treat
 Implementations SHOULD normalize `uid` values to a canonical reference representation on write.
 
 If link formats are supported, both wikilink and markdown-link forms MAY be read. Canonical write form MUST be documented.
+Link parsing and resolution MUST follow §11.
 
 ### 10.2.3 Dependency uniqueness
 
@@ -58,7 +59,7 @@ For v0.1, `reltype` and `gap` are preserved and validated but MUST NOT change th
 When `uid` cannot be resolved:
 
 - implementations SHOULD emit `unresolved_dependency_target` and treat dependency as unresolved.
-- strict mode MAY escalate this condition to error by configuration.
+- if `dependencies.require_resolved_uid_on_write=true`, add/update MUST fail with error.
 
 ### 10.2.7 Cycles
 

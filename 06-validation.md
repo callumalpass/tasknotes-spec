@@ -38,6 +38,7 @@ A conforming validator MUST implement checks required by the claimed profile(s):
 | 9 | `blocked_by` entries conform to §10.2 (shape, enum, duplicates, self-reference). | `extended` |
 | 10 | `reminders` entries conform to §10.3 (shape, type-specific fields, unique ids). | `extended` |
 | 11 | relative reminders have resolvable base fields or produce configured error/warning behavior. | `extended` |
+| 12 | link-bearing fields (`projects`, `blocked_by.uid`) conform to §11 parsing/resolution and traversal safety. | `extended` |
 
 ## 6.5 Unknown field policy
 
@@ -86,6 +87,10 @@ Issues SHOULD include:
 | `invalid_reminder_related_to` | error | relatedTo must be due or scheduled |
 | `invalid_reminder_absolute_time` | error | absoluteTime invalid datetime |
 | `unresolvable_reminder_base` | error | relative reminder base field missing/unusable |
+| `invalid_link_format` | error | link value cannot be parsed as supported format |
+| `ambiguous_link` | warning | link resolves to multiple candidates |
+| `path_traversal` | error | resolved path escapes collection root |
+| `unresolved_link_target` | warning | link target cannot be resolved |
 | `alias_conflict_ignored` | warning | alias key ignored due to canonical conflict |
 | `unknown_field` | info | unmapped field encountered |
 

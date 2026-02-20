@@ -43,6 +43,7 @@ Additional required capabilities:
 
 - dependency schema support (`blocked_by`)
 - reminder schema support (`reminders`)
+- link parsing/resolution semantics for link-bearing fields (§11)
 - dependency operations and validation per §10.2
 - reminder operations and validation per §10.3
 - batch operations with structured per-item outcomes
@@ -106,9 +107,10 @@ If only permissive mode exists, documentation MUST state that strict write-time 
 | non-recurring complete | required | required | required |
 | recurring instance complete/skip | - | required | required |
 | RRULE validation | - | required | required |
+| link parsing/resolution (§11) | - | - | required |
 | dependency schema and ops | - | - | required |
 | reminder schema and ops | - | - | required |
-| rename updates dependency UIDs | - | - | required |
+| rename updates dependency/project links | - | - | required |
 
 ## 7.9 Future test suite
 

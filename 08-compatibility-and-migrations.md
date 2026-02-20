@@ -103,7 +103,16 @@ When migrating legacy reminder data, implementations SHOULD:
 
 If reminder `id` values are missing, migration MAY generate IDs and MUST report generated count.
 
-## 8.9 Divergence register
+## 8.9 Link migration
+
+When migrating legacy link values, implementations SHOULD:
+
+- normalize supported link syntaxes according to §11 parsing rules,
+- preserve alias and anchor components where possible,
+- normalize resolved targets into canonical write format by policy,
+- detect and report ambiguous links instead of silently choosing non-deterministically.
+
+## 8.10 Divergence register
 
 Implementations SHOULD maintain a divergence register with columns:
 
@@ -113,7 +122,7 @@ Implementations SHOULD maintain a divergence register with columns:
 - migration strategy
 - deprecation timeline
 
-## 8.10 Deprecation policy
+## 8.11 Deprecation policy
 
 For any behavior deprecated by the specification:
 
@@ -122,7 +131,7 @@ For any behavior deprecated by the specification:
 3. provide migration tooling where feasible,
 4. remove deprecated behavior only in a version aligned with compatibility commitments.
 
-## 8.11 Data safety requirements
+## 8.12 Data safety requirements
 
 Migrations MUST NOT:
 
@@ -130,9 +139,10 @@ Migrations MUST NOT:
 - silently convert valid date-only fields to datetime,
 - silently rewrite recurrence semantics without explicit policy,
 - silently drop unresolved dependency entries,
+- silently rewrite link targets to different destinations without explicit policy,
 - silently delete reminders unless explicitly requested.
 
-## 8.12 Suggested migration report format
+## 8.13 Suggested migration report format
 
 ```yaml
 spec_version_from: 0.1.0-draft
@@ -149,9 +159,10 @@ changes:
   instance_overlaps_fixed: 2
   inferred_dependency_reltype: 5
   generated_reminder_ids: 8
+  normalized_link_targets: 14
 ```
 
-## 8.13 Compatibility statement example
+## 8.14 Compatibility statement example
 
 ```text
 Compatibility mode: legacy-aliases=true, legacy-timeentry-duration=true
