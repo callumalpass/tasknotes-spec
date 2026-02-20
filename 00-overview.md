@@ -1,0 +1,128 @@
+# 0. Overview
+
+## 0.1 Status and authority
+
+This document is part of `tasknotes-spec` version `0.1.0-draft`.
+
+This specification is normative for implementations that claim conformance.
+No single implementation is normative; implementations are expected to conform to the specification.
+
+## 0.2 Motivation
+
+TaskNotes-style systems store tasks as markdown files with YAML frontmatter. This model has practical advantages:
+
+- Task records are plain files that can be inspected and edited without proprietary tooling.
+- Data remains portable across environments.
+- Files are suitable for version control and collaboration workflows.
+
+As soon as more than one tool reads and writes the same task files, implicit assumptions become an interoperability risk. In practice, these risks appear in three areas:
+
+1. Field semantics and naming drift.
+2. Date and timezone interpretation differences.
+3. Recurring-task state transitions that are handled differently by different clients.
+
+When these rules are not explicit, users can get inconsistent results from equivalent operations. A shared specification reduces that risk by making behavior testable and versioned.
+
+## 0.3 Objectives
+
+This specification defines a stable contract for:
+
+- Representing task records in markdown frontmatter.
+- Mapping storage keys to canonical semantic roles.
+- Defining collection configuration (`tasknotes.yaml`).
+- Interpreting date and datetime values consistently.
+- Applying recurrence and per-instance completion/skip behavior.
+- Executing write operations with predictable side-effects.
+- Validating task records and reporting issues.
+
+## 0.4 Non-objectives
+
+This specification does not standardize:
+
+- UI layout, styling, command palettes, or interaction design.
+- Internal caching architecture or rendering pipelines.
+- Transport protocols (HTTP, IPC, etc.) except where they affect persisted task semantics.
+
+## 0.5 Scope
+
+This specification is standalone. It does not require conformance to any other specification.
+
+Implementations MAY internally reuse other libraries or specifications, but conformance claims under `tasknotes-spec` are evaluated only against this document.
+
+## 0.6 Design principles
+
+### 0.6.1 File-first persistence
+
+Task state is represented in user-visible files. Derived indexes and caches are non-canonical.
+
+### 0.6.2 Deterministic semantics
+
+Equivalent inputs MUST produce equivalent persisted outputs under the same configuration.
+
+### 0.6.3 Explicit mapping
+
+Semantic roles are canonical. Storage key names are configurable and therefore must be mapped explicitly.
+
+### 0.6.4 Backward evolution
+
+The specification supports migration from legacy keys and historical behaviors through explicit compatibility rules.
+
+## 0.7 Conformance
+
+Conformance is profile-based (see §7). A minimal implementation can conform to a narrow profile while remaining interoperable for core operations.
+
+## 0.8 Normative language
+
+The key words **MUST**, **MUST NOT**, **SHOULD**, **SHOULD NOT**, and **MAY** are to be interpreted as described in RFC 2119.
+
+## 0.9 Example collection
+
+A collection using this specification MAY look like:
+
+```text
+vault/
+├── tasks/
+│   ├── buy-groceries.md
+│   └── weekly-review.md
+├── projects/
+│   └── home.md
+└── tasknotes.yaml
+```
+
+Configuration semantics for `tasknotes.yaml` are defined in §9.
+
+A task file example:
+
+```markdown
+---
+title: Buy groceries
+status: open
+priority: normal
+due: 2026-02-21
+tags: [errands]
+contexts: ["@town"]
+dateCreated: 2026-02-20T11:15:00Z
+dateModified: 2026-02-20T11:15:00Z
+---
+
+Buy fruit and cleaning supplies.
+```
+
+## 0.10 Versioning policy
+
+This specification uses semantic versioning.
+
+- A **major** version introduces breaking semantic changes.
+- A **minor** version introduces additive behavior or optional features.
+- A **patch** version clarifies wording or fixes non-breaking defects.
+
+Implementations MUST reject unsupported major versions when strict mode is enabled.
+
+## 0.11 Change governance
+
+Specification changes SHOULD be accompanied by:
+
+- a motivation statement,
+- precise normative edits,
+- migration notes when behavior changes,
+- updated examples.
