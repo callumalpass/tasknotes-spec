@@ -111,3 +111,32 @@ A **validation issue** is a structured report containing at least:
 ## 1.23 Legacy compatibility mode
 
 **Legacy compatibility mode** is a mode where specific historical behaviors or aliases are accepted for migration but are not canonical for new writes.
+
+## 1.24 Configuration provider
+
+A **configuration provider** is an adapter that loads configuration from a source (for example `tasknotes.yaml` or `.obsidian/plugins/tasknotes/data.json`) and normalizes it to the schema in §9.
+
+## 1.25 Effective configuration
+
+The **effective configuration** is the final resolved configuration after applying provider precedence and fallback rules.
+
+## 1.26 Template file
+
+A **template file** is a markdown document used at create time to generate frontmatter and/or body content through variable expansion.
+When templating is enabled, template behavior is defined by §5.3.5 and §9.14.
+
+## 1.27 Template expansion
+
+**Template expansion** is deterministic replacement of template variables with create-time task data and runtime date/time values, followed by template merge rules.
+
+## 1.28 Time entry
+
+A **time entry** is a structured record in `time_entries` containing `startTime`, optional `endTime`, and optional `description`.
+
+## 1.29 Active time entry
+
+An **active time entry** is a time entry with `startTime` present and `endTime` absent.
+
+## 1.30 Time tracking management
+
+**Time tracking management** is the set of operations that start, stop, edit, and remove `time_entries`, including completion-triggered auto-stop behavior when configured.

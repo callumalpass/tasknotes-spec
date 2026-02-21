@@ -15,7 +15,18 @@ If `recurrence` is absent or empty, the task is non-recurring.
 ### 4.3.1 Required format
 
 `recurrence` MUST be an RFC 5545 RRULE-compatible string.
-It MAY include a `DTSTART` prefix.
+It MAY include a leading `DTSTART` segment.
+
+If `DTSTART` is present, it MUST use one of:
+
+- `DTSTART:YYYYMMDD` (date-only)
+- `DTSTART:YYYYMMDDTHHMMSSZ` (UTC datetime)
+
+Canonical combined form is:
+
+- `DTSTART:...;FREQ=...`
+
+Implementations MAY accept inbound `RRULE:` prefixes for compatibility, but canonical writes SHOULD use the combined form above.
 
 Examples:
 
@@ -52,6 +63,15 @@ If no seed can be resolved, recurrence materialization MUST fail deterministical
 For `recurrence_anchor=scheduled`, progression is based on the scheduled chain and `DTSTART` MUST remain fixed after it is set.
 
 For `recurrence_anchor=completion`, complete-instance operations MUST advance progression by updating `DTSTART` to the completion target date.
+
+### 4.4.3 `DTSTART` update semantics
+
+When `recurrence_anchor=completion` and instance completion for target day `D` succeeds:
+
+1. If recurrence uses date-only progression, `DTSTART` MUST be rewritten as `DTSTART:YYYYMMDD` for `D`.
+2. If recurrence uses datetime progression and operation target includes time, `DTSTART` MUST be rewritten as `DTSTART:YYYYMMDDTHHMMSSZ`.
+3. RRULE components other than `DTSTART` MUST be preserved unless an explicit recurrence-edit operation changes them.
+4. If `DTSTART` is absent, completion-anchor progression MUST insert it before RRULE parameters.
 
 ## 4.5 Instance state fields
 
@@ -136,6 +156,7 @@ For recurring tasks:
 
 - Base `status` is task-level metadata and MUST NOT be forcibly rewritten to a completed status on instance completion unless explicitly configured.
 - Instance state determines completion for recurrence-aware views and operations.
+- Dependency blocked/unblocked evaluation for v0.1 follows §10.2.5 and is not recurrence-instance-aware unless explicitly extended by implementation policy.
 
 For non-recurring tasks, completion uses base status semantics (§5).
 

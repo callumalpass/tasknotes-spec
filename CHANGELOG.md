@@ -13,7 +13,9 @@ Initial standalone draft of `tasknotes-spec` including:
 - validation model
 - conformance profiles
 - compatibility and migration policy
-- collection configuration schema (`tasknotes.yaml`)
+- collection configuration schema and provider model (`tasknotes.yaml`, TaskNotes `data.json`)
 - full dependency (`blocked_by`) semantics
 - full reminder (`reminders`) semantics
+- explicit time-tracking management semantics (`time_entries` lifecycle, start/stop/edit/remove, and completion-triggered auto-stop configuration)
 - explicit links chapter and link-resolution rules for projects/dependencies
+- optional `templating` conformance profile with create-time template expansion/merge semantics

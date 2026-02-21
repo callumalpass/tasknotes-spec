@@ -51,6 +51,7 @@ For v0.1, blocking evaluation MUST be status-presence based:
 1. A task is blocked if it has at least one unresolved dependency.
 2. A dependency is unresolved when the referenced task is missing or not in a completed status.
 3. Completed status MUST be determined from configured `status.completed_values`.
+4. For recurring referenced tasks in v0.1, unresolved/resolved evaluation MUST use base `status` only; `complete_instances`/`skipped_instances` are not consulted.
 
 For v0.1, `reltype` and `gap` are preserved and validated but MUST NOT change the unresolved/resolved decision.
 
@@ -59,6 +60,7 @@ For v0.1, `reltype` and `gap` are preserved and validated but MUST NOT change th
 When `uid` cannot be resolved:
 
 - implementations SHOULD emit `unresolved_dependency_target` and treat dependency as unresolved.
+- issue severity SHOULD follow `dependencies.unresolved_target_severity` (default: `warning`).
 - if `dependencies.require_resolved_uid_on_write=true`, add/update MUST fail with error.
 
 ### 10.2.7 Cycles

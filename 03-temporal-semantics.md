@@ -125,7 +125,10 @@ Implementations MUST:
 
 `completed_date` is a date role.
 
-For non-recurring completion, writers MUST set `completed_date` to the effective target day used by operation semantics (see §5).
+For non-recurring completion, writers MUST set `completed_date` using §5 semantics:
+
+- explicit completion-day input when provided,
+- otherwise current local day in active runtime timezone.
 
 ## 3.10 Created/modified timestamps
 
@@ -150,6 +153,21 @@ If both times exist, `endTime` MUST be greater than or equal to `startTime`.
 ### 3.11.3 Duration handling
 
 If duration is present, implementations SHOULD treat it as derived and MAY rewrite or remove stale duration values during normalization.
+
+### 3.11.4 Active session semantics
+
+An entry with `startTime` and no `endTime` represents an active/running session.
+
+Implementations that support time-tracking management operations (§5.19) MUST enforce at most one active session per task at commit time.
+
+### 3.11.5 Derived time calculations
+
+For interoperability, implementations SHOULD expose both derived views when reporting tracked time:
+
+- `closed_minutes`: sum of entries where both `startTime` and `endTime` exist.
+- `live_minutes`: `closed_minutes` plus elapsed minutes of active entries (if any).
+
+Implementations MUST document which derived view is used by each reporting surface (for example task cards, stats, APIs).
 
 ## 3.12 reminder temporal semantics
 

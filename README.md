@@ -15,9 +15,11 @@ The specification focuses on:
 
 - Task data model and field semantics
 - Date, datetime, and timezone rules
+- Time tracking entry and session-management semantics
 - Recurrence and per-instance completion semantics
 - Link parsing and resolution semantics
 - Dependencies and reminders semantics
+- Optional create-time templating semantics
 - Operation semantics and write side-effects
 - Validation and conformance expectations
 
@@ -44,7 +46,7 @@ This specification provides a precise contract so independent tools can make com
 | §6 | `06-validation.md` | Validation rules and issue model |
 | §7 | `07-conformance.md` | Conformance profiles and claims |
 | §8 | `08-compatibility-and-migrations.md` | Migration and compatibility policy |
-| §9 | `09-configuration.md` | `tasknotes.yaml` schema and collection configuration |
+| §9 | `09-configuration.md` | effective configuration schema and provider model (`tasknotes.yaml`, TaskNotes `data.json`, etc.) |
 | §10 | `10-dependencies-and-reminders.md` | Dependency and reminder semantics |
 | §11 | `11-links.md` | Link syntax, parsing, resolution, and rename update behavior |
 | Changelog | `CHANGELOG.md` | Spec release history |
@@ -56,6 +58,14 @@ Implementations claim conformance to one or more profiles defined in §7. A conf
 - specification version
 - profile name(s)
 - known deviations
+
+## Executable conformance
+
+This repository ships a reusable fixture-based conformance suite in `conformance/`.
+
+- generate fixtures: `npm run conformance:generate`
+- run suite: `TASKNOTES_ADAPTER=<adapter-path> npm run conformance:test`
+- run against `../mdbase-tasknotes`: `npm run conformance:test:mdbase-tasknotes`
 
 ## Versioning
 

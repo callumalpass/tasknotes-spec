@@ -24,7 +24,8 @@ Required capabilities:
 - create, update, delete operations (§5)
 - non-recurring complete/uncomplete (§5)
 - temporal parsing/canonical serialization basics (§3)
-- validation core checks (§6.4 items 1,2,3,6)
+- strict validation mode support (§6.3)
+- validation core checks (§6.4 items 1,1a,1b,2,3,6)
 
 ### 7.3.2 Profile: `recurrence`
 
@@ -37,12 +38,26 @@ Additional required capabilities:
 - instance-list invariants and effective state resolution
 - validation checks for recurrence and instance overlap
 
-### 7.3.3 Profile: `extended`
+### 7.3.3 Profile: `templating` (non-cumulative extension)
+
+This profile is not cumulative; it MAY be claimed alongside `core-lite`, `recurrence`, and/or `extended`.
+`templating` MUST NOT be claimed alone.
+
+Required capabilities:
+
+- create-time template processing semantics per §5.3.5
+- `templating` configuration support per §9.14
+- deterministic template/frontmatter/body merge behavior
+- deterministic failure-mode behavior for template read/parse failures
+- support for portable double-brace template variables defined in §5.3.5
+
+### 7.3.4 Profile: `extended`
 
 Additional required capabilities:
 
 - dependency schema support (`blocked_by`)
 - reminder schema support (`reminders`)
+- time-tracking management semantics for `time_entries` (§5.19), including per-task active-session constraints
 - link parsing/resolution semantics for link-bearing fields (§11)
 - dependency operations and validation per §10.2
 - reminder operations and validation per §10.3
@@ -58,17 +73,22 @@ A conformance claim MUST include:
 - implementation name and version,
 - `tasknotes-spec` version,
 - claimed profile list,
+- validation mode support (`strict` required; `permissive` optional),
 - known deviations,
-- compatibility mode status (if any).
+- compatibility mode status (if any),
+- configuration provider status (active provider chain, precedence policy, and fallback state).
 
 Example:
 
 ```text
 Implementation: example-task-cli v1.4.0
 Spec: tasknotes-spec 0.1.0-draft
-Profiles: core-lite, recurrence
+Profiles: core-lite, recurrence, templating
+Validation modes: strict, permissive
 Known deviations: none
 Compatibility mode: disabled
+Configuration providers: tasknotes_plugin_data_json > built_in_defaults
+Configuration fallback: none
 ```
 
 ## 7.5 Deviation disclosure
@@ -88,33 +108,42 @@ Implementations SHOULD expose machine-readable capability metadata, including:
 
 - profiles
 - effective runtime timezone
+- active configuration providers and precedence chain
 - enabled compatibility modes
 - configurable status sets
 - supported mapping aliases
+- templating support flags and effective templating failure mode
 - dependency and reminder support flags
+- time-tracking support flags, including active-session policy and auto-stop-on-complete behavior
 
 ## 7.7 Strictness disclosure
 
-Conformance claims MUST indicate validation mode support (`strict`, `permissive`, or both).
+Conformance requires `strict` validation mode support (§6.3).
 
-If only permissive mode exists, documentation MUST state that strict write-time error blocking is unavailable.
+Conformance claims MUST indicate whether `permissive` mode is also supported.
 
 ## 7.8 Example profile matrix
 
-| Capability | core-lite | recurrence | extended |
-|---|---:|---:|---:|
-| create/update/delete | required | required | required |
-| non-recurring complete | required | required | required |
-| recurring instance complete/skip | - | required | required |
-| RRULE validation | - | required | required |
-| link parsing/resolution (§11) | - | - | required |
-| dependency schema and ops | - | - | required |
-| reminder schema and ops | - | - | required |
-| rename updates dependency/project links | - | - | required |
+| Capability | core-lite | recurrence | templating | extended |
+|---|---:|---:|---:|---:|
+| create/update/delete | required | required | companion-profile required | required |
+| non-recurring complete | required | required | companion-profile required | required |
+| recurring instance complete/skip | - | required | optional | required |
+| template expansion/merge (§5.3.5) | - | - | required | optional |
+| double-brace portable variable support | - | - | required | optional |
+| RRULE validation | - | required | optional | required |
+| link parsing/resolution (§11) | - | - | optional | required |
+| dependency schema and ops | - | - | optional | required |
+| reminder schema and ops | - | - | optional | required |
+| time tracking start/stop/edit semantics (§5.19) | - | - | optional | required |
+| rename updates dependency/project links | - | - | optional | required |
 
-## 7.9 Future test suite
+## 7.9 Executable fixture suite
 
-This specification is written so conformance can be verified via executable fixtures.
+This specification includes an executable fixture suite in `conformance/`.
 
-A formal fixture format is intentionally deferred to a later version.
-Until then, conformance claims SHOULD provide reproducible sample cases for each claimed profile.
+- language-neutral fixtures are stored in `conformance/fixtures/*.json`
+- section/profile/operation coverage is tracked in `conformance/manifest.json`
+- adapters execute fixture operations per `conformance/docs/ADAPTER_CONTRACT.md`
+
+Conformance claims SHOULD report fixture pass/fail results against the claimed profiles.

@@ -29,11 +29,13 @@ This specification defines a stable contract for:
 
 - Representing task records in markdown frontmatter.
 - Mapping storage keys to canonical semantic roles.
-- Defining collection configuration (`tasknotes.yaml`).
+- Defining effective collection configuration via provider model (for example `tasknotes.yaml` and/or TaskNotes `data.json`).
 - Interpreting date and datetime values consistently.
 - Applying recurrence and per-instance completion/skip behavior.
+- Managing time tracking sessions and `time_entries` lifecycle behavior.
 - Parsing and resolving links consistently across task fields.
 - Defining dependency and reminder behavior.
+- Optionally applying deterministic create-time templating behavior.
 - Executing write operations with predictable side-effects.
 - Validating task records and reporting issues.
 
@@ -44,12 +46,14 @@ This specification does not standardize:
 - UI layout, styling, command palettes, or interaction design.
 - Internal caching architecture or rendering pipelines.
 - Transport protocols (HTTP, IPC, etc.) except where they affect persisted task semantics.
+- Rich template-language features beyond the portable create-time templating contract in §5/§7/§9.
 
 ## 0.5 Scope
 
 This specification is standalone. It does not require conformance to any other specification.
 
 Implementations MAY internally reuse other libraries or specifications, but conformance claims under `tasknotes-spec` are evaluated only against this document.
+Templating is optional and profile-gated; implementations that do not claim the templating profile remain conformant without template support.
 
 ## 0.6 Design principles
 
@@ -86,12 +90,17 @@ vault/
 ├── tasks/
 │   ├── buy-groceries.md
 │   └── weekly-review.md
+├── .obsidian/
+│   └── plugins/
+│       └── tasknotes/
+│           └── data.json
 ├── projects/
 │   └── home.md
 └── tasknotes.yaml
 ```
 
-Configuration semantics for `tasknotes.yaml` are defined in §9.
+Configuration provider semantics and effective configuration rules are defined in §9.
+An implementation MAY use either provider, both, or additional providers, based on its documented precedence policy.
 
 A task file example:
 
@@ -102,7 +111,7 @@ status: open
 priority: normal
 due: 2026-02-21
 tags: [errands]
-contexts: ["@town"]
+contexts: ["town"]
 dateCreated: 2026-02-20T11:15:00Z
 dateModified: 2026-02-20T11:15:00Z
 ---

@@ -14,9 +14,12 @@ Implementations SHOULD validate in these phases:
 
 ## 6.3 Validation modes
 
-Implementations MUST support at least one of:
+Conforming implementations MUST support:
 
 - `strict`: errors block writes.
+
+Implementations MAY additionally support:
+
 - `permissive`: writes may continue with warnings.
 
 Current mode MUST be discoverable.
@@ -27,18 +30,22 @@ A conforming validator MUST implement checks required by the claimed profile(s):
 
 | Check ID | Requirement | Required for |
 |---|---|---|
-| 1 | Required semantic roles are present. | `core-lite` and above |
+| 1 | Unconditionally required semantic roles are present (`status`, `date_created`, `date_modified`). | `core-lite` and above |
+| 1a | `completed_date` conditional requiredness is enforced per §2.2.1. | `core-lite` and above |
+| 1b | `title` resolves via title policy (§2.2.2 and §9.13): frontmatter-first, basename fallback. | `core-lite` and above |
 | 2 | Field values match role type requirements. | `core-lite` and above |
 | 3 | Temporal values conform to §3. | `core-lite` and above |
 | 4 | Recurrence values conform to §4 (including anchor-seed resolution rules). | `recurrence` and above |
 | 5 | Per-instance lists contain valid dates with no overlap. | `recurrence` and above |
 | 6 | `date_modified` is not earlier than `date_created` when both exist. | `core-lite` and above |
 | 7 | `time_estimate` is non-negative when present. | any profile that supports `time_estimate` |
-| 8 | `time_entries` ranges are valid when `endTime` exists. | any profile that supports `time_entries` |
+| 8 | `time_entries` entries include required `startTime`, ranges are valid when `endTime` exists, and at most one active entry exists per task. | any profile that supports `time_entries` |
 | 9 | `blocked_by` entries conform to §10.2 (shape, enum, duplicates, self-reference). | `extended` |
 | 10 | `reminders` entries conform to §10.3 (shape, type-specific fields, unique ids). | `extended` |
 | 11 | relative reminders have resolvable base fields or produce configured error/warning behavior. | `extended` |
 | 12 | link-bearing fields (`projects`, `blocked_by.uid`) conform to §11 parsing/resolution and traversal safety. | `extended` |
+| 13 | templating configuration is valid when provided (`templating` schema and enums). | `templating` |
+| 14 | create-time template failures obey configured failure mode (`error` vs fallback). | `templating` |
 
 ## 6.5 Unknown field policy
 
@@ -74,6 +81,8 @@ Issues SHOULD include:
 | `invalid_recurrence_anchor` | error | anchor not allowed |
 | `instance_state_overlap` | error | same date in complete and skipped lists |
 | `invalid_time_range` | error | end before start in time entry |
+| `missing_time_entry_start` | error | time entry is missing required startTime |
+| `multiple_active_time_entries` | error | more than one active time entry exists in one task |
 | `invalid_dependency_entry` | error | dependency object missing required fields |
 | `invalid_dependency_reltype` | error | dependency reltype not allowed |
 | `invalid_dependency_gap` | error | dependency gap not valid ISO 8601 duration |
@@ -92,6 +101,10 @@ Issues SHOULD include:
 | `path_traversal` | error | resolved path escapes collection root |
 | `unresolved_link_target` | warning | link target cannot be resolved |
 | `alias_conflict_ignored` | warning | alias key ignored due to canonical conflict |
+| `unresolvable_title` | error | title cannot be resolved from title resolution policy |
+| `title_source_conflict` | warning | mapped title and filename title differ; mapped title used |
+| `template_missing` | warning | configured template file cannot be read/found |
+| `template_parse_failed` | warning | template frontmatter/body parsing or expansion failed |
 | `unknown_field` | info | unmapped field encountered |
 
 Implementations MAY extend this code set but SHOULD preserve existing meanings.
@@ -109,7 +122,9 @@ Warnings SHOULD NOT block writes unless explicitly configured.
 Input:
 
 ```yaml
+title: Plan workshop
 status: open
+dateCreated: 2026-02-20T09:00:00Z
 ```
 
 Issue:
@@ -117,8 +132,8 @@ Issue:
 ```yaml
 code: missing_required
 severity: error
-field: title
-message: Required field 'title' is missing.
+field: dateModified
+message: Required field 'dateModified' is missing.
 ```
 
 ### 6.9.2 Invalid recurrence anchor
@@ -213,4 +228,23 @@ code: unknown_field
 severity: info
 field: vendorPriority
 message: field is not mapped to a known semantic role.
+```
+
+### 6.9.7 Multiple active time entries
+
+Input:
+
+```yaml
+timeEntries:
+  - startTime: 2026-02-20T10:00:00Z
+  - startTime: 2026-02-20T11:00:00Z
+```
+
+Issue:
+
+```yaml
+code: multiple_active_time_entries
+severity: error
+field: timeEntries
+message: task contains more than one active time entry.
 ```

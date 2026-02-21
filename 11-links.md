@@ -84,14 +84,15 @@ For simple wikilink names:
 
 1. Determine scope.
    - for `blocked_by.uid`, scope MUST be task files identified by `task_detection`.
-   - for `projects`, scope defaults to entire collection unless implementation-specific narrowing is configured.
-2. Attempt ID match pass (if implementation exposes ID field semantics).
-3. If no ID match, attempt filename match on markdown files.
-4. If multiple candidates, apply deterministic tie-breakers:
+   - for `projects`, scope MUST default to all markdown files in collection unless narrowed by explicit configuration.
+2. Attempt resolver pass using the implementation's normal link resolver with `sourcePath` context (for example, Obsidian-style `getFirstLinkpathDest(name, sourcePath)` behavior).
+3. If unresolved, try extension candidates in configured `links.extensions` order (§9.12), including `.md` by default.
+4. If implementation has ID semantics, it MAY run an ID match pass before filename tie-breakers.
+5. If multiple candidates remain, apply deterministic tie-breakers:
    - same directory as source,
    - shortest path,
    - lexicographically smallest path.
-5. If still ambiguous, return unresolved and emit `ambiguous_link`.
+6. If still ambiguous after tie-breakers, return unresolved and emit `ambiguous_link`.
 
 ### 11.4.4 Extension handling
 

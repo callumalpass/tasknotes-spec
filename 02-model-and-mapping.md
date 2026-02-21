@@ -16,14 +16,36 @@ Conforming implementations MUST support these semantic roles:
 
 | Semantic role | Type | Required |
 |---|---|---|
-| `title` | string | yes |
+| `title` | string | support required (value required via configured title source, see §2.2.2) |
 | `status` | string/enum | yes |
-| `completed_date` | date | support required (value required only for completed non-recurring tasks) |
+| `completed_date` | date | support required (conditionally required, see §2.2.1) |
 | `date_created` | datetime | yes |
 | `date_modified` | datetime | yes |
 
 If storage omits a role marked `yes`, validation MUST report an error (see §6).
 For operation-required roles, validation and operation rules in §5 and §6 apply.
+
+### 2.2.1 Conditional requiredness (`completed_date`)
+
+`completed_date` support is mandatory, but presence is conditional:
+
+- For non-recurring tasks with `status` in configured `status.completed_values`, `completed_date` MUST be present.
+- For non-recurring tasks with non-completed status, `completed_date` MAY be absent.
+- For recurring tasks, `completed_date` is not required by recurrence completion semantics and MAY be absent.
+
+Validators MUST apply this conditional rule and MUST NOT treat `completed_date` as unconditionally required.
+
+### 2.2.2 Conditional requiredness (`title`)
+
+Semantic `title` is always required, with deterministic read resolution and storage-mode-dependent write behavior:
+
+- Readers MUST resolve semantic title using this order:
+  1. mapped `title` key when present and non-empty;
+  2. file basename fallback.
+- If both mapped `title` and filename-derived title exist and differ, mapped `title` value MUST win and implementations SHOULD emit `title_source_conflict`.
+- Title storage mode controls canonical writes (§9.13): `frontmatter` favors mapped-key writes; `filename` favors filename-derived title with rename-on-title-change behavior.
+
+Validators MUST enforce semantic title presence using title resolution policy (§9.13), not frontmatter key presence alone.
 
 ## 2.3 Common semantic roles
 
@@ -62,11 +84,8 @@ Readers MUST:
 1. Read the canonical mapped key if present.
 2. Support configured aliases where enabled.
 3. Resolve conflicts deterministically when canonical and alias keys coexist.
-
-Conflict resolution policy MUST be documented. Recommended policy:
-
-- canonical key wins,
-- alias key ignored with warning.
+4. When canonical and alias keys both exist for the same semantic role, canonical key value MUST win.
+5. When canonical key wins over alias, validator/loader SHOULD emit warning `alias_conflict_ignored`.
 
 ### 2.4.3 Write behavior
 
@@ -104,7 +123,11 @@ This table is compatibility guidance, not a requirement to choose camelCase or s
 - `endTime` datetime (optional)
 - `description` string (optional)
 
-An implementation MAY accept `duration` on read for backward compatibility, but canonical duration is derived from start/end.
+Additional constraints:
+
+- a task MUST NOT contain more than one active time entry (entry with `startTime` and no `endTime`) at commit time.
+- an entry with missing `endTime` is interpreted as an active/running session.
+- an implementation MAY accept `duration` on read for backward compatibility, but canonical duration is derived from start/end and SHOULD NOT be persisted on canonical writes.
 
 Nested key names in `time_entries` are fixed by this specification and are not independently configurable in `mapping`.
 
