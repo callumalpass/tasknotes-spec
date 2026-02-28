@@ -1,5 +1,36 @@
 # 0. Overview
 
+## 0.0 About tasknotes
+
+**TaskNotes** is an [Obsidian](https://obsidian.md) plugin that stores tasks as individual markdown files with YAML frontmatter in a user's vault. Each task is a first-class file: readable and editable with any text editor, version-controllable, and searchable without special tooling.
+
+A minimal task file looks like this:
+
+```markdown
+---
+title: Buy groceries
+status: open
+priority: normal
+due: 2026-02-21
+tags: [task]
+dateCreated: 2026-02-20T11:15:00Z
+dateModified: 2026-02-20T11:15:00Z
+---
+
+Buy fruit and cleaning supplies.
+```
+
+Tasks are identified within the vault by a configurable detection method — by default, by the presence of a specific tag (e.g. `#task` in body or frontmatter). The plugin stores its configuration in `.obsidian/plugins/tasknotes/data.json` within the vault root.
+
+**This specification** was derived from the behavior of the tasknotes plugin and is intended to serve as a stable, testable contract for:
+
+- CLI tools and scripts that process task files outside Obsidian,
+- any application that wants to interoperate with a tasknotes vault.
+
+The spec is deliberately language-agnostic. It does not require any particular runtime, and the executable conformance suite (in `conformance/`) can be driven by an adapter written in any language.
+
+The tasknotes plugin is the primary reference for how this spec was derived, but **the specification is normative** — where the spec and the plugin behavior differ, the spec defines the intended behavior. Known deviations are disclosed via conformance claims (§7.5).
+
 ## 0.1 Status and authority
 
 This document is part of `tasknotes-spec` version `0.1.0-draft`.
@@ -83,26 +114,27 @@ The key words **MUST**, **MUST NOT**, **SHOULD**, **SHOULD NOT**, and **MAY** ar
 
 ## 0.9 Example collection
 
-A collection using this specification MAY look like:
+A default tasknotes vault looks like this:
 
 ```text
-vault/
-├── tasks/
-│   ├── buy-groceries.md
-│   └── weekly-review.md
+MyVault/
+├── TaskNotes/
+│   ├── Tasks/
+│   │   ├── 260220abc1.md       ← task file (zettel filename by default)
+│   │   └── 260220abc2.md
+│   └── Archive/                ← archive folder (if moveArchivedTasks=true)
 ├── .obsidian/
 │   └── plugins/
 │       └── tasknotes/
-│           └── data.json
-├── projects/
-│   └── home.md
-└── tasknotes.yaml
+│           └── data.json       ← plugin settings (primary config provider)
+└── tasknotes.yaml              ← optional spec-level config (secondary provider)
 ```
 
-Configuration provider semantics and effective configuration rules are defined in §9.
-An implementation MAY use either provider, both, or additional providers, based on its documented precedence policy.
+Task files are identified by the `#task` tag by default (configurable). The full default collection state is described in §9.20.
 
-A task file example:
+Configuration provider semantics and effective configuration rules are defined in §9. An implementation MAY use either provider, both, or additional providers, based on its documented precedence policy.
+
+A task file example (using default field mapping):
 
 ```markdown
 ---
@@ -110,7 +142,7 @@ title: Buy groceries
 status: open
 priority: normal
 due: 2026-02-21
-tags: [errands]
+tags: [task, errands]
 contexts: ["town"]
 dateCreated: 2026-02-20T11:15:00Z
 dateModified: 2026-02-20T11:15:00Z

@@ -51,26 +51,76 @@ If permissive mode is implemented, then in permissive mode:
 - implementations MUST emit configuration warnings,
 - implementations MUST disclose that effective configuration is partial/default-derived.
 
-### 9.2.4 TaskNotes plugin provider mapping (`data.json`)
+### 9.2.4 TaskNotes plugin provider (`data.json`)
 
-When using `.obsidian/plugins/tasknotes/data.json` (relative to collection/vault root) as a provider, normalization SHOULD map:
+The TaskNotes plugin stores settings in `.obsidian/plugins/tasknotes/data.json` within the vault root. When using this file as a configuration provider, normalization MUST apply the field mapping in the table below.
 
-- `fieldMapping` -> `mapping` for all supported semantic roles (role-name normalization required; e.g. `dateCreated` -> `date_created`, `completedDate` -> `completed_date`, `blockedBy` -> `blocked_by`),
-- `storeTitleInFilename` -> `title.storage` (`true` => `filename`, `false` => `frontmatter`),
-- `taskFilenameFormat` -> `title.filename_format`,
-- `customFilenameTemplate` -> `title.custom_filename_template`,
-- `taskCreationDefaults.useBodyTemplate` -> `templating.enabled`,
-- `taskCreationDefaults.bodyTemplate` -> `templating.template_path`,
-- `customStatuses[].value` -> `status.values`,
-- `defaultTaskStatus` -> `status.default`,
-- `customStatuses[isCompleted=true].value` -> `status.completed_values`,
-- `defaultTaskStatus` -> `defaults.status`,
-- `defaultTaskPriority` -> `defaults.priority`,
-- `autoStopTimeTrackingOnComplete` -> `time_tracking.auto_stop_on_complete`,
-- `autoStopTimeTrackingNotification` -> `time_tracking.auto_stop_notification`,
-- `taskIdentificationMethod` + related keys -> `task_detection` (for example tag/property-based detection).
+**Key mapping table** (`data.json` key → spec effective config):
 
-Provider keys with no equivalent in this specification MAY be ignored by `tasknotes-spec` consumers.
+| `data.json` key | Spec key | Notes |
+|---|---|---|
+| `fieldMapping` | `mapping` | Normalize role names: `dateCreated`→`date_created`, `completedDate`→`completed_date`, `recurrenceAnchor`→`recurrence_anchor`, `completeInstances`→`complete_instances`, `skippedInstances`→`skipped_instances`, `blockedBy`→`blocked_by`, `timeEntries`→`time_entries`, `timeEstimate`→`time_estimate` |
+| `storeTitleInFilename` | `title.storage` | `true` → `"filename"`, `false` → `"frontmatter"` |
+| `taskFilenameFormat` | `title.filename_format` | Values: `"title"`, `"zettel"`, `"timestamp"`, `"custom"`; used only when `title.storage=frontmatter` |
+| `customFilenameTemplate` | `title.custom_filename_template` | Template string, e.g. `"{title}"`; used only when `title.storage=frontmatter` and `filename_format=custom` |
+| `taskCreationDefaults.useBodyTemplate` | `templating.enabled` | boolean |
+| `taskCreationDefaults.bodyTemplate` | `templating.template_path` | Path to template file |
+| `customStatuses[*].value` | `status.values` | Ordered array of status value strings |
+| `defaultTaskStatus` | `status.default` | Default status string |
+| `customStatuses[isCompleted=true][*].value` | `status.completed_values` | Statuses where `isCompleted: true` |
+| `defaultTaskPriority` | `defaults.priority` | Default priority string |
+| `autoStopTimeTrackingOnComplete` | `time_tracking.auto_stop_on_complete` | boolean |
+| `autoStopTimeTrackingNotification` | `time_tracking.auto_stop_notification` | boolean |
+| `taskIdentificationMethod` | `task_detection.method` | `"tag"` or `"property"` |
+| `taskTag` | `task_detection.tag` | Tag string used when `method="tag"` |
+| `taskPropertyName` | `task_detection.property_name` | Frontmatter key used when `method="property"` |
+| `taskPropertyValue` | `task_detection.property_value` | Expected value; empty means key must exist |
+| `tasksFolder` | `task_detection.default_folder` | Default folder for new tasks |
+| `excludedFolders` | `task_detection.excluded_folders` | Comma-separated folder paths to exclude |
+| `moveArchivedTasks` | `archive.move_on_archive` | boolean |
+| `archiveFolder` | `archive.folder` | Archive destination folder |
+| `useFrontmatterMarkdownLinks` | `links.use_markdown_format` | boolean; see §11 |
+
+**Key `data.json` fields with defaults** (for cold-start reading of a vault with no `tasknotes.yaml`):
+
+| Field | Type | Default | Meaning |
+|---|---|---|---|
+| `tasksFolder` | string | `"TaskNotes/Tasks"` | Default folder for new task files |
+| `taskIdentificationMethod` | `"tag" \| "property"` | `"tag"` | How task files are identified |
+| `taskTag` | string | `"task"` | Tag that identifies task files (when `method="tag"`) |
+| `taskPropertyName` | string | `""` | Frontmatter key for property-based identification |
+| `taskPropertyValue` | string | `""` | Expected value for property-based identification (empty = key presence) |
+| `storeTitleInFilename` | boolean | `true` | Title storage mode |
+| `taskFilenameFormat` | `"title" \| "zettel" \| "timestamp" \| "custom"` | `"zettel"` | Filename generation format |
+| `customFilenameTemplate` | string | `"{title}"` | Template for `"custom"` filename format |
+| `defaultTaskStatus` | string | `"open"` | Default status on create |
+| `defaultTaskPriority` | string | `"normal"` | Default priority on create |
+| `customStatuses` | StatusConfig[] | see §9.20 | Ordered status definitions |
+| `autoStopTimeTrackingOnComplete` | boolean | `true` | Auto-stop active session on completion |
+| `autoStopTimeTrackingNotification` | boolean | `false` | Show notification when auto-stopping |
+| `useFrontmatterMarkdownLinks` | boolean | `false` | Use markdown links in frontmatter (requires obsidian-frontmatter-markdown-links plugin) |
+| `moveArchivedTasks` | boolean | `false` | Move task file to archive folder on archive |
+| `archiveFolder` | string | `"TaskNotes/Archive"` | Archive destination folder |
+| `excludedFolders` | string | `""` | Comma-separated folders to exclude from task indexing |
+
+**StatusConfig object shape:**
+
+```json
+{
+  "id": "done",
+  "value": "done",
+  "label": "Done",
+  "color": "#00aa00",
+  "isCompleted": true,
+  "order": 3,
+  "autoArchive": false,
+  "autoArchiveDelay": 5
+}
+```
+
+`spec_version` is not present in `data.json`. Implementations MUST synthesize an effective `spec_version` as described in §9.5.
+
+Provider keys not listed above MAY be ignored by `tasknotes-spec` consumers.
 
 ## 9.3 Required top-level keys
 
@@ -101,6 +151,7 @@ Required keys apply to the effective configuration after provider resolution.
 ## 9.5 spec_version behavior
 
 `spec_version` MUST be a semantic version string.
+Pre-release identifiers are valid (for example `0.1.0-draft`).
 
 Implementations in strict mode MUST reject unsupported major versions.
 
@@ -147,33 +198,64 @@ mapping:
 
 ## 9.7 task_detection schema
 
-`task_detection` controls how task files are identified.
+`task_detection` controls how task files are identified within the vault.
 
-At least one detection method MUST be enabled.
+### Detection methods
 
-Supported methods:
+The tasknotes plugin natively supports two identification methods, controlled by `taskIdentificationMethod` in `data.json` (mapped to `task_detection.method`):
+
+**`tag` (default)** — A markdown file is a task if it contains the configured tag (default `#task`) in its frontmatter `tags` array or inline in the body. Configured by `task_detection.tag`.
+
+**`property`** — A markdown file is a task if a specified frontmatter property has a specified value (or exists, if value is empty). Configured by `task_detection.property_name` and `task_detection.property_value`.
+
+### 9.7.1 Tag matching semantics
+
+When `task_detection.method=tag`, matching MUST follow these rules:
+
+1. Normalize configured `task_detection.tag` by stripping one leading `#` when present.
+2. Compare tag names case-insensitively after normalization.
+3. Frontmatter matching:
+   - `tags` MAY be a list of strings or a single string.
+   - each tag value is normalized by trimming surrounding whitespace and stripping one leading `#`.
+   - match requires exact normalized equality (for example `task` matches `#task`; `task` does not match `tasking`).
+4. Body matching:
+   - only markdown text outside fenced code blocks and inline code spans is considered,
+   - a match requires a hashtag token with exact normalized name (for example `#task`),
+   - partial-word matches MUST NOT count (for example `#tasking` does not match configured `task`).
+
+If either frontmatter or body matches, the file is identified as a task.
+
+`tasknotes.yaml`-level providers MAY additionally support:
 
 - `path_glob` (example: `tasks/**/*.md`)
 - `field_presence` (example: required key `status`)
 - `field_match` (example: `type == "task"`)
-- `tag_match` (example: file contains tag `task`)
 
-If multiple methods are configured, `task_detection.combine` MUST define combinator semantics:
+If multiple methods are configured in `tasknotes.yaml`, `task_detection.combine` MUST define combinator semantics:
 
 - `or` (default): file is a task if any enabled method matches.
 - `and`: file is a task only if all enabled methods match.
 
 If `task_detection.combine` is absent, implementations MUST default to `or`.
 
-Example:
+Implementations MUST exclude folders listed in `task_detection.excluded_folders` from task indexing.
+
+Example (`tasknotes.yaml`, equivalent to tag-based default):
 
 ```yaml
 task_detection:
-  combine: or
-  path_glob: tasks/**/*.md
-  field_match:
-    key: type
-    values: [task]
+  method: tag
+  tag: task
+  default_folder: TaskNotes/Tasks
+```
+
+Example (property-based):
+
+```yaml
+task_detection:
+  method: property
+  property_name: type
+  property_value: task
 ```
 
 ## 9.8 defaults schema
@@ -297,14 +379,15 @@ title:
 Rules:
 
 - `storage` MUST be `frontmatter` or `filename`.
-- `filename_format` MUST be `title`, `zettel`, `timestamp`, or `custom`.
-- `custom_filename_template` MUST be provided and non-empty when `storage=frontmatter` and `filename_format=custom`.
+- when `storage=frontmatter`, `filename_format` MUST be `title`, `zettel`, `timestamp`, or `custom`.
+- when `storage=frontmatter` and `filename_format=custom`, `custom_filename_template` MUST be provided and non-empty.
+- when `storage=filename`, `filename_format` and `custom_filename_template` MAY be present for compatibility input but MUST be ignored for canonical write behavior.
 - Read precedence MUST be frontmatter-first with filename fallback:
   1. mapped `title` key when present and non-empty;
   2. file basename fallback.
 - If frontmatter and basename titles both exist and differ, frontmatter title MUST win.
 - If `storage=filename`, canonical writes MUST treat filename as title source, MUST rename on title change, and MUST ignore `filename_format` and `custom_filename_template`.
-- If `storage=frontmatter`, canonical writes SHOULD persist mapped title key; `filename_format` and `custom_filename_template` govern create-time filename generation.
+- If `storage=frontmatter`, canonical writes MUST persist mapped title key; `filename_format` and `custom_filename_template` govern create-time filename generation.
 
 Informative mapping to TaskNotes settings:
 
@@ -385,6 +468,7 @@ compatibility:
 Rules:
 
 - Compatibility flags MUST default to conservative behavior in new collections.
+- `legacy_local_datetime_input=true` MAY relax strict parsing for offset-less datetimes only in permissive mode; strict mode parsing rules in §3.4.2 still apply.
 - Enabled compatibility flags SHOULD be disclosed in conformance output (§7).
 
 ## 9.18 Complete configuration example (`yaml_file` provider)
@@ -484,6 +568,7 @@ Examples:
 - invalid `links.unresolved_default_severity`
 - invalid `title.storage`
 - invalid `title.filename_format`
+- missing `title.filename_format` when `title.storage=frontmatter`
 - missing `title.custom_filename_template` when `title.storage=frontmatter` and `title.filename_format=custom`
 - missing `templating.template_path` when `templating.enabled=true`
 - invalid `templating.failure_mode`
@@ -491,3 +576,132 @@ Examples:
 - invalid `reminders.date_only_anchor_time`
 - invalid `time_tracking.auto_stop_on_complete`
 - invalid `time_tracking.auto_stop_notification`
+
+## 9.20 Default collection state
+
+This section describes what a fresh tasknotes vault looks like before any user customization. Implementations that read an existing tasknotes vault without a `tasknotes.yaml` SHOULD apply these defaults when `data.json` is absent or fields are missing.
+
+### Folder layout
+
+```text
+MyVault/
+├── TaskNotes/
+│   ├── Tasks/          ← new tasks created here by default
+│   └── Archive/        ← archived tasks moved here (if moveArchivedTasks=true)
+└── .obsidian/
+    └── plugins/
+        └── tasknotes/
+            └── data.json
+```
+
+### Task detection
+
+Default method: `tag`. A file is a task if it contains the tag `#task` in its frontmatter `tags` array or inline in the body.
+
+### Default field mapping
+
+| Semantic role | Default storage key |
+|---|---|
+| `title` | `title` |
+| `status` | `status` |
+| `priority` | `priority` |
+| `due` | `due` |
+| `scheduled` | `scheduled` |
+| `contexts` | `contexts` |
+| `projects` | `projects` |
+| `time_estimate` | `timeEstimate` |
+| `completed_date` | `completedDate` |
+| `date_created` | `dateCreated` |
+| `date_modified` | `dateModified` |
+| `recurrence` | `recurrence` |
+| `recurrence_anchor` | `recurrence_anchor` |
+| `complete_instances` | `complete_instances` |
+| `skipped_instances` | `skipped_instances` |
+| `time_entries` | `timeEntries` |
+| `blocked_by` | `blockedBy` |
+| `reminders` | `reminders` |
+
+Note: `recurrenceAnchor`, `completeInstances`, and `skippedInstances` are accepted as aliases on read (§2.5). The mixed camelCase/snake_case defaults are intentional for compatibility with historical TaskNotes frontmatter.
+
+### Default statuses
+
+| Value | Label | `isCompleted` | Order |
+|---|---|---|---|
+| `none` | None | false | 0 |
+| `open` | Open | false | 1 |
+| `in-progress` | In progress | false | 2 |
+| `done` | Done | true | 3 |
+
+Default status on create: `open`. Default completed status (first `isCompleted=true`): `done`.
+
+### Default priorities
+
+| Value | Label | Weight |
+|---|---|---|
+| `none` | None | 0 |
+| `low` | Low | 1 |
+| `normal` | Normal | 2 |
+| `high` | High | 3 |
+
+Default priority on create: `normal`.
+
+### Title and filename defaults
+
+- `title.storage`: `filename` (titles stored in filename, not frontmatter)
+- TaskNotes `data.json` may contain `taskFilenameFormat` (default `zettel`), but this value is ignored by canonical writes while `title.storage=filename`
+- Title is read from frontmatter `title` key first; filename-derived title as fallback (§2.2.2)
+
+### Time tracking defaults
+
+- `auto_stop_on_complete`: `true`
+- `auto_stop_notification`: `false`
+
+### Link format defaults
+
+- `useFrontmatterMarkdownLinks`: `false` — wikilinks used by default (e.g. `[[task-name]]`)
+- To use markdown link format, the `obsidian-frontmatter-markdown-links` plugin must also be installed
+
+### Effective configuration for a minimal fresh vault
+
+When neither `data.json` nor `tasknotes.yaml` is present, implementations MUST use the following effective configuration:
+
+```yaml
+spec_version: 0.1.0-draft   # synthesized
+mapping:
+  title: title
+  status: status
+  priority: priority
+  due: due
+  scheduled: scheduled
+  contexts: contexts
+  projects: projects
+  time_estimate: timeEstimate
+  completed_date: completedDate
+  date_created: dateCreated
+  date_modified: dateModified
+  recurrence: recurrence
+  recurrence_anchor: recurrence_anchor
+  complete_instances: complete_instances
+  skipped_instances: skipped_instances
+  time_entries: timeEntries
+  blocked_by: blockedBy
+  reminders: reminders
+task_detection:
+  method: tag
+  tag: task
+  default_folder: TaskNotes/Tasks
+status:
+  values: [none, open, in-progress, done]
+  default: open
+  completed_values: [done]
+title:
+  storage: filename
+time_tracking:
+  auto_stop_on_complete: true
+  auto_stop_notification: false
+links:
+  use_markdown_format: false
+  extensions: [".md"]
+  unresolved_default_severity: warning
+  update_references_on_rename: true
+```

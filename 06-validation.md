@@ -86,7 +86,7 @@ Issues SHOULD include:
 | `invalid_dependency_entry` | error | dependency object missing required fields |
 | `invalid_dependency_reltype` | error | dependency reltype not allowed |
 | `invalid_dependency_gap` | error | dependency gap not valid ISO 8601 duration |
-| `duplicate_dependency_uid` | error | repeated dependency uid in task |
+| `duplicate_dependency_uid` | warning (or error by policy) | repeated dependency uid in task |
 | `self_dependency` | error | task depends on itself |
 | `unresolved_dependency_target` | warning | dependency target not resolvable |
 | `invalid_reminder_entry` | error | reminder object missing required fields |

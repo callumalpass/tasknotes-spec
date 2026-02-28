@@ -62,16 +62,17 @@ If no seed can be resolved, recurrence materialization MUST fail deterministical
 
 For `recurrence_anchor=scheduled`, progression is based on the scheduled chain and `DTSTART` MUST remain fixed after it is set.
 
-For `recurrence_anchor=completion`, complete-instance operations MUST advance progression by updating `DTSTART` to the completion target date.
+For `recurrence_anchor=completion`, complete-instance operations MUST advance progression by updating `DTSTART` to the completion target (date or datetime per §4.4.3).
 
 ### 4.4.3 `DTSTART` update semantics
 
-When `recurrence_anchor=completion` and instance completion for target day `D` succeeds:
+When `recurrence_anchor=completion` and instance completion succeeds for resolved target day `D`:
 
-1. If recurrence uses date-only progression, `DTSTART` MUST be rewritten as `DTSTART:YYYYMMDD` for `D`.
-2. If recurrence uses datetime progression and operation target includes time, `DTSTART` MUST be rewritten as `DTSTART:YYYYMMDDTHHMMSSZ`.
-3. RRULE components other than `DTSTART` MUST be preserved unless an explicit recurrence-edit operation changes them.
-4. If `DTSTART` is absent, completion-anchor progression MUST insert it before RRULE parameters.
+1. Instance-list state (`complete_instances`, `skipped_instances`) MUST always use day `D`.
+2. If the caller provided an explicit datetime target, `DTSTART` MUST be rewritten as `DTSTART:YYYYMMDDTHHMMSSZ` using that target instant normalized to UTC.
+3. Otherwise, `DTSTART` MUST be rewritten as `DTSTART:YYYYMMDD` for day `D`.
+4. RRULE components other than `DTSTART` MUST be preserved unless an explicit recurrence-edit operation changes them.
+5. If `DTSTART` is absent, completion-anchor progression MUST insert it before RRULE parameters.
 
 ## 4.5 Instance state fields
 
@@ -100,7 +101,7 @@ Conforming behavior:
 1. Add `D` to `complete_instances`.
 2. Remove `D` from `skipped_instances` if present.
 3. Leave base task status unchanged unless explicit policy states otherwise.
-4. Update `date_modified`.
+4. Update `date_modified` when state changes.
 
 Operation MUST be idempotent.
 
@@ -124,7 +125,7 @@ Conforming behavior:
 
 1. Add `D` to `skipped_instances`.
 2. Remove `D` from `complete_instances` if present.
-3. Update `date_modified`.
+3. Update `date_modified` when state changes.
 
 Operation MUST be idempotent.
 

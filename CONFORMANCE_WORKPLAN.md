@@ -1,6 +1,6 @@
 # Tasknotes-Spec Conformance Program (mdbase-tasknotes)
 
-This document tracks the long-running effort to build and enforce a high-coverage conformance suite against `tasknotes-spec`, now targeting 4500+ tests with current corpus at 4753 and growing.
+This document tracks the long-running effort to build and enforce a high-coverage conformance suite against `tasknotes-spec`, now targeting 4500+ tests with current corpus at 4863 and growing.
 
 ## Goal
 
@@ -37,14 +37,14 @@ This document tracks the long-running effort to build and enforce a high-coverag
 
 - [x] Date/datetime parse validation tests.
 - [x] Date canonicalization and comparison tests.
-- [ ] Timezone-sensitive day-boundary tests.
+- [x] Timezone-sensitive day-boundary tests.
 
 ### Operations (§5 core)
 
 - [x] Create defaults and metadata timestamp tests.
-- [ ] Update patch semantics and preservation tests.
-- [ ] Non-recurring complete/uncomplete semantics tests.
-- [ ] Rename semantics (title-storage interactions) tests.
+- [x] Update patch semantics and preservation tests.
+- [x] Non-recurring complete/uncomplete semantics tests.
+- [x] Rename semantics (title-storage interactions) tests.
 
 ### Validation + Conformance (§6/§7 core)
 
@@ -63,48 +63,48 @@ This document tracks the long-running effort to build and enforce a high-coverag
 ### Recurrence operations (§5.7-§5.9)
 
 - [x] Complete instance behavior matrix tests.
-- [ ] Uncomplete instance behavior matrix tests.
-- [ ] Skip/unskip behavior matrix tests.
-- [ ] Target day/date resolution matrix tests.
+- [x] Uncomplete instance behavior matrix tests.
+- [x] Skip/unskip behavior matrix tests.
+- [x] Target day/date resolution matrix tests.
 
 ## Phase 3: Templating Conformance (~80 tests target)
 
 ### Create-time templating (§5.3.5 / §7.3.3 / §9.14)
 
-- [ ] Template section parsing tests (`--- ... ---` frontmatter split + body remainder).
-- [ ] Deterministic create pipeline ordering tests (base payload, expansion, merge precedence).
-- [ ] Portable variable expansion tests (`{{title}}`, `{{status}}`, `{{priority}}`, `{{dueDate}}`, etc.).
-- [ ] Template syntax and variable tokenization tests.
-- [ ] Failure mode tests (`error` vs `warning_fallback`).
-- [ ] Fallback behavior tests (non-templated frontmatter/body when template load/parse fails).
+- [x] Template section parsing tests (`--- ... ---` frontmatter split + body remainder).
+- [x] Deterministic create pipeline ordering tests (base payload, expansion, merge precedence).
+- [x] Portable variable expansion tests (`{{title}}`, `{{status}}`, `{{priority}}`, `{{dueDate}}`, etc.).
+- [x] Template syntax and variable tokenization tests.
+- [x] Failure mode tests (`error` vs `warning_fallback`).
+- [x] Fallback behavior tests (non-templated frontmatter/body when template load/parse fails).
 
 ### TaskNotes `data.json` template mapping
 
-- [ ] `taskCreationDefaults.useBodyTemplate` -> `templating.enabled` mapping tests.
-- [ ] `taskCreationDefaults.bodyTemplate` -> `templating.template_path` mapping tests.
+- [x] `taskCreationDefaults.useBodyTemplate` -> `templating.enabled` mapping tests.
+- [x] `taskCreationDefaults.bodyTemplate` -> `templating.template_path` mapping tests.
 
 ## Phase 4: Extended Conformance (~220 tests target)
 
 ### Dependencies + reminders (§10)
 
 - [x] Dependency schema/reltype/gap validation tests.
-- [ ] Dependency resolution severity and missing-target behavior tests.
+- [x] Dependency resolution severity and missing-target behavior tests.
 - [x] Reminder schema and type-specific field tests.
 - [x] Relative reminder base-resolution tests.
 
 ### Links (§11)
 
-- [ ] Wikilink/markdown parsing tests.
-- [ ] Resolution order and extension-trial tests.
-- [ ] Ambiguity and unresolved behavior tests.
-- [ ] Rename/update-reference behavior tests.
+- [x] Wikilink/markdown parsing tests.
+- [x] Resolution order and extension-trial tests.
+- [x] Ambiguity and unresolved behavior tests.
+- [x] Rename/update-reference behavior tests.
 
 ## Phase 5: Provider/Configuration Conformance (~70 tests target)
 
 ### Provider model (§9)
 
 - [x] Effective config precedence/merge tests.
-- [ ] Strict vs permissive provider behavior tests.
+- [x] Strict vs permissive provider behavior tests.
 - [x] `spec_version` synthesized vs explicit behavior tests.
 
 ### TaskNotes `data.json` provider mapping
@@ -124,26 +124,26 @@ This document tracks the long-running effort to build and enforce a high-coverag
 
 ### Time entries model + temporal semantics (§2.6.1 / §3.11)
 
-- [ ] Validate single-active-session invariant per task (`multiple_active_time_entries`).
-- [ ] Validate required `startTime` handling (`missing_time_entry_start`).
-- [ ] Validate active-session temporal semantics (`startTime` without `endTime`).
-- [ ] Validate canonical write normalization behavior for legacy `duration`.
+- [x] Validate single-active-session invariant per task (`multiple_active_time_entries`).
+- [x] Validate required `startTime` handling (`missing_time_entry_start`).
+- [x] Validate active-session temporal semantics (`startTime` without `endTime`).
+- [x] Validate canonical write normalization behavior for legacy `duration`.
 
 ### Time tracking operations (§5.19)
 
-- [ ] Add operation fixtures for `time.start`, `time.stop`, `time.edit_entries`, `time.remove_entry`.
-- [ ] Add invariants for `date_modified` updates on start/stop/edit/remove.
-- [ ] Add negative-path fixtures for already-active start and stop-without-active.
-- [ ] Add reporting semantics fixtures for documented `closed_minutes` vs `live_minutes`.
+- [x] Add operation fixtures for `time.start`, `time.stop`, `time.edit_entries`, `time.remove_entry`.
+- [x] Add invariants for `date_modified` updates on start/stop/edit/remove.
+- [x] Add negative-path fixtures for already-active start and stop-without-active.
+- [x] Add reporting semantics fixtures for documented `closed_minutes` vs `live_minutes`.
 
 ### Validation / conformance / configuration integration (§6 / §7 / §9.16)
 
-- [ ] Add `validation.core_evaluate` fixtures for new time-tracking validation codes.
-- [ ] Add conformance capability checks for time-tracking support flags.
-- [ ] Add provider mapping fixtures:
+- [x] Add `validation.core_evaluate` fixtures for new time-tracking validation codes.
+- [x] Add conformance capability checks for time-tracking support flags.
+- [x] Add provider mapping fixtures:
   - `autoStopTimeTrackingOnComplete` -> `time_tracking.auto_stop_on_complete`
   - `autoStopTimeTrackingNotification` -> `time_tracking.auto_stop_notification`
-- [ ] Add config-schema fixtures for `time_tracking` key validation.
+- [x] Add config-schema fixtures for `time_tracking` key validation.
 
 ## Deliverables
 
@@ -159,7 +159,7 @@ This document tracks the long-running effort to build and enforce a high-coverag
 - [x] Conformance scaffolding landed.
 - [x] Core-lite batch complete.
 - [x] Recurrence batch complete.
-- [ ] Templating batch complete.
+- [x] Templating batch complete.
 - [x] Extended batch complete (schema-level operations).
 - [x] Provider batch complete (core provider + TaskNotes mapping).
 - [x] Full pass complete.
@@ -173,5 +173,8 @@ This document tracks the long-running effort to build and enforce a high-coverag
 - [x] 2026-02-21: `../mdbase-tasknotes` passes suite at scale (`4756` tests including harness checks, `0` failed, `1` skipped due missing optional capability claim).
 - [x] 2026-02-21: Moved conformance execution logic into `../mdbase-tasknotes/src/conformance.ts` and converted adapter to thin pass-through.
 - [x] 2026-02-21: Elevated claim to include `extended` (`dependencies`, `reminders`, `links`) and reached full suite pass with no skips (`4756` tests, `0` failed, `0` skipped).
+- [x] 2026-02-21: Expanded suite to cover the full normative surface across §2–§11, including §5 lifecycle semantics and §8 migration/compatibility operations; added section coverage guard test (`conformance/tests/coverage.test.mjs`).
+- [x] 2026-02-21: After expanding suite breadth, `../mdbase-tasknotes` now correctly fails uncovered areas (`64` failing fixtures), establishing an actionable gap list for implementation alignment.
 - [x] 2026-02-21: Spec updated with explicit time-tracking management semantics across §2/§3/§5/§6/§7/§9.
-- [ ] 2026-02-21: Begin Phase 7 fixture expansion for time-tracking operations and config mapping coverage.
+- [x] 2026-02-21: Completed Phase 7 fixture expansion for time-tracking operations, validation, provider mapping, and config schema checks.
+- [x] 2026-02-21: Added remaining unchecked fixture buckets across §3 timezone boundaries, §5 core/rename/recurrence target matrices, §10 missing-target severity, §11 rename-reference updates, and §9 strict/permissive provider behavior.

@@ -101,9 +101,9 @@ Implementations SHOULD accept these aliases on read for interoperability:
 
 | Semantic role | Canonical example | Alias examples |
 |---|---|---|
-| `recurrence_anchor` | `recurrenceAnchor` | `recurrence_anchor` |
-| `complete_instances` | `completeInstances` | `complete_instances` |
-| `skipped_instances` | `skippedInstances` | `skipped_instances` |
+| `recurrence_anchor` | `recurrence_anchor` | `recurrenceAnchor` |
+| `complete_instances` | `complete_instances` | `completeInstances` |
+| `skipped_instances` | `skipped_instances` | `skippedInstances` |
 | `date_created` | `dateCreated` | `date_created` |
 | `date_modified` | `dateModified` | `date_modified` |
 | `completed_date` | `completedDate` | `completed_date` |
@@ -179,9 +179,9 @@ mapping:
   date_modified: dateModified
   completed_date: completedDate
   recurrence: recurrence
-  recurrence_anchor: recurrenceAnchor
-  complete_instances: completeInstances
-  skipped_instances: skippedInstances
+  recurrence_anchor: recurrence_anchor
+  complete_instances: complete_instances
+  skipped_instances: skipped_instances
   time_estimate: timeEstimate
   time_entries: timeEntries
   blocked_by: blockedBy
@@ -197,9 +197,9 @@ status: open
 priority: high
 scheduled: 2026-02-20
 recurrence: FREQ=WEEKLY;BYDAY=FR
-recurrenceAnchor: scheduled
-completeInstances: [2026-02-13]
-skippedInstances: []
+recurrence_anchor: scheduled
+complete_instances: [2026-02-13]
+skipped_instances: []
 blockedBy:
   - uid: "[[prepare-metrics]]"
     reltype: FINISHTOSTART
@@ -224,8 +224,8 @@ Review completed work and plan next week.
 Given frontmatter:
 
 ```yaml
-recurrenceAnchor: scheduled
-recurrence_anchor: completion
+recurrence_anchor: scheduled
+recurrenceAnchor: completion
 ```
 
-If canonical key is `recurrenceAnchor`, a conforming loader using canonical-precedence policy MUST resolve semantic `recurrence_anchor` as `scheduled` and SHOULD emit a compatibility warning.
+If canonical key is `recurrence_anchor`, a conforming loader using canonical-precedence policy MUST resolve semantic `recurrence_anchor` as `scheduled` and SHOULD emit a compatibility warning.

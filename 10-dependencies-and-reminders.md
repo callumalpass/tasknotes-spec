@@ -31,12 +31,15 @@ Link parsing and resolution MUST follow §11.
 
 ### 10.2.3 Dependency uniqueness
 
-Within a task, dependency entries MUST be unique by normalized `uid`.
+Within a task, dependency entries SHOULD be unique by normalized `uid`.
 
-If duplicates occur:
+If duplicates occur, implementations MAY choose any documented policy:
 
-- strict mode: MUST raise `duplicate_dependency_uid`.
-- permissive mode: MAY normalize to one entry and emit warning.
+- preserve duplicates as provided,
+- normalize to one entry and emit warning,
+- reject with `duplicate_dependency_uid`.
+
+The chosen policy MUST be deterministic and MUST be documented in conformance claims.
 
 ### 10.2.4 Self-dependency
 
@@ -82,7 +85,7 @@ If maintained, reverse updates SHOULD remain consistent with `blocked_by` edits.
 Add dependency MUST:
 
 - validate entry shape,
-- reject or normalize duplicates by policy,
+- handle duplicates by policy (preserve, normalize, or reject),
 - preserve unrelated dependency entries,
 - update `date_modified` on change.
 

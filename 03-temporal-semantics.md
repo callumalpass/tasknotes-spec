@@ -42,7 +42,9 @@ Date parsing MUST reject invalid calendar dates.
 
 ### 3.4.2 Datetime parsing
 
-Datetime parsing MUST reject malformed values and SHOULD reject ambiguous local datetimes without offset in strict mode.
+Datetime parsing MUST reject malformed values.
+In strict mode, datetime parsing MUST reject ambiguous local datetimes without offset (for example `2026-02-20T09:00:00` with no timezone offset).
+In permissive mode, implementations MAY accept such values only under an explicitly documented compatibility policy and SHOULD emit a warning.
 
 ### 3.4.3 Mixed input tolerance
 
@@ -137,7 +139,7 @@ For non-recurring completion, writers MUST set `completed_date` using §5 semant
 Writers MUST:
 
 - set both on create,
-- update `date_modified` on successful mutating operations,
+- update `date_modified` on successful mutating operations that change persisted state,
 - preserve `date_created` unless explicit migration/edit operation changes it.
 
 ## 3.11 time_entries semantics

@@ -145,5 +145,90 @@ This specification includes an executable fixture suite in `conformance/`.
 - language-neutral fixtures are stored in `conformance/fixtures/*.json`
 - section/profile/operation coverage is tracked in `conformance/manifest.json`
 - adapters execute fixture operations per `conformance/docs/ADAPTER_CONTRACT.md`
+- runners MUST execute fixtures only when both conditions hold:
+  - fixture `profile` is satisfied by claimed adapter profiles under cumulative profile rules (§7.3),
+  - all fixture `requires` capability tokens are present.
 
 Conformance claims SHOULD report fixture pass/fail results against the claimed profiles.
+
+## 7.10 Meta operations
+
+The following operations are part of the conformance interface and MUST be supported by any adapter that participates in the conformance suite, regardless of claimed profile.
+
+### `meta.claim`
+
+Returns the adapter's self-reported metadata.
+
+Input: `{}` (empty object)
+
+Output:
+```json
+{
+  "ok": true,
+  "result": {
+    "implementation": "my-tool",
+    "version": "1.0.0",
+    "profiles": ["core-lite", "recurrence"],
+    "capabilities": ["dependencies", "links"]
+  }
+}
+```
+
+Fields:
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `implementation` | string | yes | Human-readable implementation name |
+| `version` | string | yes | Implementation version string |
+| `profiles` | string[] | yes | Claimed conformance profiles; valid values: `core-lite`, `recurrence`, `extended`, `templating` |
+| `capabilities` | string[] | yes | Optional capability tokens; known tokens listed in §7.11 |
+
+### `meta.has_capability`
+
+Tests whether the adapter claims a specific capability.
+
+Input:
+```json
+{ "capability": "dependencies" }
+```
+
+Output:
+```json
+{ "ok": true, "result": { "value": true } }
+```
+
+`result.value` MUST be `true` if the capability is in the `capabilities` array returned by `meta.claim`, and `false` otherwise.
+
+### `meta.has_profile`
+
+Tests whether the adapter claims a specific conformance profile.
+
+Input:
+```json
+{ "profile": "recurrence" }
+```
+
+Output:
+```json
+{ "ok": true, "result": { "value": true } }
+```
+
+`result.value` MUST be `true` if the profile is in the `profiles` array returned by `meta.claim`, and `false` otherwise.
+
+## 7.11 Known capability tokens
+
+The following capability tokens are defined by this specification. Implementations MAY define additional tokens.
+
+| Token | Required by profile | Meaning |
+|---|---|---|
+| `dependencies` | `extended` | Supports `blocked_by`, dependency operations, and dependency validation |
+| `reminders` | `extended` | Supports `reminders`, reminder operations, and reminder validation |
+| `links` | `extended` | Supports link parsing and resolution (§11) |
+| `rename` | `extended` | Supports file rename with reference updates |
+| `archive` | `extended` | Supports archive semantics (§5.12) |
+| `batch` | `extended` | Supports batch operations with per-item outcomes (§5.15) |
+| `concurrency` | `extended` | Supports write-conflict detection (§5.16) |
+| `dry-run` | `extended` | Supports dry-run mode (§5.17) |
+| `time-tracking` | `extended` | Supports time-tracking management operations (§5.19) |
+| `migration` | — | Supports migration operations (§8) |
+| `templating` | `templating` | Supports create-time templating (§5.3.5) |

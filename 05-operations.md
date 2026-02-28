@@ -11,7 +11,7 @@ For all mutating operations:
 1. Validation MUST run before commit in strict mode.
 2. Writes MUST be atomic at file level (all-or-nothing per file).
 3. `date_modified` MUST be updated on successful state change.
-4. Unknown fields MUST be preserved unless explicit normalization is requested.
+4. Unknown fields MUST be preserved unless explicit normalization is requested. This applies to every operation in this section: create, update, complete, uncomplete, skip, unskip, dependency mutations, reminder mutations, archive, and time-tracking operations.
 5. Operations identified as idempotent MUST remain safe under repetition.
 
 ### 5.2.1 Target day/date resolution
@@ -28,7 +28,19 @@ Resolution MUST be deterministic:
    - else current local day in active runtime timezone (§3.6).
 3. For non-recurring complete, if caller omits explicit completion-day input, implementations MUST use current local day in active runtime timezone.
 
-When an explicit target is datetime, operations that require day semantics MUST use its calendar date part in active runtime timezone unless documented otherwise.
+When an explicit target is datetime:
+
+- operations that require day semantics MUST use its calendar date part in active runtime timezone,
+- for recurring `complete instance` with `recurrence_anchor=completion`, the same explicit datetime target MUST also drive `DTSTART` rewrite semantics in §4.4.3.
+
+### 5.2.2 Idempotency and `date_modified`
+
+For operations marked idempotent:
+
+- first application MAY change state and `date_modified`,
+- repeated application with semantically equivalent input MUST leave persisted state unchanged.
+
+When a repeated idempotent operation is a no-op, `date_modified` MUST remain unchanged.
 
 ## 5.3 Create
 
@@ -109,9 +121,70 @@ Template parse rules:
 
 Portable variable support:
 
-- Implementations claiming `templating` MUST support `{{title}}`, `{{status}}`, `{{priority}}`, `{{dueDate}}`, `{{scheduledDate}}`, `{{details}}`, `{{contexts}}`, `{{tags}}`, `{{timeEstimate}}`, `{{date}}`, and `{{time}}`.
-- Implementations MAY support additional variables.
-- Unknown variables MUST be handled per `templating.unknown_variable_policy` (§9.14).
+Implementations claiming `templating` MUST support all variables in the **Required** column of the table below. Implementations MAY support any variable in the **Extended** column.
+
+**Required task-data variables:**
+
+| Variable | Value | Format / separator |
+|---|---|---|
+| `{{title}}` | Semantic title | string; YAML-quoted if needed |
+| `{{status}}` | Task status value | string |
+| `{{priority}}` | Task priority value | string |
+| `{{dueDate}}` | Due date if set | `YYYY-MM-DD` or empty |
+| `{{scheduledDate}}` | Scheduled date if set | `YYYY-MM-DD` or empty |
+| `{{details}}` | Caller-provided body/description | string |
+| `{{contexts}}` | Contexts list | comma-separated, e.g. `"work, home"` |
+| `{{tags}}` | Tags list | comma-separated, e.g. `"task, errands"` |
+| `{{hashtags}}` | Tags list as hashtags | space-separated, e.g. `"#task #errands"` |
+| `{{timeEstimate}}` | Time estimate in minutes | integer string or empty |
+| `{{parentNote}}` | Parent note name/path | string; YAML-quoted if needed |
+
+**Required date/time variables (expansion time):**
+
+| Variable | Value | Format |
+|---|---|---|
+| `{{date}}` | Current date | `yyyy-MM-dd` |
+| `{{time}}` | Current time (24h) | `HH:mm` |
+| `{{year}}` | Full year | `yyyy` |
+| `{{month}}` | Month number | `MM` |
+| `{{day}}` | Day of month | `dd` |
+
+**Extended variables (optional):**
+
+| Variable | Value | Format |
+|---|---|---|
+| `{{dateTime}}` | Date + time | `yyyy-MM-dd-HHmm` |
+| `{{timestamp}}` | Full timestamp | `yyyy-MM-dd-HHmmss` |
+| `{{shortDate}}` | Short date | `yyMMdd` |
+| `{{shortYear}}` | Two-digit year | `yy` |
+| `{{monthName}}` | Month full name | e.g. `February` |
+| `{{monthNameShort}}` | Month short name | e.g. `Feb` |
+| `{{dayName}}` | Weekday full name | e.g. `Monday` |
+| `{{dayNameShort}}` | Weekday short name | e.g. `Mon` |
+| `{{week}}` | ISO week number | `ww` |
+| `{{quarter}}` | Quarter number | `1`–`4` |
+| `{{hour}}` | Hour (24h) | `HH` |
+| `{{minute}}` | Minute | `mm` |
+| `{{second}}` | Second | `ss` |
+| `{{time12}}` | Time with AM/PM | `hh:mm a` |
+| `{{time24}}` | Time (24h) | `HH:mm` |
+| `{{timezone}}` | UTC offset long | e.g. `+05:30` |
+| `{{utcOffset}}` | UTC offset long | e.g. `+05:30` |
+| `{{unix}}` | Unix timestamp (seconds) | integer string |
+| `{{unixMs}}` | Unix timestamp (ms) | integer string |
+| `{{zettel}}` | Zettelkasten ID | date + seconds-since-midnight base-36 |
+| `{{titleLower}}` | Title lowercase | string |
+| `{{titleUpper}}` | Title uppercase | string |
+| `{{titleSnake}}` | Title snake_case | string |
+| `{{titleKebab}}` | Title kebab-case | string |
+| `{{titleCamel}}` | Title camelCase | string |
+| `{{titlePascal}}` | Title PascalCase | string |
+| `{{priorityShort}}` | First letter of priority | uppercase char |
+| `{{statusShort}}` | First letter of status | uppercase char |
+
+Unknown variables (not in the above lists) MUST be handled per `templating.unknown_variable_policy` (§9.14):
+- `preserve`: leave the `{{...}}` placeholder as-is.
+- `empty`: replace with an empty string.
 
 Failure behavior:
 
@@ -173,7 +246,7 @@ For non-recurring tasks, complete MUST:
    - explicit completion-day input when provided,
    - otherwise current local day in active runtime timezone (§5.2.1).
 3. Apply overwrite policy deterministically (`overwrite` or `preserve_if_present`).
-4. Update `date_modified`.
+4. Update `date_modified` on state change.
 
 Implementations MUST document completion-day input handling and `completed_date` overwrite policy.
 
@@ -196,6 +269,7 @@ Operation MUST be idempotent.
 For recurring tasks, complete with resolved target date `D` (§5.2.1) MUST follow §4.7.
 
 Writers MUST NOT convert recurring completion into a base status rewrite unless explicit configuration requires it.
+When `recurrence_anchor=completion` and caller supplies an explicit datetime target, implementations MUST apply §4.4.3 datetime `DTSTART` rewrite behavior.
 
 ## 5.8 Uncomplete instance (recurring)
 
@@ -508,3 +582,263 @@ reminders:
     relatedTo: due
     offset: -PT1H
 ```
+
+## 5.21 Conformance operation interface
+
+The conformance suite exercises operations via the `execute(operation, input) → envelope` interface defined in the adapter contract. This section specifies the input/output contracts for each conformance-testable operation name.
+
+Unless otherwise noted, all operations return `{ ok: true, result: {...} }` on success and `{ ok: false, error: "..." }` on failure.
+
+### General operations
+
+#### `op.mutate_with_validation`
+
+Tests §5.2 rule 1: validation runs before commit.
+
+Input:
+```json
+{ "strict": true, "frontmatter": { ... } }
+```
+
+Behavior: validate `frontmatter` as a task record. In strict mode (`strict=true`), any validation error MUST produce `ok=false`.
+
+Output on validation error:
+```json
+{ "ok": false, "error": "validation|invalid_type|..." }
+```
+
+---
+
+#### `op.atomic_write`
+
+Tests §5.2 rule 2: writes are all-or-nothing.
+
+Input:
+```json
+{
+  "original": { ... },
+  "patch": { ... },
+  "simulateFailureAfterWrite": true
+}
+```
+
+Behavior: apply `patch` to `original`, then simulate a post-write failure. The adapter MUST report whether the write was committed and what state the record is in after recovery.
+
+Output:
+```json
+{
+  "ok": true,
+  "result": {
+    "committed": false,
+    "persisted": { ... }
+  }
+}
+```
+
+`committed=false` means the write was rolled back. `persisted` reflects the actual frontmatter after recovery — it MUST match `original` (not the patched version) when `simulateFailureAfterWrite=true`.
+
+---
+
+#### `op.idempotency_check`
+
+Tests §5.2 rule 5: operations are safe under repetition.
+
+Input:
+```json
+{
+  "operation": "complete_nonrecurring",
+  "first": { "status": "open", "completedDate": null },
+  "second": { "status": "done", "completedDate": "2026-02-20" }
+}
+```
+
+Behavior: applying the named operation to `first` state and then again to `second` state MUST produce identical persisted results (including unchanged `dateModified` on the second no-op application). The adapter checks whether this holds.
+
+Output:
+```json
+{ "ok": true, "result": { "idempotent": true } }
+```
+
+---
+
+#### `op.update_patch`
+
+Tests §5.4 patch semantics and unknown-field preservation.
+
+Input:
+```json
+{
+  "original": { "title": "...", "vendorTicket": "ZX-42", ... },
+  "patch": { "priority": "high" },
+  "changed": true
+}
+```
+
+Behavior: apply `patch` to `original`. Return the merged frontmatter.
+
+Output:
+```json
+{
+  "ok": true,
+  "result": {
+    "changed": true,
+    "frontmatter": { "title": "...", "priority": "high", "vendorTicket": "ZX-42", ... }
+  }
+}
+```
+
+- `changed` indicates whether any field actually changed value.
+- `frontmatter` MUST include all unknown fields from `original` unchanged.
+
+---
+
+#### `op.complete_nonrecurring`
+
+Tests §5.5 non-recurring completion.
+
+Input:
+```json
+{
+  "frontmatter": { "title": "...", "status": "open" },
+  "completedValues": ["done", "cancelled"],
+  "explicitDate": "2026-02-20"
+}
+```
+
+Behavior: apply a complete operation to `frontmatter` using `completedValues` (ordered list) and `explicitDate` as the completion day (omit to use current local day).
+
+Output:
+```json
+{ "ok": true, "result": { "status": "done", "completedDate": "2026-02-20" } }
+```
+
+- `status` MUST be the first entry in `completedValues`.
+- `completedDate` MUST be `explicitDate` if provided; otherwise a valid `YYYY-MM-DD` date.
+- If `frontmatter.status` is already a completed value, the operation MUST still succeed (idempotent).
+
+---
+
+#### `op.uncomplete_nonrecurring`
+
+Tests §5.6 non-recurring uncompletion.
+
+Input:
+```json
+{
+  "frontmatter": { "title": "...", "status": "done", "completedDate": "2026-02-20" },
+  "defaultStatus": "open",
+  "clearCompletedDate": true
+}
+```
+
+Output:
+```json
+{ "ok": true, "result": { "status": "open", "completedDate": null } }
+```
+
+- `status` MUST be `defaultStatus`.
+- If `clearCompletedDate=true`, `completedDate` MUST be `null` in the result.
+- If `clearCompletedDate=false`, `completedDate` MUST be preserved.
+
+---
+
+#### `op.error_shape`
+
+Tests §5.18 error model.
+
+Input:
+```json
+{ "operation": "update", "code": "invalid_type", "message": "bad value", "field": "status" }
+```
+
+Behavior: construct and return a structured error object.
+
+Output:
+```json
+{
+  "ok": true,
+  "result": {
+    "operation": "update",
+    "code": "invalid_type",
+    "message": "..."
+  }
+}
+```
+
+The `message` field MUST be a non-empty string. The `operation` and `code` fields MUST match the input.
+
+---
+
+#### `op.detect_conflict`
+
+Tests §5.16 write-conflict detection.
+
+Input:
+```json
+{ "expectedVersion": "a", "actualVersion": "b", "overwrite": false }
+```
+
+Behavior: when `expectedVersion != actualVersion` and `overwrite=false`, the operation MUST fail.
+
+Output on conflict:
+```json
+{ "ok": false, "error": "conflict|write_conflict|..." }
+```
+
+---
+
+#### `op.dry_run`
+
+Tests §5.17 dry-run mode.
+
+Input:
+```json
+{ "operation": "update", "patch": { "status": "done" } }
+```
+
+Output:
+```json
+{
+  "ok": true,
+  "result": {
+    "wrote": false,
+    "plannedChanges": ["status", ...]
+  }
+}
+```
+
+`wrote` MUST be `false`. `plannedChanges` MUST list the field names that would have changed.
+
+---
+
+### Recurrence operations
+
+For `recurrence.complete`, `recurrence.uncomplete_instance`, `recurrence.skip_instance`, `recurrence.unskip_instance`, and `recurrence.effective_state`, the input and output contracts are defined by the respective sections of §4 and §5.7–5.9.
+
+Common input fields for recurrence operations:
+- `targetDate` or `completionDate`: `YYYY-MM-DD` target day
+- `completeInstances`: current list of completed dates
+- `skippedInstances`: current list of skipped dates
+
+`recurrence.effective_state` output:
+```json
+{ "ok": true, "result": { "value": "completed|skipped|open" } }
+```
+
+---
+
+### Time-tracking operations
+
+For `time.start`, `time.stop`, `time.replace_entries`, `time.remove_entry`, `time.auto_stop_on_complete`, and `time.report_totals`, the contracts are defined by §5.19.
+
+Common input patterns:
+- `entries`: current `time_entries` array
+- `now`: ISO 8601 datetime representing current instant
+- `dateModified`: current `date_modified` value
+
+`time.report_totals` output:
+```json
+{ "ok": true, "result": { "closed_minutes": N, "live_minutes": M } }
+```
+
+`live_minutes` is only present when an active (no `endTime`) entry exists.
