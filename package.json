@@ -1,0 +1,15 @@
+{
+  "name": "tasknotes-spec",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "conformance:generate": "node conformance/scripts/generate-fixtures.mjs",
+    "conformance:test": "node --test conformance/tests/**/*.test.mjs",
+    "conformance:build:tasknotes-bridge": "mkdir -p conformance/adapters/.generated && npm --prefix ../tasknotes exec -- esbuild conformance/adapters/tasknotes-date-bridge.ts --bundle --platform=node --format=esm --outfile=conformance/adapters/.generated/tasknotes-date-bridge.mjs && npm --prefix ../tasknotes exec -- esbuild conformance/adapters/tasknotes-templating-bridge.ts --bundle --platform=node --format=cjs --outfile=conformance/adapters/.generated/tasknotes-templating-bridge.cjs",
+    "conformance:test:tasknotes": "npm run conformance:generate && (cd ../mdbase-tasknotes && npm run build) && npm run conformance:build:tasknotes-bridge && TASKNOTES_ADAPTER=./conformance/adapters/tasknotes.adapter.mjs npm run conformance:test",
+    "conformance:test:mdbase-tasknotes": "npm run conformance:generate && (cd ../mdbase-tasknotes && npm run build) && TASKNOTES_ADAPTER=./conformance/adapters/mdbase-tasknotes.adapter.mjs npm run conformance:test",
+    "conformance:count": "node -e \"const fs=require('fs');const m=JSON.parse(fs.readFileSync('conformance/manifest.json','utf8'));console.log(m.totalCases)\"",
+    "conformance:package": "node conformance/scripts/package-fixtures.mjs"
+  }
+}
