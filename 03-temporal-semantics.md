@@ -29,7 +29,9 @@ Canonical datetime serialization is UTC ISO 8601 with `Z`, for example:
 2026-02-20T13:45:00Z
 ```
 
+Canonical datetime writes MUST use second precision (`YYYY-MM-DDTHH:MM:SSZ`) and MUST NOT include fractional seconds.
 Implementations MAY accept alternative inbound datetime forms but MUST normalize outbound canonical writes.
+If an accepted inbound datetime includes fractional seconds, writers MUST normalize deterministically by truncating fractional precision to whole seconds.
 
 ## 3.4 Parsing requirements
 
@@ -49,6 +51,30 @@ In permissive mode, implementations MAY accept such values only under an explici
 ### 3.4.3 Mixed input tolerance
 
 Implementations MAY accept both date and datetime values for roles like `due` and `scheduled` if configured to do so. The accepted form MUST be documented.
+
+### 3.4.4 Inbound acceptance matrix
+
+To avoid ambiguity, conforming parsers MUST follow this matrix.
+
+Date forms:
+
+| Form | Example | Strict | Permissive |
+|---|---|---|---|
+| Canonical date | `2026-02-20` | accept | accept |
+| Basic date (no separators) | `20260220` | reject (`invalid_date_value`) | MAY accept only under documented compatibility policy; SHOULD emit warning |
+
+Datetime forms:
+
+| Form | Example | Strict | Permissive |
+|---|---|---|---|
+| Canonical UTC | `2026-02-20T09:00:00Z` | accept | accept |
+| ISO with explicit offset | `2026-02-20T09:00:00+10:00` | accept | accept |
+| ISO with fractional seconds | `2026-02-20T09:00:00.250Z` | accept (normalize to second precision on write) | accept (normalize to second precision on write) |
+| Offset-less local datetime | `2026-02-20T09:00:00` | reject (`invalid_datetime_value`) | MAY accept only under documented compatibility policy; SHOULD emit warning |
+| Space-separated datetime | `2026-02-20 09:00:00` | reject (`invalid_datetime_value`) | MAY accept only under documented compatibility policy; SHOULD emit warning |
+| Basic datetime (no separators) | `20260220T090000Z` | reject (`invalid_datetime_value`) | MAY accept only under documented compatibility policy; SHOULD emit warning |
+
+When permissive-mode compatibility accepts a non-canonical form, canonical writes MUST still follow §3.3.
 
 ## 3.5 Day semantics vs instant semantics
 

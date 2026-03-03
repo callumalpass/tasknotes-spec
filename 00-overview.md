@@ -85,6 +85,7 @@ This specification is standalone. It does not require conformance to any other s
 
 Implementations MAY internally reuse other libraries or specifications, but conformance claims under `tasknotes-spec` are evaluated only against this document.
 Templating is optional and profile-gated; implementations that do not claim the templating profile remain conformant without template support.
+References to TaskNotes plugin behavior, Obsidian behavior, or external specifications are informative context only unless this specification explicitly marks a requirement as normative.
 
 ## 0.6 Design principles
 

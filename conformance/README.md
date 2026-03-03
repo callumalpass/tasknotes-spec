@@ -8,7 +8,7 @@ This directory contains the reusable `tasknotes-spec` conformance suite.
 - Assertions are shared in `conformance/lib/matchers.mjs`.
 - Implementations provide adapters per `conformance/docs/ADAPTER_CONTRACT.md`.
 - `conformance/manifest.json` tracks total case count and section/profile coverage.
-- `conformance/tests/coverage.test.mjs` enforces that all normative spec sections have fixture representation.
+- `conformance/tests/coverage.test.mjs` enforces both section representation and minimum-depth thresholds for key sections/operations.
 
 ## Run
 

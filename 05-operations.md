@@ -23,15 +23,22 @@ Resolution MUST be deterministic:
 
 1. If caller provides an explicit target date/datetime, that value is authoritative.
 2. If caller omits target for recurring instance operations, implementations MUST resolve in this order:
-   - task `scheduled` date part, if present,
-   - else task `due` date part, if present,
+   - task `scheduled`, if present and target-day-resolvable,
+   - else task `due`, if present and target-day-resolvable,
    - else current local day in active runtime timezone (§3.6).
-3. For non-recurring complete, if caller omits explicit completion-day input, implementations MUST use current local day in active runtime timezone.
+3. Target-day resolution for fallback task fields (`scheduled` / `due`) MUST use this extraction policy:
+   - if stored value is canonical date (`YYYY-MM-DD`), use it as-is;
+   - if stored value is datetime, use the literal date token before `T` (`YYYY-MM-DD`) without timezone shifting;
+   - if stored value is non-canonical but accepted by compatibility policy, implementations MAY normalize to a date token and SHOULD emit a warning;
+   - if a candidate value is unusable, continue to the next fallback source.
+4. For non-recurring complete, if caller omits explicit completion-day input, implementations MUST use current local day in active runtime timezone.
 
 When an explicit target is datetime:
 
 - operations that require day semantics MUST use its calendar date part in active runtime timezone,
 - for recurring `complete instance` with `recurrence_anchor=completion`, the same explicit datetime target MUST also drive `DTSTART` rewrite semantics in §4.4.3.
+
+This explicit-target datetime rule is intentionally distinct from persisted-field fallback extraction above.
 
 ### 5.2.2 Idempotency and `date_modified`
 
@@ -57,6 +64,8 @@ Create MUST:
 - resolve semantic `title` and filename/path behavior according to §9.13,
 - apply create-time templating when enabled and supported (§5.3.5, §9.14, §7),
 - serialize canonical keys and canonical temporal formats,
+- when `recurrence` is present, canonicalize `DTSTART` per §4.4.5,
+- preserve caller-provided semantic `id` when present,
 - fail with validation errors if required constraints are unmet,
 - apply default reminders according to §10.3.9 when configured.
 
@@ -186,10 +195,21 @@ Unknown variables (not in the above lists) MUST be handled per `templating.unkno
 - `preserve`: leave the `{{...}}` placeholder as-is.
 - `empty`: replace with an empty string.
 
+Deterministic expansion context:
+
+- date/time variable expansion MUST use the active runtime timezone from §3.6.
+- locale-sensitive variables (`monthName`, `monthNameShort`, `dayName`, `dayNameShort`, `time12`) MUST use English locale outputs for portability (`January`, `Jan`, `Monday`, `Mon`, `AM`/`PM`).
+- template-generated datetime-like outputs used in frontmatter MUST normalize to second precision when written as canonical datetime roles (§3.3.2).
+
 Failure behavior:
 
 - `templating.failure_mode=error`: template read/parse failures MUST abort create.
 - `templating.failure_mode=warning_fallback`: template read/parse failures MUST continue create using non-templated behavior (base frontmatter + caller body/details) and SHOULD emit warnings (`template_missing` or `template_parse_failed`).
+
+### 5.3.6 Identity handling on create
+
+If semantic `id` is provided on create, writers MUST preserve it.
+If implementation supports auto-generation of semantic `id`, generation policy MUST be documented and resulting `id` MUST remain stable after create.
 
 ## 5.4 Update
 
@@ -270,6 +290,8 @@ For recurring tasks, complete with resolved target date `D` (§5.2.1) MUST follo
 
 Writers MUST NOT convert recurring completion into a base status rewrite unless explicit configuration requires it.
 When `recurrence_anchor=completion` and caller supplies an explicit datetime target, implementations MUST apply §4.4.3 datetime `DTSTART` rewrite behavior.
+When `recurrence_anchor=scheduled` and `DTSTART` is absent, implementations MUST insert `DTSTART` deterministically per §4.4.5.
+Next-occurrence recalculation in this mode MUST follow §4.4.4.
 
 ## 5.8 Uncomplete instance (recurring)
 
@@ -351,6 +373,7 @@ Rename operation changes file path/filename while preserving semantic record ide
 - If `title.storage=filename`, basename changes from rename MUST update effective semantic title.
 - If `title.storage=frontmatter`, rename MUST NOT implicitly rewrite mapped `title` unless explicitly requested.
 - Implementations that persist frontmatter title in `title.storage=filename` mode MUST either update that field on rename or remove it to prevent divergence.
+- If semantic `id` is present, rename/move MUST preserve its value unchanged.
 
 If implementation supports link/reference updating, it MUST:
 
@@ -388,12 +411,14 @@ If dry run mode is supported, operation MUST:
 
 ## 5.18 Error model
 
-Operation failures MUST return structured errors with:
+Implementation-native operation failures MUST provide structured error information with:
 
 - operation name,
 - error code,
 - message,
 - optional field/path context.
+
+For conformance adapter envelopes (§5.21), failures MAY be represented as a compact `error` string for transport compatibility, but implementations SHOULD also expose the structured fields (for example via `error_details`).
 
 ## 5.19 Time tracking management
 
@@ -587,7 +612,7 @@ reminders:
 
 The conformance suite exercises operations via the `execute(operation, input) → envelope` interface defined in the adapter contract. This section specifies the input/output contracts for each conformance-testable operation name.
 
-Unless otherwise noted, all operations return `{ ok: true, result: {...} }` on success and `{ ok: false, error: "..." }` on failure.
+Unless otherwise noted, all operations return `{ ok: true, result: {...} }` on success and `{ ok: false, error: "..." }` on failure. Adapters MAY additionally return `error_details` with structured fields from §5.18.
 
 ### General operations
 

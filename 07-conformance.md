@@ -57,14 +57,27 @@ Additional required capabilities:
 
 - dependency schema support (`blocked_by`)
 - reminder schema support (`reminders`)
-- time-tracking management semantics for `time_entries` (§5.19), including per-task active-session constraints
 - link parsing/resolution semantics for link-bearing fields (§11)
+- time-tracking management semantics for `time_entries` (§5.19), including per-task active-session constraints
 - dependency operations and validation per §10.2
 - reminder operations and validation per §10.3
-- batch operations with structured per-item outcomes
-- reference-aware rename behavior (including dependency UID references)
 
-If `extended` is claimed, all of the above MUST conform to documented semantics.
+If `extended` is claimed, all of the above baseline capabilities MUST conform to documented semantics.
+
+Claiming `extended` also has required capability-token implications:
+
+- `meta.claim.capabilities` MUST include `dependencies`, `reminders`, `links`, and `time-tracking`.
+- Omitting any of these tokens while claiming `extended` is a non-conformant claim (even if capability-gated fixtures are skipped by a runner).
+
+Optional capability extensions within `extended`:
+
+- `rename` capability: reference-aware rename behavior (including dependency UID references)
+- `archive` capability: archive semantics (§5.12)
+- `batch` capability: batch operations with per-item outcomes (§5.15)
+- `concurrency` capability: write-conflict detection semantics (§5.16)
+- `dry-run` capability: dry-run semantics (§5.17)
+
+When an optional capability token is claimed, corresponding behavior MUST conform to documented semantics.
 
 ## 7.4 Conformance claim format
 
@@ -136,7 +149,11 @@ Conformance claims MUST indicate whether `permissive` mode is also supported.
 | dependency schema and ops | - | - | optional | required |
 | reminder schema and ops | - | - | optional | required |
 | time tracking start/stop/edit semantics (§5.19) | - | - | optional | required |
-| rename updates dependency/project links | - | - | optional | required |
+| rename updates dependency/project links | - | - | optional | optional via `rename` capability |
+| archive semantics (§5.12) | - | - | optional | optional via `archive` capability |
+| batch per-item outcomes (§5.15) | - | - | optional | optional via `batch` capability |
+| write-conflict detection (§5.16) | - | - | optional | optional via `concurrency` capability |
+| dry-run reporting (§5.17) | - | - | optional | optional via `dry-run` capability |
 
 ## 7.9 Executable fixture suite
 
@@ -144,16 +161,20 @@ This specification includes an executable fixture suite in `conformance/`.
 
 - language-neutral fixtures are stored in `conformance/fixtures/*.json`
 - section/profile/operation coverage is tracked in `conformance/manifest.json`
+- coverage guard tests MUST enforce both section representation and minimum-depth thresholds for key sections/operations.
 - adapters execute fixture operations per `conformance/docs/ADAPTER_CONTRACT.md`
 - runners MUST execute fixtures only when both conditions hold:
   - fixture `profile` is satisfied by claimed adapter profiles under cumulative profile rules (§7.3),
   - all fixture `requires` capability tokens are present.
 
+Fixture expectations MUST be profile-modular: they MUST NOT assume capability values or profile memberships beyond what the fixture's own `profile`/`requires` gating guarantees.
+Fixtures for optional extension capabilities (`rename`, `archive`, `batch`, `concurrency`, `dry-run`) MUST be capability-gated via `requires` and MUST NOT rely on `extended` profile membership alone.
+
 Conformance claims SHOULD report fixture pass/fail results against the claimed profiles.
 
 ## 7.10 Meta operations
 
-The following operations are part of the conformance interface and MUST be supported by any adapter that participates in the conformance suite, regardless of claimed profile.
+The following operations are part of the conformance interface and MUST be supported by any adapter that participates in the conformance suite, regardless of claimed profile. These meta operations MUST be callable without requiring any capability token.
 
 ### `meta.claim`
 
@@ -168,6 +189,8 @@ Output:
   "result": {
     "implementation": "my-tool",
     "version": "1.0.0",
+    "spec_version": "0.1.0-draft",
+    "validation_modes": ["strict"],
     "profiles": ["core-lite", "recurrence"],
     "capabilities": ["dependencies", "links"]
   }
@@ -180,8 +203,18 @@ Fields:
 |---|---|---|---|
 | `implementation` | string | yes | Human-readable implementation name |
 | `version` | string | yes | Implementation version string |
+| `spec_version` | string | yes | `tasknotes-spec` version targeted by this adapter |
+| `validation_modes` | string[] | yes | Supported validation modes; MUST include `strict` |
 | `profiles` | string[] | yes | Claimed conformance profiles; valid values: `core-lite`, `recurrence`, `extended`, `templating` |
 | `capabilities` | string[] | yes | Optional capability tokens; known tokens listed in §7.11 |
+
+`profiles` lists explicitly claimed profiles. Cumulative profile expansion is applied by runners for fixture selection (§7.3, §7.9), but does not change literal membership semantics of `meta.has_profile`.
+
+Profile-token consistency rules:
+
+- If `profiles` contains `extended`, `capabilities` MUST include `dependencies`, `reminders`, `links`, and `time-tracking`.
+- If `profiles` contains `templating`, `capabilities` MUST include `templating`.
+- Runners and fixture suites SHOULD validate these claim-consistency rules directly from `meta.claim`, not only by capability-gating feature fixtures.
 
 ### `meta.has_capability`
 
@@ -224,11 +257,11 @@ The following capability tokens are defined by this specification. Implementatio
 | `dependencies` | `extended` | Supports `blocked_by`, dependency operations, and dependency validation |
 | `reminders` | `extended` | Supports `reminders`, reminder operations, and reminder validation |
 | `links` | `extended` | Supports link parsing and resolution (§11) |
-| `rename` | `extended` | Supports file rename with reference updates |
-| `archive` | `extended` | Supports archive semantics (§5.12) |
-| `batch` | `extended` | Supports batch operations with per-item outcomes (§5.15) |
-| `concurrency` | `extended` | Supports write-conflict detection (§5.16) |
-| `dry-run` | `extended` | Supports dry-run mode (§5.17) |
 | `time-tracking` | `extended` | Supports time-tracking management operations (§5.19) |
+| `rename` | optional extension under `extended` | Supports file rename with reference updates |
+| `archive` | optional extension under `extended` | Supports archive semantics (§5.12) |
+| `batch` | optional extension under `extended` | Supports batch operations with per-item outcomes (§5.15) |
+| `concurrency` | optional extension under `extended` | Supports write-conflict detection (§5.16) |
+| `dry-run` | optional extension under `extended` | Supports dry-run mode (§5.17) |
 | `migration` | — | Supports migration operations (§8) |
 | `templating` | `templating` | Supports create-time templating (§5.3.5) |

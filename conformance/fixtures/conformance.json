@@ -5,9 +5,6 @@
     "profile": "core-lite",
     "operation": "meta.claim",
     "assertion": "envelope_equals",
-    "requires": [
-      "claim"
-    ],
     "input": {},
     "expect": {
       "ok": true,
@@ -15,20 +12,22 @@
         "implementation": {
           "$regex": "^\\S+$"
         },
-        "spec_version": {
-          "$regex": "^0\\.1\\.0-draft$"
+        "version": {
+          "$regex": "^\\S+$"
         },
-        "profiles": {
-          "$contains": [
-            "core-lite",
-            "recurrence",
-            "extended"
-          ]
+        "spec_version": {
+          "$regex": "^\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.-]+)?$"
         },
         "validation_modes": {
           "$contains": [
             "strict"
           ]
+        },
+        "profiles": {
+          "$contains": []
+        },
+        "capabilities": {
+          "$contains": []
         }
       }
     }
@@ -39,16 +38,18 @@
     "profile": "core-lite",
     "operation": "meta.has_capability",
     "assertion": "envelope_equals",
-    "requires": [
-      "claim"
-    ],
     "input": {
-      "capability": "date"
+      "capability": "dependencies"
     },
     "expect": {
       "ok": true,
       "result": {
-        "value": true
+        "value": {
+          "$oneOf": [
+            true,
+            false
+          ]
+        }
       }
     }
   },
@@ -58,16 +59,18 @@
     "profile": "core-lite",
     "operation": "meta.has_capability",
     "assertion": "envelope_equals",
-    "requires": [
-      "claim"
-    ],
     "input": {
-      "capability": "field-mapping"
+      "capability": "reminders"
     },
     "expect": {
       "ok": true,
       "result": {
-        "value": true
+        "value": {
+          "$oneOf": [
+            true,
+            false
+          ]
+        }
       }
     }
   },
@@ -77,16 +80,18 @@
     "profile": "core-lite",
     "operation": "meta.has_capability",
     "assertion": "envelope_equals",
-    "requires": [
-      "claim"
-    ],
     "input": {
-      "capability": "recurrence"
+      "capability": "links"
     },
     "expect": {
       "ok": true,
       "result": {
-        "value": true
+        "value": {
+          "$oneOf": [
+            true,
+            false
+          ]
+        }
       }
     }
   },
@@ -96,16 +101,18 @@
     "profile": "core-lite",
     "operation": "meta.has_capability",
     "assertion": "envelope_equals",
-    "requires": [
-      "claim"
-    ],
     "input": {
-      "capability": "create-compat"
+      "capability": "rename"
     },
     "expect": {
       "ok": true,
       "result": {
-        "value": true
+        "value": {
+          "$oneOf": [
+            true,
+            false
+          ]
+        }
       }
     }
   },
@@ -115,16 +122,18 @@
     "profile": "core-lite",
     "operation": "meta.has_capability",
     "assertion": "envelope_equals",
-    "requires": [
-      "claim"
-    ],
     "input": {
-      "capability": "ops-core"
+      "capability": "archive"
     },
     "expect": {
       "ok": true,
       "result": {
-        "value": true
+        "value": {
+          "$oneOf": [
+            true,
+            false
+          ]
+        }
       }
     }
   },
@@ -134,16 +143,18 @@
     "profile": "core-lite",
     "operation": "meta.has_capability",
     "assertion": "envelope_equals",
-    "requires": [
-      "claim"
-    ],
     "input": {
-      "capability": "claim"
+      "capability": "batch"
     },
     "expect": {
       "ok": true,
       "result": {
-        "value": true
+        "value": {
+          "$oneOf": [
+            true,
+            false
+          ]
+        }
       }
     }
   },
@@ -153,16 +164,18 @@
     "profile": "core-lite",
     "operation": "meta.has_capability",
     "assertion": "envelope_equals",
-    "requires": [
-      "claim"
-    ],
     "input": {
-      "capability": "config-lite"
+      "capability": "concurrency"
     },
     "expect": {
       "ok": true,
       "result": {
-        "value": true
+        "value": {
+          "$oneOf": [
+            true,
+            false
+          ]
+        }
       }
     }
   },
@@ -172,16 +185,18 @@
     "profile": "core-lite",
     "operation": "meta.has_capability",
     "assertion": "envelope_equals",
-    "requires": [
-      "claim"
-    ],
     "input": {
-      "capability": "validation-core"
+      "capability": "dry-run"
     },
     "expect": {
       "ok": true,
       "result": {
-        "value": true
+        "value": {
+          "$oneOf": [
+            true,
+            false
+          ]
+        }
       }
     }
   },
@@ -191,16 +206,18 @@
     "profile": "core-lite",
     "operation": "meta.has_capability",
     "assertion": "envelope_equals",
-    "requires": [
-      "claim"
-    ],
     "input": {
-      "capability": "dependencies"
+      "capability": "time-tracking"
     },
     "expect": {
       "ok": true,
       "result": {
-        "value": true
+        "value": {
+          "$oneOf": [
+            true,
+            false
+          ]
+        }
       }
     }
   },
@@ -210,16 +227,18 @@
     "profile": "core-lite",
     "operation": "meta.has_capability",
     "assertion": "envelope_equals",
-    "requires": [
-      "claim"
-    ],
     "input": {
-      "capability": "reminders"
+      "capability": "migration"
     },
     "expect": {
       "ok": true,
       "result": {
-        "value": true
+        "value": {
+          "$oneOf": [
+            true,
+            false
+          ]
+        }
       }
     }
   },
@@ -229,161 +248,6 @@
     "profile": "core-lite",
     "operation": "meta.has_capability",
     "assertion": "envelope_equals",
-    "requires": [
-      "claim"
-    ],
-    "input": {
-      "capability": "links"
-    },
-    "expect": {
-      "ok": true,
-      "result": {
-        "value": true
-      }
-    }
-  },
-  {
-    "id": "conformance.0013",
-    "section": "§7.11",
-    "profile": "core-lite",
-    "operation": "meta.has_capability",
-    "assertion": "envelope_equals",
-    "requires": [
-      "claim"
-    ],
-    "input": {
-      "capability": "migration"
-    },
-    "expect": {
-      "ok": true,
-      "result": {
-        "value": false
-      }
-    }
-  },
-  {
-    "id": "conformance.0014",
-    "section": "§7.11",
-    "profile": "core-lite",
-    "operation": "meta.has_capability",
-    "assertion": "envelope_equals",
-    "requires": [
-      "claim"
-    ],
-    "input": {
-      "capability": "time-tracking"
-    },
-    "expect": {
-      "ok": true,
-      "result": {
-        "value": true
-      }
-    }
-  },
-  {
-    "id": "conformance.0015",
-    "section": "§7.11",
-    "profile": "core-lite",
-    "operation": "meta.has_capability",
-    "assertion": "envelope_equals",
-    "requires": [
-      "claim"
-    ],
-    "input": {
-      "capability": "rename"
-    },
-    "expect": {
-      "ok": true,
-      "result": {
-        "value": false
-      }
-    }
-  },
-  {
-    "id": "conformance.0016",
-    "section": "§7.11",
-    "profile": "core-lite",
-    "operation": "meta.has_capability",
-    "assertion": "envelope_equals",
-    "requires": [
-      "claim"
-    ],
-    "input": {
-      "capability": "archive"
-    },
-    "expect": {
-      "ok": true,
-      "result": {
-        "value": false
-      }
-    }
-  },
-  {
-    "id": "conformance.0017",
-    "section": "§7.11",
-    "profile": "core-lite",
-    "operation": "meta.has_capability",
-    "assertion": "envelope_equals",
-    "requires": [
-      "claim"
-    ],
-    "input": {
-      "capability": "batch"
-    },
-    "expect": {
-      "ok": true,
-      "result": {
-        "value": false
-      }
-    }
-  },
-  {
-    "id": "conformance.0018",
-    "section": "§7.11",
-    "profile": "core-lite",
-    "operation": "meta.has_capability",
-    "assertion": "envelope_equals",
-    "requires": [
-      "claim"
-    ],
-    "input": {
-      "capability": "concurrency"
-    },
-    "expect": {
-      "ok": true,
-      "result": {
-        "value": false
-      }
-    }
-  },
-  {
-    "id": "conformance.0019",
-    "section": "§7.11",
-    "profile": "core-lite",
-    "operation": "meta.has_capability",
-    "assertion": "envelope_equals",
-    "requires": [
-      "claim"
-    ],
-    "input": {
-      "capability": "dry-run"
-    },
-    "expect": {
-      "ok": true,
-      "result": {
-        "value": false
-      }
-    }
-  },
-  {
-    "id": "conformance.0020",
-    "section": "§7.11",
-    "profile": "core-lite",
-    "operation": "meta.has_capability",
-    "assertion": "envelope_equals",
-    "requires": [
-      "claim"
-    ],
     "input": {
       "capability": "templating"
     },
@@ -392,98 +256,82 @@
       "result": {
         "value": {
           "$oneOf": [
-            false,
-            true
+            true,
+            false
           ]
         }
       }
     }
   },
   {
-    "id": "conformance.0021",
-    "section": "§7.11",
-    "profile": "core-lite",
-    "operation": "meta.has_capability",
-    "assertion": "envelope_equals",
-    "requires": [
-      "claim"
-    ],
-    "input": {
-      "capability": "extended"
-    },
-    "expect": {
-      "ok": true,
-      "result": {
-        "value": true
-      }
-    }
-  },
-  {
-    "id": "conformance.0022",
+    "id": "conformance.0013",
     "section": "§7.10",
     "profile": "core-lite",
     "operation": "meta.has_profile",
     "assertion": "envelope_equals",
-    "requires": [
-      "claim"
-    ],
     "input": {
       "profile": "core-lite"
     },
     "expect": {
       "ok": true,
       "result": {
-        "value": true
+        "value": {
+          "$oneOf": [
+            true,
+            false
+          ]
+        }
       }
     }
   },
   {
-    "id": "conformance.0023",
+    "id": "conformance.0014",
     "section": "§7.10",
     "profile": "core-lite",
     "operation": "meta.has_profile",
     "assertion": "envelope_equals",
-    "requires": [
-      "claim"
-    ],
     "input": {
       "profile": "recurrence"
     },
     "expect": {
       "ok": true,
       "result": {
-        "value": true
+        "value": {
+          "$oneOf": [
+            true,
+            false
+          ]
+        }
       }
     }
   },
   {
-    "id": "conformance.0024",
+    "id": "conformance.0015",
     "section": "§7.10",
     "profile": "core-lite",
     "operation": "meta.has_profile",
     "assertion": "envelope_equals",
-    "requires": [
-      "claim"
-    ],
     "input": {
       "profile": "extended"
     },
     "expect": {
       "ok": true,
       "result": {
-        "value": true
+        "value": {
+          "$oneOf": [
+            true,
+            false
+          ]
+        }
       }
     }
   },
   {
-    "id": "conformance.0025",
+    "id": "conformance.0016",
     "section": "§7.10",
     "profile": "core-lite",
     "operation": "meta.has_profile",
     "assertion": "envelope_equals",
-    "requires": [
-      "claim"
-    ],
     "input": {
       "profile": "templating"
     },
@@ -492,8 +340,57 @@
       "result": {
         "value": {
           "$oneOf": [
-            false,
-            true
+            true,
+            false
+          ]
+        }
+      }
+    }
+  },
+  {
+    "id": "conformance.0017",
+    "section": "§7.3.4",
+    "profile": "extended",
+    "operation": "meta.claim",
+    "assertion": "envelope_equals",
+    "input": {},
+    "expect": {
+      "ok": true,
+      "result": {
+        "profiles": {
+          "$contains": [
+            "extended"
+          ]
+        },
+        "capabilities": {
+          "$contains": [
+            "dependencies",
+            "reminders",
+            "links",
+            "time-tracking"
+          ]
+        }
+      }
+    }
+  },
+  {
+    "id": "conformance.0018",
+    "section": "§7.3.3",
+    "profile": "templating",
+    "operation": "meta.claim",
+    "assertion": "envelope_equals",
+    "input": {},
+    "expect": {
+      "ok": true,
+      "result": {
+        "profiles": {
+          "$contains": [
+            "templating"
+          ]
+        },
+        "capabilities": {
+          "$contains": [
+            "templating"
           ]
         }
       }

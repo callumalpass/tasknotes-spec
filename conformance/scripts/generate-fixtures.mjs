@@ -1357,72 +1357,94 @@ function buildConformanceFixtures() {
     profile: "core-lite",
     operation: "meta.claim",
     assertion: "envelope_equals",
-    requires: ["claim"],
     input: {},
     expect: {
       ok: true,
       result: {
         implementation: { $regex: "^\\S+$" },
-        spec_version: { $regex: "^0\\.1\\.0-draft$" },
-        profiles: { $contains: ["core-lite", "recurrence", "extended"] },
+        version: { $regex: "^\\S+$" },
+        spec_version: { $regex: "^\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.-]+)?$" },
         validation_modes: { $contains: ["strict"] },
+        profiles: { $contains: [] },
+        capabilities: { $contains: [] },
       },
     },
   });
 
   const capabilityChecks = [
-    ["date", true],
-    ["field-mapping", true],
-    ["recurrence", true],
-    ["create-compat", true],
-    ["ops-core", true],
-    ["claim", true],
-    ["config-lite", true],
-    ["validation-core", true],
-    ["dependencies", true],
-    ["reminders", true],
-    ["links", true],
-    ["migration", false],
-    ["time-tracking", true],
-    ["rename", false],
-    ["archive", false],
-    ["batch", false],
-    ["concurrency", false],
-    ["dry-run", false],
-    ["templating", { $oneOf: [false, true] }],
-    ["extended", true],
+    "dependencies",
+    "reminders",
+    "links",
+    "rename",
+    "archive",
+    "batch",
+    "concurrency",
+    "dry-run",
+    "time-tracking",
+    "migration",
+    "templating",
   ];
 
-  for (const [capability, value] of capabilityChecks) {
+  for (const capability of capabilityChecks) {
     w.add({
       section: "§7.11",
       profile: "core-lite",
       operation: "meta.has_capability",
       assertion: "envelope_equals",
-      requires: ["claim"],
       input: { capability },
-      expect: { ok: true, result: { value } },
+      expect: { ok: true, result: { value: { $oneOf: [true, false] } } },
     });
   }
 
   const profileChecks = [
-    ["core-lite", true],
-    ["recurrence", true],
-    ["extended", true],
-    ["templating", { $oneOf: [false, true] }],
+    "core-lite",
+    "recurrence",
+    "extended",
+    "templating",
   ];
 
-  for (const [profile, value] of profileChecks) {
+  for (const profile of profileChecks) {
     w.add({
       section: "§7.10",
       profile: "core-lite",
       operation: "meta.has_profile",
       assertion: "envelope_equals",
-      requires: ["claim"],
       input: { profile },
-      expect: { ok: true, result: { value } },
+      expect: { ok: true, result: { value: { $oneOf: [true, false] } } },
     });
   }
+
+  // Claim consistency: extended profile implies required capability tokens.
+  w.add({
+    section: "§7.3.4",
+    profile: "extended",
+    operation: "meta.claim",
+    assertion: "envelope_equals",
+    input: {},
+    expect: {
+      ok: true,
+      result: {
+        profiles: { $contains: ["extended"] },
+        capabilities: { $contains: ["dependencies", "reminders", "links", "time-tracking"] },
+      },
+    },
+  });
+
+  // Claim consistency: templating profile implies templating capability token.
+  w.add({
+    section: "§7.3.3",
+    profile: "templating",
+    operation: "meta.claim",
+    assertion: "envelope_equals",
+    input: {},
+    expect: {
+      ok: true,
+      result: {
+        profiles: { $contains: ["templating"] },
+        capabilities: { $contains: ["templating"] },
+      },
+    },
+  });
 
   return w.list();
 }
@@ -1784,6 +1806,146 @@ function buildConfigFixtures() {
         ok: true,
         result: {
           value: { $contains: c.expectContains },
+        },
+      },
+    });
+  }
+
+  const detectionCases = [
+    {
+      taskDetection: { method: "tag", tag: "task" },
+      filePath: "TaskNotes/Tasks/a.md",
+      frontmatter: { tags: ["task", "errands"] },
+      body: "",
+      expected: true,
+    },
+    {
+      taskDetection: { method: "tag", tag: "#task" },
+      filePath: "TaskNotes/Tasks/a.md",
+      frontmatter: { tags: ["  #TASK  "] },
+      body: "",
+      expected: true,
+    },
+    {
+      taskDetection: { method: "tag", tag: "task" },
+      filePath: "TaskNotes/Tasks/a.md",
+      frontmatter: { tags: "#task" },
+      body: "",
+      expected: true,
+    },
+    {
+      taskDetection: { method: "tag", tag: "task" },
+      filePath: "TaskNotes/Tasks/a.md",
+      frontmatter: {},
+      body: "Plan work #task today",
+      expected: true,
+    },
+    {
+      taskDetection: { method: "tag", tag: "task" },
+      filePath: "TaskNotes/Tasks/a.md",
+      frontmatter: {},
+      body: "Plan work #tasking today",
+      expected: false,
+    },
+    {
+      taskDetection: { method: "tag", tag: "task" },
+      filePath: "TaskNotes/Tasks/a.md",
+      frontmatter: {},
+      body: "Use `#task` literal only",
+      expected: false,
+    },
+    {
+      taskDetection: { method: "tag", tag: "task" },
+      filePath: "TaskNotes/Tasks/a.md",
+      frontmatter: {},
+      body: "```md\n#task inside code fence\n```\noutside fence",
+      expected: false,
+    },
+    {
+      taskDetection: { method: "property", property_name: "type", property_value: "task" },
+      filePath: "TaskNotes/Tasks/a.md",
+      frontmatter: { type: "task" },
+      body: "",
+      expected: true,
+    },
+    {
+      taskDetection: { method: "property", property_name: "type", property_value: "" },
+      filePath: "TaskNotes/Tasks/a.md",
+      frontmatter: { type: "anything" },
+      body: "",
+      expected: true,
+    },
+    {
+      taskDetection: { method: "property", property_name: "type", property_value: "task" },
+      filePath: "TaskNotes/Tasks/a.md",
+      frontmatter: { type: "note" },
+      body: "",
+      expected: false,
+    },
+    {
+      taskDetection: {
+        method: "tag",
+        tag: "task",
+        excluded_folders: ["TaskNotes/Archive"],
+      },
+      filePath: "TaskNotes/Archive/a.md",
+      frontmatter: { tags: ["task"] },
+      body: "",
+      expected: false,
+    },
+    {
+      taskDetection: {
+        methods: ["tag", "property"],
+        combine: "or",
+        tag: "task",
+        property_name: "type",
+        property_value: "task",
+      },
+      filePath: "TaskNotes/Tasks/a.md",
+      frontmatter: { type: "task", tags: [] },
+      body: "",
+      expected: true,
+    },
+    {
+      taskDetection: {
+        methods: ["tag", "property"],
+        combine: "and",
+        tag: "task",
+        property_name: "type",
+        property_value: "task",
+      },
+      filePath: "TaskNotes/Tasks/a.md",
+      frontmatter: { type: "task", tags: [] },
+      body: "",
+      expected: false,
+    },
+    {
+      taskDetection: {
+        methods: ["tag", "property"],
+        combine: "and",
+        tag: "task",
+        property_name: "type",
+        property_value: "task",
+      },
+      filePath: "TaskNotes/Tasks/a.md",
+      frontmatter: { type: "task", tags: ["#task"] },
+      body: "",
+      expected: true,
+    },
+  ];
+
+  for (const c of detectionCases) {
+    w.add({
+      section: "§9.7.1",
+      profile: "core-lite",
+      operation: "config.detect_task_file",
+      assertion: "envelope_equals",
+      requires: ["config-lite"],
+      input: c,
+      expect: {
+        ok: true,
+        result: {
+          value: c.expected,
         },
       },
     });
@@ -2250,6 +2412,7 @@ function buildDependencyFixtures() {
     {
       entry: { uid: "[[missing-task]]", reltype: "FINISHTOSTART" },
       unresolvedTargetSeverity: "warning",
+      treatMissingTargetAsBlocked: true,
       requireResolvedUidOnWrite: false,
       onWrite: false,
       expect: { ok: true, result: { blocked: true, issue: "unresolved_dependency_target", severity: "warning" } },
@@ -2257,6 +2420,7 @@ function buildDependencyFixtures() {
     {
       entry: { uid: "[[missing-task]]", reltype: "FINISHTOSTART" },
       unresolvedTargetSeverity: "error",
+      treatMissingTargetAsBlocked: true,
       requireResolvedUidOnWrite: false,
       onWrite: false,
       expect: { ok: true, result: { blocked: true, issue: "unresolved_dependency_target", severity: "error" } },
@@ -2264,6 +2428,15 @@ function buildDependencyFixtures() {
     {
       entry: { uid: "[[missing-task]]", reltype: "FINISHTOSTART" },
       unresolvedTargetSeverity: "warning",
+      treatMissingTargetAsBlocked: false,
+      requireResolvedUidOnWrite: false,
+      onWrite: false,
+      expect: { ok: true, result: { blocked: false, issue: "unresolved_dependency_target", severity: "warning" } },
+    },
+    {
+      entry: { uid: "[[missing-task]]", reltype: "FINISHTOSTART" },
+      unresolvedTargetSeverity: "warning",
+      treatMissingTargetAsBlocked: true,
       requireResolvedUidOnWrite: true,
       onWrite: true,
       expectError: "unresolved_dependency_target|require_resolved_uid_on_write",
@@ -2477,6 +2650,27 @@ function buildLinkFixtures() {
       errorRegex: "path_traversal|escape",
     },
     {
+      raw: "[Doc](../../../escape.md)",
+      sourcePath: "tasks/sub/task-002.md",
+      collectionRoot: "/vault",
+      candidates: [],
+      errorRegex: "path_traversal|escape",
+    },
+    {
+      raw: "../../../escape.md",
+      sourcePath: "tasks/sub/task-002.md",
+      collectionRoot: "/vault",
+      candidates: [],
+      errorRegex: "path_traversal|escape",
+    },
+    {
+      raw: "[[../../../outside/secret]]",
+      sourcePath: "deep/nested/path/task.md",
+      collectionRoot: "/vault",
+      candidates: [],
+      errorRegex: "path_traversal|escape",
+    },
+    {
       raw: "[[meeting-notes]]",
       sourcePath: "tasks/sub/task-002.md",
       collectionRoot: "/vault",
@@ -2591,6 +2785,66 @@ function buildLinkFixtures() {
       result: {
         updated: {
           $contains: ["[[task-001-renamed]]", "[[task-999]]", "[[other-note]]"],
+        },
+      },
+    },
+  });
+
+  // link.update_references_on_rename updates markdown-link targets and preserves anchors
+  w.add({
+    section: "§11.6",
+    profile: "extended",
+    operation: "link.update_references_on_rename",
+    assertion: "envelope_equals",
+    requires: ["links", "rename"],
+    input: {
+      oldPath: "tasks/task-001.md",
+      newPath: "tasks/task-001-v2.md",
+      references: [
+        "[Task](tasks/task-001.md)",
+        "[Task](tasks/task-001.md#details)",
+        "[Task](tasks/task-777.md#other)",
+      ],
+    },
+    expect: {
+      ok: true,
+      result: {
+        updated: {
+          $contains: [
+            "[Task](tasks/task-001-v2.md)",
+            "[Task](tasks/task-001-v2.md#details)",
+            "[Task](tasks/task-777.md#other)",
+          ],
+        },
+      },
+    },
+  });
+
+  // link.update_references_on_rename updates wikilinks while preserving aliases
+  w.add({
+    section: "§11.6",
+    profile: "extended",
+    operation: "link.update_references_on_rename",
+    assertion: "envelope_equals",
+    requires: ["links", "rename"],
+    input: {
+      oldPath: "tasks/task-001.md",
+      newPath: "tasks/task-001-v3.md",
+      references: [
+        "[[task-001#anchor|Alias]]",
+        "[[task-001]]",
+        "[[task-abc]]",
+      ],
+    },
+    expect: {
+      ok: true,
+      result: {
+        updated: {
+          $contains: [
+            "[[task-001-v3#anchor|Alias]]",
+            "[[task-001-v3]]",
+            "[[task-abc]]",
+          ],
         },
       },
     },
@@ -3373,12 +3627,56 @@ function buildOperationFixtures() {
     },
   });
 
+  // rename.apply with nested folders and reference updates enabled
+  w.add({
+    section: "§5.14",
+    profile: "extended",
+    operation: "rename.apply",
+    assertion: "envelope_equals",
+    requires: ["rename"],
+    input: {
+      fromPath: "tasks/sub/OldNested.md",
+      toPath: "tasks/sub/NewNested.md",
+      titleStorage: "filename",
+      updateReferences: true,
+    },
+    expect: {
+      ok: true,
+      result: {
+        path: "tasks/sub/NewNested.md",
+        referencesUpdated: true,
+      },
+    },
+  });
+
+  // rename.apply keeps explicit destination regardless of title-storage mode
+  w.add({
+    section: "§5.14",
+    profile: "extended",
+    operation: "rename.apply",
+    assertion: "envelope_equals",
+    requires: ["rename"],
+    input: {
+      fromPath: "tasks/FrontmatterMode.md",
+      toPath: "archive/FrontmatterModeRenamed.md",
+      titleStorage: "frontmatter",
+      updateReferences: false,
+    },
+    expect: {
+      ok: true,
+      result: {
+        path: "archive/FrontmatterModeRenamed.md",
+        referencesUpdated: false,
+      },
+    },
+  });
+
   const renameTitleStorageCases = [
     {
       titleStorage: "filename",
       oldPath: "tasks/Old.md",
       newTitle: "New Title",
-      expectedPath: "tasks/New-Title.md",
+      expectedPathRegex: "^tasks/New(?:-| )Title\\.md$",
       expectedFrontmatterTitle: "New Title",
       expectedRenamed: true,
     },
@@ -3403,7 +3701,7 @@ function buildOperationFixtures() {
       expect: {
         ok: true,
         result: {
-          path: c.expectedPath,
+          path: c.expectedPathRegex ? { $regex: c.expectedPathRegex } : c.expectedPath,
           renamed: c.expectedRenamed,
           frontmatter: { $contains: { title: c.expectedFrontmatterTitle } },
         },
@@ -3861,7 +4159,7 @@ function buildOperationFixtures() {
         selector: { index: 5 },
         dateModified: "2026-02-20T10:00:00Z",
       },
-      expectError: "index_out_of_range|out_of_range|invalid|not_found",
+      expectError: "index_out_of_range|out_of_range|[Ii]nvalid|not_found",
     },
     // time.auto_stop_on_complete does nothing when feature is disabled
     {

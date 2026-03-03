@@ -37,15 +37,15 @@ Validators MUST apply this conditional rule and MUST NOT treat `completed_date` 
 
 ### 2.2.2 Conditional requiredness (`title`)
 
-Semantic `title` is always required, with deterministic read resolution and storage-mode-dependent write behavior:
+Semantic `title` is always required, with deterministic read resolution and storage-mode-dependent read/write behavior:
 
-- Readers MUST resolve semantic title using this order:
-  1. mapped `title` key when present and non-empty;
-  2. file basename fallback.
-- If both mapped `title` and filename-derived title exist and differ, mapped `title` value MUST win and implementations SHOULD emit `title_source_conflict`.
+- Readers MUST resolve semantic title using storage-mode-aware precedence (§9.13):
+  1. when `title.storage=frontmatter`: mapped `title` key when present and non-empty, then file basename fallback;
+  2. when `title.storage=filename`: file basename first, then mapped `title` fallback when basename is unavailable.
+- If mapped title and filename-derived title both exist and differ, the source authoritative for active `title.storage` MUST win and implementations SHOULD emit `title_source_conflict`.
 - Title storage mode controls canonical writes (§9.13): `frontmatter` favors mapped-key writes; `filename` favors filename-derived title with rename-on-title-change behavior.
 
-Validators MUST enforce semantic title presence using title resolution policy (§9.13), not frontmatter key presence alone.
+Validators MUST enforce semantic title presence using the active title-resolution policy (§9.13), not frontmatter key presence alone.
 
 ## 2.3 Common semantic roles
 
@@ -53,6 +53,7 @@ Implementations conforming beyond minimal scope SHOULD support:
 
 | Semantic role | Type | Notes |
 |---|---|---|
+| `id` | string | stable task identity token; see §2.6.5 |
 | `priority` | string/enum | configurable values |
 | `due` | date or datetime | see §3 |
 | `scheduled` | date or datetime | see §3 |
@@ -76,6 +77,7 @@ Optional extended roles are defined in §7 profiles.
 
 An implementation MUST have an effective mapping from each supported semantic role to a canonical write key.
 Mapping configuration is defined in §9.
+If semantic role `id` is supported, it MUST also have a canonical write key.
 
 ### 2.4.2 Read behavior
 
@@ -158,6 +160,15 @@ Detailed semantics are defined in §10. `uid` parsing and resolution MUST follow
 
 Detailed semantics are defined in §10.
 
+### 2.6.5 id (stable task identity)
+
+When semantic role `id` is present:
+
+- value MUST be a non-empty string.
+- value MUST be treated as stable identity metadata and MUST NOT be rewritten by rename, move, or title-change operations.
+- readers and link resolution MAY use it as an identity lookup key (see §11.4 Step 3).
+- implementations SHOULD keep `id` unique within a collection; duplicate IDs SHOULD produce a validation issue.
+
 ## 2.7 Unknown fields
 
 Unknown frontmatter keys MUST be preserved by default during updates, complete/uncomplete, skip/unskip, dependency mutations, reminder mutations, and archive operations.
@@ -173,6 +184,7 @@ Example effective mapping:
 
 ```yaml
 mapping:
+  id: id
   title: title
   status: status
   date_created: dateCreated
@@ -192,6 +204,7 @@ mapping:
 
 ```markdown
 ---
+id: task-2026-01-10-weekly-review
 title: Weekly review
 status: open
 priority: high

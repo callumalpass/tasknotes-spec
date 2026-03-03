@@ -32,7 +32,7 @@ A conforming validator MUST implement checks required by the claimed profile(s):
 |---|---|---|
 | 1 | Unconditionally required semantic roles are present (`status`, `date_created`, `date_modified`). | `core-lite` and above |
 | 1a | `completed_date` conditional requiredness is enforced per §2.2.1. | `core-lite` and above |
-| 1b | `title` resolves via title policy (§2.2.2 and §9.13): frontmatter-first, basename fallback. | `core-lite` and above |
+| 1b | `title` resolves via active title policy (§2.2.2 and §9.13): storage-mode-aware precedence and fallback. | `core-lite` and above |
 | 2 | Field values match role type requirements. | `core-lite` and above |
 | 3 | Temporal values conform to §3. | `core-lite` and above |
 | 4 | Recurrence values conform to §4 (including anchor-seed resolution rules). | `recurrence` and above |
@@ -46,6 +46,7 @@ A conforming validator MUST implement checks required by the claimed profile(s):
 | 12 | link-bearing fields (`projects`, `blocked_by.uid`) conform to §11 parsing/resolution and traversal safety. | `extended` |
 | 13 | templating configuration is valid when provided (`templating` schema and enums). | `templating` |
 | 14 | create-time template failures obey configured failure mode (`error` vs fallback). | `templating` |
+| 15 | semantic `id` (when present) is a non-empty string; duplicate collection-level IDs SHOULD be reported when detectable. | any profile that supports semantic `id` |
 
 ## 6.5 Unknown field policy
 
@@ -86,7 +87,7 @@ Issues SHOULD include:
 | `invalid_dependency_entry` | error | dependency object missing required fields |
 | `invalid_dependency_reltype` | error | dependency reltype not allowed |
 | `invalid_dependency_gap` | error | dependency gap not valid ISO 8601 duration |
-| `duplicate_dependency_uid` | warning (or error by policy) | repeated dependency uid in task |
+| `duplicate_dependency_uid` | error in strict mode when `dependencies.enforce_unique_uid=true`; warning otherwise by policy | repeated dependency uid in task |
 | `self_dependency` | error | task depends on itself |
 | `unresolved_dependency_target` | warning | dependency target not resolvable |
 | `invalid_reminder_entry` | error | reminder object missing required fields |
@@ -100,9 +101,11 @@ Issues SHOULD include:
 | `ambiguous_link` | warning | link resolves to multiple candidates |
 | `path_traversal` | error | resolved path escapes collection root |
 | `unresolved_link_target` | warning | link target cannot be resolved |
+| `invalid_task_id` | error | semantic `id` is empty or invalid type |
+| `duplicate_task_id` | warning | duplicate semantic `id` detected in collection scope |
 | `alias_conflict_ignored` | warning | alias key ignored due to canonical conflict |
 | `unresolvable_title` | error | title cannot be resolved from title resolution policy |
-| `title_source_conflict` | warning | mapped title and filename title differ; mapped title used |
+| `title_source_conflict` | warning | mapped title and filename title differ; active title-storage policy selected authoritative source |
 | `template_missing` | warning | configured template file cannot be read/found |
 | `template_parse_failed` | warning | template frontmatter/body parsing or expansion failed |
 | `unknown_field` | info | unmapped field encountered |
@@ -114,6 +117,8 @@ Implementations MAY extend this code set but SHOULD preserve existing meanings.
 In strict mode, mutating operations MUST fail if any error-severity issue is present after applying intended changes.
 
 Warnings SHOULD NOT block writes unless explicitly configured.
+
+Datetime/date acceptance and rejection in validation MUST follow the normative matrix in §3.4.4.
 
 ## 6.9 Validation examples
 

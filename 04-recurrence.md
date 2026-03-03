@@ -74,6 +74,28 @@ When `recurrence_anchor=completion` and instance completion succeeds for resolve
 4. RRULE components other than `DTSTART` MUST be preserved unless an explicit recurrence-edit operation changes them.
 5. If `DTSTART` is absent, completion-anchor progression MUST insert it before RRULE parameters.
 
+### 4.4.4 Recalculation semantics for `recurrence_anchor=completion`
+
+When calculating the next candidate occurrence for `recurrence_anchor=completion`:
+
+1. Implementations MUST treat `DTSTART` progression as the consumed-history mechanism.
+2. `complete_instances` MUST NOT be used as an exclusion set for future occurrence selection in this mode.
+3. `skipped_instances` MUST still exclude matching candidate dates.
+4. Candidate selection MUST choose the first RRULE occurrence strictly after the current `DTSTART` anchor (or resolved seed if `DTSTART` is absent).
+
+This matches the completion-anchor progression model where each completion advances the chain by rewriting `DTSTART`.
+
+### 4.4.5 `DTSTART` canonicalization on recurring writes
+
+To ensure stable recurrence materialization across implementations, writers that persist recurring tasks MUST ensure `DTSTART` is present after create or successful recurring-instance completion.
+
+Rules:
+
+1. If persisted `recurrence` already contains `DTSTART`, keep it unless an explicit operation updates it per §4.4.3.
+2. If persisted `recurrence` omits `DTSTART`, writers MUST resolve a seed using §4.4.1 and insert `DTSTART` before RRULE parameters.
+3. For `recurrence_anchor=scheduled`, inserted `DTSTART` becomes the fixed progression baseline and MUST NOT be rewritten by later scheduled-anchor completions.
+4. If seed resolution fails, operation MUST fail deterministically and emit `missing_recurrence_seed`.
+
 ## 4.5 Instance state fields
 
 Per-instance state is represented by:
@@ -210,6 +232,21 @@ recurrenceAnchor: completion
 
 If implementation supports next-occurrence materialization, it MUST compute next occurrence relative to completion progression when anchor is `completion`, not solely by scheduled chain.
 Implementations using `DTSTART` progression MUST update `DTSTART` to the completion date for this mode.
+
+Worked example (`recurrence_anchor=completion`):
+
+```yaml
+recurrence: DTSTART:20260220;FREQ=DAILY
+recurrence_anchor: completion
+complete_instances: [2026-02-20, 2026-02-21]
+skipped_instances: [2026-02-23]
+```
+
+Conforming recalculation:
+
+- does **not** exclude `2026-02-22` because it is absent from `skipped_instances`,
+- does exclude `2026-02-23` because it is skipped,
+- ignores `complete_instances` for future exclusion in this mode (§4.4.4).
 
 ## 4.17 Validation examples
 

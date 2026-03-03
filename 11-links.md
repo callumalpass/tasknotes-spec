@@ -2,13 +2,19 @@
 
 ## 11.1 Purpose
 
-This section defines link syntax, parsing, resolution, and write-format semantics for link-bearing task fields — primarily `projects` and `blocked_by.uid`. The resolution algorithm aligns with `mdbase-spec §8` and Obsidian's own wikilink semantics.
+This section defines link syntax, parsing, resolution, and write-format semantics for link-bearing task fields — primarily `projects` and `blocked_by.uid`.
+Alignment with Obsidian and other ecosystems is informative context only; normative conformance is defined entirely by this section.
+
+Applicability:
+
+- Implementations claiming profile `extended` (§7.3.4) MUST conform to this section for supported link-bearing roles.
+- Implementations that do not claim `extended` MAY treat link-shaped strings as opaque data and are not required to implement §11 behavior.
 
 ---
 
 ## 11.2 Link formats
 
-Implementations MUST support three link formats.
+Implementations that conform to §11 (see §11.1 applicability) MUST support three link formats.
 
 ### 11.2.1 Wikilinks
 
@@ -120,7 +126,9 @@ For simple wikilink names (no path separator):
    - For `blocked_by.uid`: scope to files matching `task_detection` (task files only)
    - For `projects`: scope to all markdown files in the collection unless narrowed by explicit configuration
 
-2. **ID match pass:** search scoped files for a frontmatter `id` field equal to the name.
+2. **ID match pass:** search scoped files for semantic role `id` (§2.6.5) equal to the name.
+   - Implementations MAY treat literal frontmatter key `id` as compatibility input when semantic mapping for `id` is unavailable.
+   - Equality MUST be exact string equality.
    - If exactly one match: resolve to that file
    - If multiple matches: fail with `ambiguous_link`
 
@@ -131,7 +139,8 @@ For simple wikilink names (no path separator):
    b. Shortest path (fewest path segments)
    c. Lexicographically smallest path
 
-5. If still ambiguous after all tiebreakers: resolve to `null` and emit `ambiguous_link`
+5. Implementations MUST deduplicate normalized candidate paths before applying tiebreakers.
+6. If candidate selection is still non-singleton after deduplication and all tiebreakers (for example equivalent-path collisions under implementation-specific normalization), resolve to `null` and emit `ambiguous_link`.
 
 ### Step 4: Extension handling
 
@@ -280,6 +289,7 @@ If unresolved:
 `blocked_by.uid` values MUST use this section's parsing/resolution rules.
 
 For dependency semantics, unresolved `uid` handling follows §10.2.6.
+For unresolved-target severity, `dependencies.unresolved_target_severity` controls and takes precedence over `links.unresolved_default_severity`.
 
 The canonical write form for `uid` values is specified in §11.6.
 
@@ -292,7 +302,7 @@ If an implementation supports reference updates on rename (i.e. claims the `rena
 1. It MUST update resolvable references in `blocked_by.uid` and `projects` link fields.
 2. It SHOULD update links in body content.
 3. It SHOULD preserve the original link format when possible.
-4. It MUST preserve alias and anchor components where valid.
+4. It MUST preserve alias and anchor components where valid for the target field. For `blocked_by.uid`, alias and anchor are non-canonical and MUST be removed on write (§11.6).
 5. It MUST report unresolved or ambiguous rewrite cases.
 
 If reference updates are not supported, this limitation MUST be disclosed in conformance claims.
@@ -311,6 +321,7 @@ Link validation issues:
 | `path_traversal` | error | Resolved path escapes collection root |
 
 `unresolved_link_target` severity may be promoted to error via `links.unresolved_default_severity=error`.
+For `blocked_by.uid`, use `unresolved_dependency_target` severity policy from §10.2.6 instead of `unresolved_link_target`.
 
 ---
 

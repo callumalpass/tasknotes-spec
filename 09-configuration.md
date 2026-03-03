@@ -35,7 +35,8 @@ Provider precedence MUST be deterministic.
 Unless explicitly documented otherwise, implementations MUST resolve configuration per top-level key:
 
 - for each key in §9.3/§9.4, the highest-precedence provider that supplies that key wins,
-- winning object values replace lower-precedence object values as whole objects (no implicit deep merge).
+- winning object values replace lower-precedence object values as whole objects (no implicit deep merge),
+- after top-level selection, implementations MUST apply documented schema defaults for missing nested keys before exposing effective configuration.
 
 If an implementation supports deep-merge behavior, it MUST be explicitly documented and deterministic.
 
@@ -178,6 +179,8 @@ Minimum required roles in mapping:
 - `date_created`
 - `date_modified`
 
+If semantic role `id` is supported (§2.6.5), mapping SHOULD include `id`.
+
 Example:
 
 ```yaml
@@ -208,6 +211,25 @@ The tasknotes plugin natively supports two identification methods, controlled by
 
 **`property`** — A markdown file is a task if a specified frontmatter property has a specified value (or exists, if value is empty). Configured by `task_detection.property_name` and `task_detection.property_value`.
 
+Schema and selection rules:
+
+1. `task_detection` MAY specify either:
+   - `method` (single-method form), or
+   - `methods` (multi-method form; non-empty list).
+2. If both are present, `methods` MUST take precedence and implementations SHOULD emit a configuration warning.
+3. If neither is present, effective detection method MUST default to `tag`.
+4. `method` MUST be `tag` or `property`.
+5. `methods` entries MUST be unique and MUST be from:
+   - `tag`
+   - `property`
+   - `path_glob`
+   - `field_presence`
+   - `field_match`
+6. Method-specific required keys:
+   - when `tag` is enabled, effective `task_detection.tag` MUST be non-empty (default `task` when absent);
+   - when `property` is enabled, `task_detection.property_name` MUST be provided and non-empty; `task_detection.property_value` MAY be empty (empty means key-exists semantics).
+7. If `methods` has more than one entry, `task_detection.combine` controls combination semantics (§9.7.3). If omitted, it MUST default to `or`.
+
 ### 9.7.1 Tag matching semantics
 
 When `task_detection.method=tag`, matching MUST follow these rules:
@@ -225,11 +247,27 @@ When `task_detection.method=tag`, matching MUST follow these rules:
 
 If either frontmatter or body matches, the file is identified as a task.
 
+### 9.7.2 Property matching semantics
+
+When property detection is enabled (`method=property` or `methods` includes `property`):
+
+1. `task_detection.property_name` MUST name the frontmatter key to inspect.
+2. If `task_detection.property_value` is non-empty, match requires semantic equality with the configured value.
+3. If `task_detection.property_value` is empty or absent, match requires key presence only.
+
+### 9.7.3 Multi-method extension semantics
+
 `tasknotes.yaml`-level providers MAY additionally support:
 
 - `path_glob` (example: `tasks/**/*.md`)
 - `field_presence` (example: required key `status`)
 - `field_match` (example: `type == "task"`)
+
+Extension-key shape:
+
+- `path_glob`: string or list<string> of collection-relative glob patterns.
+- `field_presence`: string or list<string> of required frontmatter keys.
+- `field_match`: object map of `key -> expected scalar value` for exact semantic equality checks.
 
 If multiple methods are configured in `tasknotes.yaml`, `task_detection.combine` MUST define combinator semantics:
 
@@ -239,6 +277,8 @@ If multiple methods are configured in `tasknotes.yaml`, `task_detection.combine`
 If `task_detection.combine` is absent, implementations MUST default to `or`.
 
 Implementations MUST exclude folders listed in `task_detection.excluded_folders` from task indexing.
+
+Executable conformance: adapters participating in the fixture suite SHOULD expose `config.detect_task_file` to evaluate these detection semantics against fixture inputs.
 
 Example (`tasknotes.yaml`, equivalent to tag-based default):
 
@@ -336,8 +376,10 @@ dependencies:
 Rules:
 
 - `default_reltype` MUST be one of the allowed reltype values in §10.2.
-- `treat_missing_target_as_blocked` controls runtime blocked evaluation for unresolved targets.
+- `treat_missing_target_as_blocked` controls whether missing/unresolvable dependency targets contribute to blocked-state evaluation (§10.2.5).
+- If `treat_missing_target_as_blocked` is absent, effective value MUST default to `true`.
 - `enforce_unique_uid=true` enforces uniqueness at validation/write time.
+- If `enforce_unique_uid` is absent, effective value MUST default to `true`.
 - `unresolved_target_severity` MUST be `warning` or `error`.
 - `require_resolved_uid_on_write=true` requires dependency UID resolution success for add/update operations.
 
@@ -382,10 +424,10 @@ Rules:
 - when `storage=frontmatter`, `filename_format` MUST be `title`, `zettel`, `timestamp`, or `custom`.
 - when `storage=frontmatter` and `filename_format=custom`, `custom_filename_template` MUST be provided and non-empty.
 - when `storage=filename`, `filename_format` and `custom_filename_template` MAY be present for compatibility input but MUST be ignored for canonical write behavior.
-- Read precedence MUST be frontmatter-first with filename fallback:
-  1. mapped `title` key when present and non-empty;
-  2. file basename fallback.
-- If frontmatter and basename titles both exist and differ, frontmatter title MUST win.
+- Read precedence MUST be storage-mode-aware:
+  1. when `storage=frontmatter`, use mapped `title` key when present and non-empty, then file basename fallback;
+  2. when `storage=filename`, use file basename first, then mapped `title` fallback when basename is unavailable.
+- If frontmatter and basename titles both exist and differ, the source authoritative for active `storage` MUST win.
 - If `storage=filename`, canonical writes MUST treat filename as title source, MUST rename on title change, and MUST ignore `filename_format` and `custom_filename_template`.
 - If `storage=frontmatter`, canonical writes MUST persist mapped title key; `filename_format` and `custom_filename_template` govern create-time filename generation.
 
@@ -435,7 +477,10 @@ Rules:
 
 - `date_only_anchor_time` MUST be `HH:MM` 24-hour local time format.
 - `date_only_anchor_time` is used by §10.3.4 for relative reminders against date-only bases.
+- `apply_defaults_when_explicit` MUST be boolean when present.
+- if `apply_defaults_when_explicit` is absent, effective value MUST default to `false`.
 - `apply_defaults_when_explicit=false` means explicit input reminders replace default-reminder application at create time.
+- `apply_defaults_when_explicit=true` means explicit create-time reminders are merged with defaults using §10.3.9 deterministic merge rules.
 
 ## 9.16 time_tracking schema
 
@@ -562,6 +607,10 @@ Examples:
 - `status.default` not present in `status.values`
 - unsupported `validation.mode`
 - `validation.mode=permissive` but permissive mode is not implemented
+- invalid `task_detection.method`
+- invalid `task_detection.methods` entry
+- empty `task_detection.tag` when `tag` method is enabled
+- missing `task_detection.property_name` when `property` method is enabled
 - invalid `task_detection.combine`
 - invalid `dependencies.default_reltype`
 - invalid `dependencies.unresolved_target_severity`
@@ -574,6 +623,7 @@ Examples:
 - invalid `templating.failure_mode`
 - invalid `templating.unknown_variable_policy`
 - invalid `reminders.date_only_anchor_time`
+- invalid `reminders.apply_defaults_when_explicit`
 - invalid `time_tracking.auto_stop_on_complete`
 - invalid `time_tracking.auto_stop_notification`
 
@@ -649,7 +699,7 @@ Default priority on create: `normal`.
 
 - `title.storage`: `filename` (titles stored in filename, not frontmatter)
 - TaskNotes `data.json` may contain `taskFilenameFormat` (default `zettel`), but this value is ignored by canonical writes while `title.storage=filename`
-- Title is read from frontmatter `title` key first; filename-derived title as fallback (§2.2.2)
+- Title is read from filename first; frontmatter `title` is compatibility fallback when filename-derived title is unavailable (§2.2.2)
 
 ### Time tracking defaults
 

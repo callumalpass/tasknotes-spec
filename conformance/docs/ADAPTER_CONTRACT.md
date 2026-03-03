@@ -9,7 +9,7 @@ Conformance fixtures are implementation-agnostic and live in `tasknotes-spec`. E
 An adapter is any callable that satisfies this interface:
 
 ```
-execute(operation: string, input: object) → { ok: bool, result?: object, error?: string }
+execute(operation: string, input: object) → { ok: bool, result?: object, error?: string, error_details?: object }
 ```
 
 And a metadata query:
@@ -18,6 +18,8 @@ And a metadata query:
 metadata() → {
   implementation: string,
   version: string,
+  spec_version: string,
+  validation_modes: string[],
   profiles: string[],
   capabilities: string[]
 }
@@ -30,7 +32,8 @@ metadata() → {
   - `ok` (boolean, required): `true` on success, `false` on failure
   - `result` (object, optional): the operation's output, present when `ok` is `true`
   - `error` (string, optional): a human-readable error message, present when `ok` is `false`
-- Must never throw or panic for invalid inputs; all errors must be returned as `{ ok: false, error: "..." }`.
+  - `error_details` (object, optional): structured error fields (`operation`, `code`, `message`, optional `field/path`) when available
+- Must never throw or panic for invalid inputs; all errors must be returned in the envelope.
 
 ### `metadata` / `meta.claim`
 
@@ -40,8 +43,15 @@ The runner calls the `meta.claim` operation (with `input = {}`) to obtain adapte
 |-------|------|-------------|
 | `implementation` | string | Name of the implementation under test |
 | `version` | string | Version of the implementation |
+| `spec_version` | string | `tasknotes-spec` version targeted by the adapter |
+| `validation_modes` | string[] | Supported validation modes; must include `strict` |
 | `profiles` | string[] | Conformance profiles claimed (e.g. `["core-lite", "recurrence"]`) |
 | `capabilities` | string[] | Optional capability tokens claimed (e.g. `["dependencies", "links"]`) |
+
+Profile-token consistency requirements:
+
+- If `profiles` includes `extended`, `capabilities` must include `dependencies`, `reminders`, `links`, and `time-tracking`.
+- If `profiles` includes `templating`, `capabilities` must include `templating`.
 
 ---
 
@@ -63,6 +73,8 @@ The runner locates the adapter module via the `TASKNOTES_ADAPTER` environment va
 export const metadata = {
   implementation: "my-tasknotes",
   version: "1.2.3",
+  spec_version: "0.1.0-draft",
+  validation_modes: ["strict"],
   profiles: ["core-lite"],
   capabilities: [],
 };
@@ -136,6 +148,7 @@ All operation names that appear in the fixture files are listed here. Operations
 - `config.merge_top_level`
 - `config.spec_version_effective`
 - `config.map_tasknotes_plugin`
+- `config.detect_task_file`
 - `config.provider_behavior`
 - `config.validate_schema`
 - `validation.core_evaluate`

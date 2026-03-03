@@ -61,6 +61,7 @@ const requiredSections = [
   "§8.13",
   "§8.14",
   "§9",
+  "§9.7.1",
   "§9.2.3",
   "§9.2.4",
   "§9.19",
@@ -71,6 +72,47 @@ const requiredSections = [
   "§11.7",
 ];
 
+const sectionMinimums = {
+  "§2": 100,
+  "§3": 1200,
+  "§4": 800,
+  "§5.3": 250,
+  "§6": 50,
+  "§9": 500,
+  "§9.7.1": 10,
+  "§10": 800,
+  "§11": 10,
+  "§11.3": 20,
+  "§11.6": 2,
+};
+
+const operationMinimums = {
+  "date.parse_utc": 300,
+  "date.parse_local": 300,
+  "date.validate": 300,
+  "recurrence.complete": 500,
+  "recurrence.recalculate": 150,
+  "config.resolve_collection_path": 500,
+  "config.detect_task_file": 10,
+  "validation.core_evaluate": 40,
+  "dependency.validate_entry": 300,
+  "reminder.validate_entry": 500,
+  "link.parse": 20,
+  "link.resolve": 10,
+  "link.update_references_on_rename": 2,
+  "templating.expand_variables": 5,
+};
+
+const fixtureFileMinimums = {
+  "date.json": 1000,
+  "recurrence.json": 500,
+  "config.json": 300,
+  "operations.json": 80,
+  "dependencies.json": 200,
+  "reminders.json": 300,
+  "links.json": 30,
+};
+
 test("conformance coverage: required sections represented", () => {
   for (const section of requiredSections) {
     const count = manifest.bySection?.[section] || 0;
@@ -78,9 +120,40 @@ test("conformance coverage: required sections represented", () => {
   }
 });
 
+test("conformance coverage: key section depth thresholds", () => {
+  for (const [section, minimum] of Object.entries(sectionMinimums)) {
+    const count = manifest.bySection?.[section] || 0;
+    assert.ok(
+      count >= minimum,
+      `Expected at least ${minimum} fixtures for ${section}, got ${count}`,
+    );
+  }
+});
+
 test("conformance coverage: operation surface is broad", () => {
   const operations = Object.keys(manifest.byOperation || {});
   assert.ok(operations.length >= 70, `Expected at least 70 operations, got ${operations.length}`);
+});
+
+test("conformance coverage: key operation depth thresholds", () => {
+  for (const [operation, minimum] of Object.entries(operationMinimums)) {
+    const count = manifest.byOperation?.[operation] || 0;
+    assert.ok(
+      count >= minimum,
+      `Expected at least ${minimum} fixtures for operation ${operation}, got ${count}`,
+    );
+  }
+});
+
+test("conformance coverage: key fixture file depth thresholds", () => {
+  const fileCounts = new Map((manifest.files || []).map((entry) => [entry.file, entry.cases]));
+  for (const [file, minimum] of Object.entries(fixtureFileMinimums)) {
+    const count = fileCounts.get(file) || 0;
+    assert.ok(
+      count >= minimum,
+      `Expected at least ${minimum} fixtures in ${file}, got ${count}`,
+    );
+  }
 });
 
 test("conformance coverage: meta and operation-interface ops represented", () => {

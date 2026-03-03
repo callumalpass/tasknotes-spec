@@ -18546,5 +18546,425 @@
         }
       }
     }
+  },
+  {
+    "id": "config.0669",
+    "section": "§9.7.1",
+    "profile": "core-lite",
+    "operation": "config.detect_task_file",
+    "assertion": "envelope_equals",
+    "requires": [
+      "config-lite"
+    ],
+    "input": {
+      "taskDetection": {
+        "method": "tag",
+        "tag": "task"
+      },
+      "filePath": "TaskNotes/Tasks/a.md",
+      "frontmatter": {
+        "tags": [
+          "task",
+          "errands"
+        ]
+      },
+      "body": "",
+      "expected": true
+    },
+    "expect": {
+      "ok": true,
+      "result": {
+        "value": true
+      }
+    }
+  },
+  {
+    "id": "config.0670",
+    "section": "§9.7.1",
+    "profile": "core-lite",
+    "operation": "config.detect_task_file",
+    "assertion": "envelope_equals",
+    "requires": [
+      "config-lite"
+    ],
+    "input": {
+      "taskDetection": {
+        "method": "tag",
+        "tag": "#task"
+      },
+      "filePath": "TaskNotes/Tasks/a.md",
+      "frontmatter": {
+        "tags": [
+          "  #TASK  "
+        ]
+      },
+      "body": "",
+      "expected": true
+    },
+    "expect": {
+      "ok": true,
+      "result": {
+        "value": true
+      }
+    }
+  },
+  {
+    "id": "config.0671",
+    "section": "§9.7.1",
+    "profile": "core-lite",
+    "operation": "config.detect_task_file",
+    "assertion": "envelope_equals",
+    "requires": [
+      "config-lite"
+    ],
+    "input": {
+      "taskDetection": {
+        "method": "tag",
+        "tag": "task"
+      },
+      "filePath": "TaskNotes/Tasks/a.md",
+      "frontmatter": {
+        "tags": "#task"
+      },
+      "body": "",
+      "expected": true
+    },
+    "expect": {
+      "ok": true,
+      "result": {
+        "value": true
+      }
+    }
+  },
+  {
+    "id": "config.0672",
+    "section": "§9.7.1",
+    "profile": "core-lite",
+    "operation": "config.detect_task_file",
+    "assertion": "envelope_equals",
+    "requires": [
+      "config-lite"
+    ],
+    "input": {
+      "taskDetection": {
+        "method": "tag",
+        "tag": "task"
+      },
+      "filePath": "TaskNotes/Tasks/a.md",
+      "frontmatter": {},
+      "body": "Plan work #task today",
+      "expected": true
+    },
+    "expect": {
+      "ok": true,
+      "result": {
+        "value": true
+      }
+    }
+  },
+  {
+    "id": "config.0673",
+    "section": "§9.7.1",
+    "profile": "core-lite",
+    "operation": "config.detect_task_file",
+    "assertion": "envelope_equals",
+    "requires": [
+      "config-lite"
+    ],
+    "input": {
+      "taskDetection": {
+        "method": "tag",
+        "tag": "task"
+      },
+      "filePath": "TaskNotes/Tasks/a.md",
+      "frontmatter": {},
+      "body": "Plan work #tasking today",
+      "expected": false
+    },
+    "expect": {
+      "ok": true,
+      "result": {
+        "value": false
+      }
+    }
+  },
+  {
+    "id": "config.0674",
+    "section": "§9.7.1",
+    "profile": "core-lite",
+    "operation": "config.detect_task_file",
+    "assertion": "envelope_equals",
+    "requires": [
+      "config-lite"
+    ],
+    "input": {
+      "taskDetection": {
+        "method": "tag",
+        "tag": "task"
+      },
+      "filePath": "TaskNotes/Tasks/a.md",
+      "frontmatter": {},
+      "body": "Use `#task` literal only",
+      "expected": false
+    },
+    "expect": {
+      "ok": true,
+      "result": {
+        "value": false
+      }
+    }
+  },
+  {
+    "id": "config.0675",
+    "section": "§9.7.1",
+    "profile": "core-lite",
+    "operation": "config.detect_task_file",
+    "assertion": "envelope_equals",
+    "requires": [
+      "config-lite"
+    ],
+    "input": {
+      "taskDetection": {
+        "method": "tag",
+        "tag": "task"
+      },
+      "filePath": "TaskNotes/Tasks/a.md",
+      "frontmatter": {},
+      "body": "```md\n#task inside code fence\n```\noutside fence",
+      "expected": false
+    },
+    "expect": {
+      "ok": true,
+      "result": {
+        "value": false
+      }
+    }
+  },
+  {
+    "id": "config.0676",
+    "section": "§9.7.1",
+    "profile": "core-lite",
+    "operation": "config.detect_task_file",
+    "assertion": "envelope_equals",
+    "requires": [
+      "config-lite"
+    ],
+    "input": {
+      "taskDetection": {
+        "method": "property",
+        "property_name": "type",
+        "property_value": "task"
+      },
+      "filePath": "TaskNotes/Tasks/a.md",
+      "frontmatter": {
+        "type": "task"
+      },
+      "body": "",
+      "expected": true
+    },
+    "expect": {
+      "ok": true,
+      "result": {
+        "value": true
+      }
+    }
+  },
+  {
+    "id": "config.0677",
+    "section": "§9.7.1",
+    "profile": "core-lite",
+    "operation": "config.detect_task_file",
+    "assertion": "envelope_equals",
+    "requires": [
+      "config-lite"
+    ],
+    "input": {
+      "taskDetection": {
+        "method": "property",
+        "property_name": "type",
+        "property_value": ""
+      },
+      "filePath": "TaskNotes/Tasks/a.md",
+      "frontmatter": {
+        "type": "anything"
+      },
+      "body": "",
+      "expected": true
+    },
+    "expect": {
+      "ok": true,
+      "result": {
+        "value": true
+      }
+    }
+  },
+  {
+    "id": "config.0678",
+    "section": "§9.7.1",
+    "profile": "core-lite",
+    "operation": "config.detect_task_file",
+    "assertion": "envelope_equals",
+    "requires": [
+      "config-lite"
+    ],
+    "input": {
+      "taskDetection": {
+        "method": "property",
+        "property_name": "type",
+        "property_value": "task"
+      },
+      "filePath": "TaskNotes/Tasks/a.md",
+      "frontmatter": {
+        "type": "note"
+      },
+      "body": "",
+      "expected": false
+    },
+    "expect": {
+      "ok": true,
+      "result": {
+        "value": false
+      }
+    }
+  },
+  {
+    "id": "config.0679",
+    "section": "§9.7.1",
+    "profile": "core-lite",
+    "operation": "config.detect_task_file",
+    "assertion": "envelope_equals",
+    "requires": [
+      "config-lite"
+    ],
+    "input": {
+      "taskDetection": {
+        "method": "tag",
+        "tag": "task",
+        "excluded_folders": [
+          "TaskNotes/Archive"
+        ]
+      },
+      "filePath": "TaskNotes/Archive/a.md",
+      "frontmatter": {
+        "tags": [
+          "task"
+        ]
+      },
+      "body": "",
+      "expected": false
+    },
+    "expect": {
+      "ok": true,
+      "result": {
+        "value": false
+      }
+    }
+  },
+  {
+    "id": "config.0680",
+    "section": "§9.7.1",
+    "profile": "core-lite",
+    "operation": "config.detect_task_file",
+    "assertion": "envelope_equals",
+    "requires": [
+      "config-lite"
+    ],
+    "input": {
+      "taskDetection": {
+        "methods": [
+          "tag",
+          "property"
+        ],
+        "combine": "or",
+        "tag": "task",
+        "property_name": "type",
+        "property_value": "task"
+      },
+      "filePath": "TaskNotes/Tasks/a.md",
+      "frontmatter": {
+        "type": "task",
+        "tags": []
+      },
+      "body": "",
+      "expected": true
+    },
+    "expect": {
+      "ok": true,
+      "result": {
+        "value": true
+      }
+    }
+  },
+  {
+    "id": "config.0681",
+    "section": "§9.7.1",
+    "profile": "core-lite",
+    "operation": "config.detect_task_file",
+    "assertion": "envelope_equals",
+    "requires": [
+      "config-lite"
+    ],
+    "input": {
+      "taskDetection": {
+        "methods": [
+          "tag",
+          "property"
+        ],
+        "combine": "and",
+        "tag": "task",
+        "property_name": "type",
+        "property_value": "task"
+      },
+      "filePath": "TaskNotes/Tasks/a.md",
+      "frontmatter": {
+        "type": "task",
+        "tags": []
+      },
+      "body": "",
+      "expected": false
+    },
+    "expect": {
+      "ok": true,
+      "result": {
+        "value": false
+      }
+    }
+  },
+  {
+    "id": "config.0682",
+    "section": "§9.7.1",
+    "profile": "core-lite",
+    "operation": "config.detect_task_file",
+    "assertion": "envelope_equals",
+    "requires": [
+      "config-lite"
+    ],
+    "input": {
+      "taskDetection": {
+        "methods": [
+          "tag",
+          "property"
+        ],
+        "combine": "and",
+        "tag": "task",
+        "property_name": "type",
+        "property_value": "task"
+      },
+      "filePath": "TaskNotes/Tasks/a.md",
+      "frontmatter": {
+        "type": "task",
+        "tags": [
+          "#task"
+        ]
+      },
+      "body": "",
+      "expected": true
+    },
+    "expect": {
+      "ok": true,
+      "result": {
+        "value": true
+      }
+    }
   }
 ]

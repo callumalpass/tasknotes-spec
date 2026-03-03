@@ -28,7 +28,7 @@ Every call to `execute` must return an envelope:
 
 ```json
 { "ok": true,  "result": { ... } }   // success
-{ "ok": false, "error": "message" }  // failure
+{ "ok": false, "error": "message", "error_details": { ... } }  // failure (`error_details` optional)
 ```
 
 Your implementation must never throw or panic for invalid inputs — all errors go in the envelope.
@@ -92,6 +92,8 @@ envelope = implementation.execute("meta.claim", {})
 claimed = envelope.result
 # claimed.implementation : string
 # claimed.version        : string
+# claimed.spec_version   : string
+# claimed.validation_modes : string[] (must include "strict")
 # claimed.profiles       : string[]
 # claimed.capabilities   : string[]
 ```

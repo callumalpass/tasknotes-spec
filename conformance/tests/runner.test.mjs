@@ -8,6 +8,7 @@ import { applyAssertion } from "../lib/matchers.mjs";
 const fixturesDir = resolve(process.cwd(), "conformance", "fixtures");
 const fixtures = loadFixtures(fixturesDir);
 const adapterPath = process.env.TASKNOTES_ADAPTER;
+const requireFullCoverage = process.env.CONFORMANCE_REQUIRE_FULL_COVERAGE === "1";
 let adapterPromise;
 
 function expandProfiles(claimedProfiles) {
@@ -48,10 +49,16 @@ test(`conformance: run ${fixtures.length} fixture cases`, async (t) => {
   if (!adapter) return;
   const { metadata, execute } = adapter;
   const effectiveProfiles = expandProfiles(metadata.profiles);
+  let executedCount = 0;
 
   for (const fixture of fixtures) {
     await t.test(`${fixture.id} ${fixture.operation}`, async () => {
       if (!effectiveProfiles.has(fixture.profile)) {
+        if (requireFullCoverage) {
+          assert.fail(
+            `adapter ${metadata.implementation} missing profile for fixture ${fixture.id}: ${fixture.profile}`,
+          );
+        }
         t.skip(
           `adapter ${metadata.implementation} missing profile for fixture: ${fixture.profile}`,
         );
@@ -62,13 +69,27 @@ test(`conformance: run ${fixtures.length} fixture cases`, async (t) => {
         || fixture.requires.every((cap) => metadata.capabilities.includes(cap));
 
       if (!hasCapability) {
+        if (requireFullCoverage) {
+          assert.fail(
+            `adapter ${metadata.implementation} missing capability for fixture ${fixture.id}: ${fixture.requires.join(", ")}`,
+          );
+        }
         t.skip(`adapter ${metadata.implementation} missing capability: ${fixture.requires.join(", ")}`);
         return;
       }
 
       const envelope = await execute(fixture.operation, fixture.input);
+      executedCount += 1;
       applyAssertion(fixture, envelope);
     });
+  }
+
+  if (requireFullCoverage) {
+    assert.equal(
+      executedCount,
+      fixtures.length,
+      `Expected all fixtures to execute when CONFORMANCE_REQUIRE_FULL_COVERAGE=1; executed ${executedCount}/${fixtures.length}`,
+    );
   }
 });
 

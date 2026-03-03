@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-02-23T10:45:33.328Z",
-  "totalCases": 4954,
+  "generatedAt": "2026-03-03T20:06:35.430Z",
+  "totalCases": 4969,
   "files": [
     {
       "file": "date.json",
@@ -20,11 +20,11 @@
     },
     {
       "file": "conformance.json",
-      "cases": 25
+      "cases": 18
     },
     {
       "file": "config.json",
-      "cases": 668
+      "cases": 682
     },
     {
       "file": "config-schema.json",
@@ -36,7 +36,7 @@
     },
     {
       "file": "operations.json",
-      "cases": 97
+      "cases": 99
     },
     {
       "file": "templating.json",
@@ -48,7 +48,7 @@
     },
     {
       "file": "dependencies.json",
-      "cases": 385
+      "cases": 386
     },
     {
       "file": "reminders.json",
@@ -56,14 +56,14 @@
     },
     {
       "file": "links.json",
-      "cases": 38
+      "cases": 43
     }
   ],
   "byProfile": {
-    "core-lite": 2868,
+    "core-lite": 2873,
     "recurrence": 1019,
-    "extended": 1050,
-    "templating": 17
+    "extended": 1059,
+    "templating": 18
   },
   "bySection": {
     "§3": 1595,
@@ -72,11 +72,14 @@
     "§4": 996,
     "§5.3": 322,
     "§7.10": 5,
-    "§7.11": 20,
+    "§7.11": 11,
+    "§7.3.4": 1,
+    "§7.3.3": 2,
     "§9": 667,
     "§9.2.4": 8,
     "§11.7": 1,
     "§9.20": 1,
+    "§9.7.1": 14,
     "§9.2.3": 3,
     "§9.19": 15,
     "§6": 60,
@@ -98,7 +101,7 @@
     "§5.11.3": 2,
     "§5.12": 1,
     "§5.13": 2,
-    "§5.14": 2,
+    "§5.14": 4,
     "§5.4.4": 2,
     "§5.15": 4,
     "§5.16": 3,
@@ -112,7 +115,6 @@
     "§5.19.6": 5,
     "§5.3.5": 15,
     "§9.14": 1,
-    "§7.3.3": 1,
     "§8.2": 2,
     "§8.3": 1,
     "§8.4": 2,
@@ -127,11 +129,11 @@
     "§8.12": 1,
     "§8.14": 1,
     "§10": 946,
-    "§10.2.6": 3,
+    "§10.2.6": 4,
     "§11.3": 25,
     "§11": 10,
-    "§11.5": 1,
-    "§11.6": 2
+    "§11.5": 4,
+    "§11.6": 4
   },
   "byOperation": {
     "date.parse_utc": 509,
@@ -153,13 +155,14 @@
     "recurrence.complete": 760,
     "recurrence.recalculate": 240,
     "create_compat.create": 322,
-    "meta.claim": 1,
-    "meta.has_capability": 20,
+    "meta.claim": 3,
+    "meta.has_capability": 11,
     "meta.has_profile": 4,
     "config.resolve_collection_path": 648,
     "config.merge_top_level": 4,
     "config.spec_version_effective": 6,
     "config.map_tasknotes_plugin": 10,
+    "config.detect_task_file": 14,
     "config.provider_behavior": 3,
     "config.validate_schema": 24,
     "validation.core_evaluate": 56,
@@ -182,7 +185,7 @@
     "reminder.remove": 2,
     "archive.apply": 1,
     "delete.remove": 2,
-    "rename.apply": 2,
+    "rename.apply": 4,
     "rename.title_storage_interaction": 2,
     "batch.apply": 4,
     "op.detect_conflict": 3,
@@ -217,11 +220,11 @@
     "migration.compat_statement": 1,
     "dependency.validate_entry": 378,
     "dependency.validate_set": 4,
-    "dependency.missing_target_behavior": 3,
+    "dependency.missing_target_behavior": 4,
     "reminder.validate_entry": 560,
     "reminder.validate_set": 4,
     "link.parse": 25,
-    "link.resolve": 11,
-    "link.update_references_on_rename": 2
+    "link.resolve": 14,
+    "link.update_references_on_rename": 4
   }
 }

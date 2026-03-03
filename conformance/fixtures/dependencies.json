@@ -8525,6 +8525,7 @@
         "reltype": "FINISHTOSTART"
       },
       "unresolvedTargetSeverity": "warning",
+      "treatMissingTargetAsBlocked": true,
       "requireResolvedUidOnWrite": false,
       "onWrite": false,
       "expect": {
@@ -8560,6 +8561,7 @@
         "reltype": "FINISHTOSTART"
       },
       "unresolvedTargetSeverity": "error",
+      "treatMissingTargetAsBlocked": true,
       "requireResolvedUidOnWrite": false,
       "onWrite": false,
       "expect": {
@@ -8585,6 +8587,42 @@
     "section": "§10.2.6",
     "profile": "extended",
     "operation": "dependency.missing_target_behavior",
+    "assertion": "envelope_equals",
+    "requires": [
+      "dependencies"
+    ],
+    "input": {
+      "entry": {
+        "uid": "[[missing-task]]",
+        "reltype": "FINISHTOSTART"
+      },
+      "unresolvedTargetSeverity": "warning",
+      "treatMissingTargetAsBlocked": false,
+      "requireResolvedUidOnWrite": false,
+      "onWrite": false,
+      "expect": {
+        "ok": true,
+        "result": {
+          "blocked": false,
+          "issue": "unresolved_dependency_target",
+          "severity": "warning"
+        }
+      }
+    },
+    "expect": {
+      "ok": true,
+      "result": {
+        "blocked": false,
+        "issue": "unresolved_dependency_target",
+        "severity": "warning"
+      }
+    }
+  },
+  {
+    "id": "dependency.0386",
+    "section": "§10.2.6",
+    "profile": "extended",
+    "operation": "dependency.missing_target_behavior",
     "assertion": "envelope_error",
     "requires": [
       "dependencies"
@@ -8595,6 +8633,7 @@
         "reltype": "FINISHTOSTART"
       },
       "unresolvedTargetSeverity": "warning",
+      "treatMissingTargetAsBlocked": true,
       "requireResolvedUidOnWrite": true,
       "onWrite": true,
       "expectError": "unresolved_dependency_target|require_resolved_uid_on_write"

@@ -31,15 +31,16 @@ Link parsing and resolution MUST follow §11.
 
 ### 10.2.3 Dependency uniqueness
 
-Within a task, dependency entries SHOULD be unique by normalized `uid`.
+Within a task, dependency entries are keyed by normalized `uid`.
 
-If duplicates occur, implementations MAY choose any documented policy:
+Policy is configuration-driven and MUST be deterministic:
 
-- preserve duplicates as provided,
-- normalize to one entry and emit warning,
-- reject with `duplicate_dependency_uid`.
+- when `dependencies.enforce_unique_uid=true` (default), duplicate normalized `uid` values MUST NOT be accepted as canonical persisted state:
+  - strict mode: duplicates MUST fail validation/write with `duplicate_dependency_uid`;
+  - permissive mode: implementations MAY either fail or normalize to one entry, but MUST emit `duplicate_dependency_uid`.
+- when `dependencies.enforce_unique_uid=false`, duplicates MAY be preserved as compatibility behavior.
 
-The chosen policy MUST be deterministic and MUST be documented in conformance claims.
+The active policy MUST be documented in conformance claims.
 
 ### 10.2.4 Self-dependency
 
@@ -52,9 +53,10 @@ Self-dependency is a validation error.
 For v0.1, blocking evaluation MUST be status-presence based:
 
 1. A task is blocked if it has at least one unresolved dependency.
-2. A dependency is unresolved when the referenced task is missing or not in a completed status.
+2. A dependency on a resolvable task is unresolved when the referenced task is not in a completed status.
 3. Completed status MUST be determined from configured `status.completed_values`.
 4. For recurring referenced tasks in v0.1, unresolved/resolved evaluation MUST use base `status` only; `complete_instances`/`skipped_instances` are not consulted.
+5. When a referenced task is missing/unresolvable, whether that missing target contributes to blocked-state evaluation MUST follow `dependencies.treat_missing_target_as_blocked` (§9.11, default `true`).
 
 For v0.1, `reltype` and `gap` are preserved and validated but MUST NOT change the unresolved/resolved decision.
 
@@ -62,8 +64,11 @@ For v0.1, `reltype` and `gap` are preserved and validated but MUST NOT change th
 
 When `uid` cannot be resolved:
 
-- implementations SHOULD emit `unresolved_dependency_target` and treat dependency as unresolved.
+- implementations SHOULD emit `unresolved_dependency_target`.
+- blocked-state contribution for this missing target MUST follow `dependencies.treat_missing_target_as_blocked` (§9.11).
 - issue severity SHOULD follow `dependencies.unresolved_target_severity` (default: `warning`).
+- for `blocked_by.uid`, this dependency-specific severity policy MUST take precedence over `links.unresolved_default_severity`.
+- parse failures that produce `invalid_link_format` and containment violations that produce `path_traversal` remain error-severity conditions from §11.
 - if `dependencies.require_resolved_uid_on_write=true`, add/update MUST fail with error.
 
 ### 10.2.7 Cycles
@@ -207,8 +212,16 @@ Remove reminder by `id` MUST be idempotent.
 
 If `defaults.reminders` is configured (see §9):
 
-- create without explicit reminders SHOULD apply defaults.
-- create with explicit reminders MUST NOT append defaults unless configured to do so.
+- create without explicit reminders MUST apply defaults.
+- create with explicit reminders MUST follow `reminders.apply_defaults_when_explicit` (§9.15):
+  - `false` (default): explicit reminders replace defaults.
+  - `true`: explicit reminders are merged with defaults.
+
+Deterministic merge rules when `apply_defaults_when_explicit=true`:
+
+1. Start with explicit reminders in caller order.
+2. Append each default reminder whose `id` is not already present.
+3. If explicit and default reminders share an `id`, explicit reminder MUST win.
 
 ### 10.3.10 Reminder examples
 
