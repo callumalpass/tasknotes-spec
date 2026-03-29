@@ -741,6 +741,32 @@
   },
   {
     "id": "ops.0030",
+    "section": "§5.8",
+    "profile": "recurrence",
+    "operation": "recurrence.uncomplete_instance",
+    "assertion": "envelope_equals",
+    "input": {
+      "targetDate": "2026-02-21",
+      "recurrenceAnchor": "completion",
+      "recurrence": "DTSTART:20260221;FREQ=DAILY",
+      "completeInstances": [
+        "2026-02-20",
+        "2026-02-21"
+      ],
+      "skippedInstances": []
+    },
+    "expect": {
+      "ok": true,
+      "result": {
+        "completeInstances": [
+          "2026-02-20"
+        ],
+        "updatedRecurrence": "DTSTART:20260221;FREQ=DAILY"
+      }
+    }
+  },
+  {
+    "id": "ops.0031",
     "section": "§5.9",
     "profile": "recurrence",
     "operation": "recurrence.skip_instance",
@@ -766,7 +792,7 @@
     }
   },
   {
-    "id": "ops.0031",
+    "id": "ops.0032",
     "section": "§5.9",
     "profile": "recurrence",
     "operation": "recurrence.unskip_instance",
@@ -791,7 +817,7 @@
     }
   },
   {
-    "id": "ops.0032",
+    "id": "ops.0033",
     "section": "§4.11",
     "profile": "recurrence",
     "operation": "recurrence.effective_state",
@@ -813,7 +839,7 @@
     }
   },
   {
-    "id": "ops.0033",
+    "id": "ops.0034",
     "section": "§5.7",
     "profile": "recurrence",
     "operation": "recurrence.complete",
@@ -834,7 +860,7 @@
     }
   },
   {
-    "id": "ops.0034",
+    "id": "ops.0035",
     "section": "§5.8",
     "profile": "recurrence",
     "operation": "recurrence.uncomplete_instance",
@@ -860,7 +886,7 @@
     }
   },
   {
-    "id": "ops.0035",
+    "id": "ops.0036",
     "section": "§5.9",
     "profile": "recurrence",
     "operation": "recurrence.skip_instance",
@@ -886,7 +912,7 @@
     }
   },
   {
-    "id": "ops.0036",
+    "id": "ops.0037",
     "section": "§5.9",
     "profile": "recurrence",
     "operation": "recurrence.unskip_instance",
@@ -911,7 +937,7 @@
     }
   },
   {
-    "id": "ops.0037",
+    "id": "ops.0038",
     "section": "§4.11",
     "profile": "recurrence",
     "operation": "recurrence.effective_state",
@@ -933,7 +959,7 @@
     }
   },
   {
-    "id": "ops.0038",
+    "id": "ops.0039",
     "section": "§5.7",
     "profile": "recurrence",
     "operation": "recurrence.complete",
@@ -954,7 +980,7 @@
     }
   },
   {
-    "id": "ops.0039",
+    "id": "ops.0040",
     "section": "§5.8",
     "profile": "recurrence",
     "operation": "recurrence.uncomplete_instance",
@@ -980,7 +1006,7 @@
     }
   },
   {
-    "id": "ops.0040",
+    "id": "ops.0041",
     "section": "§5.9",
     "profile": "recurrence",
     "operation": "recurrence.skip_instance",
@@ -1006,7 +1032,7 @@
     }
   },
   {
-    "id": "ops.0041",
+    "id": "ops.0042",
     "section": "§5.9",
     "profile": "recurrence",
     "operation": "recurrence.unskip_instance",
@@ -1032,7 +1058,7 @@
     }
   },
   {
-    "id": "ops.0042",
+    "id": "ops.0043",
     "section": "§4.11",
     "profile": "recurrence",
     "operation": "recurrence.effective_state",
@@ -1054,7 +1080,7 @@
     }
   },
   {
-    "id": "ops.0043",
+    "id": "ops.0044",
     "section": "§5.10.1",
     "profile": "extended",
     "operation": "dependency.add",
@@ -1091,7 +1117,7 @@
     }
   },
   {
-    "id": "ops.0044",
+    "id": "ops.0045",
     "section": "§5.10.2",
     "profile": "extended",
     "operation": "dependency.remove",
@@ -1125,7 +1151,7 @@
     }
   },
   {
-    "id": "ops.0045",
+    "id": "ops.0046",
     "section": "§5.10.3",
     "profile": "extended",
     "operation": "dependency.replace",
@@ -1160,7 +1186,7 @@
     }
   },
   {
-    "id": "ops.0046",
+    "id": "ops.0047",
     "section": "§5.10.1",
     "profile": "extended",
     "operation": "dependency.add",
@@ -1188,7 +1214,7 @@
     }
   },
   {
-    "id": "ops.0047",
+    "id": "ops.0048",
     "section": "§5.10.2",
     "profile": "extended",
     "operation": "dependency.remove",
@@ -1213,7 +1239,7 @@
     }
   },
   {
-    "id": "ops.0048",
+    "id": "ops.0049",
     "section": "§5.10.3",
     "profile": "extended",
     "operation": "dependency.replace",
@@ -1242,7 +1268,7 @@
     }
   },
   {
-    "id": "ops.0049",
+    "id": "ops.0050",
     "section": "§5.10.3",
     "profile": "extended",
     "operation": "dependency.replace",
@@ -1293,7 +1319,7 @@
     }
   },
   {
-    "id": "ops.0050",
+    "id": "ops.0051",
     "section": "§5.11.1",
     "profile": "extended",
     "operation": "reminder.add",
@@ -1336,7 +1362,7 @@
     }
   },
   {
-    "id": "ops.0051",
+    "id": "ops.0052",
     "section": "§5.11.2",
     "profile": "extended",
     "operation": "reminder.update",
@@ -1373,7 +1399,7 @@
     }
   },
   {
-    "id": "ops.0052",
+    "id": "ops.0053",
     "section": "§5.11.3",
     "profile": "extended",
     "operation": "reminder.remove",
@@ -1411,7 +1437,7 @@
     }
   },
   {
-    "id": "ops.0053",
+    "id": "ops.0054",
     "section": "§5.11.1",
     "profile": "extended",
     "operation": "reminder.add",
@@ -1441,7 +1467,7 @@
     }
   },
   {
-    "id": "ops.0054",
+    "id": "ops.0055",
     "section": "§5.11.2",
     "profile": "extended",
     "operation": "reminder.update",
@@ -1476,7 +1502,7 @@
     }
   },
   {
-    "id": "ops.0055",
+    "id": "ops.0056",
     "section": "§5.11.3",
     "profile": "extended",
     "operation": "reminder.remove",
@@ -1503,7 +1529,7 @@
     }
   },
   {
-    "id": "ops.0056",
+    "id": "ops.0057",
     "section": "§5.10.1",
     "profile": "extended",
     "operation": "dependency.add",
@@ -1540,7 +1566,7 @@
     }
   },
   {
-    "id": "ops.0057",
+    "id": "ops.0058",
     "section": "§5.11.2",
     "profile": "extended",
     "operation": "reminder.update",
@@ -1569,7 +1595,7 @@
     }
   },
   {
-    "id": "ops.0058",
+    "id": "ops.0059",
     "section": "§5.12",
     "profile": "extended",
     "operation": "archive.apply",
@@ -1595,7 +1621,7 @@
     }
   },
   {
-    "id": "ops.0059",
+    "id": "ops.0060",
     "section": "§5.13",
     "profile": "core-lite",
     "operation": "delete.remove",
@@ -1613,7 +1639,7 @@
     }
   },
   {
-    "id": "ops.0060",
+    "id": "ops.0061",
     "section": "§5.13",
     "profile": "core-lite",
     "operation": "delete.remove",
@@ -1633,7 +1659,7 @@
     }
   },
   {
-    "id": "ops.0061",
+    "id": "ops.0062",
     "section": "§5.14",
     "profile": "extended",
     "operation": "rename.apply",
@@ -1656,7 +1682,7 @@
     }
   },
   {
-    "id": "ops.0062",
+    "id": "ops.0063",
     "section": "§5.14",
     "profile": "extended",
     "operation": "rename.apply",
@@ -1679,7 +1705,7 @@
     }
   },
   {
-    "id": "ops.0063",
+    "id": "ops.0064",
     "section": "§5.14",
     "profile": "extended",
     "operation": "rename.apply",
@@ -1702,7 +1728,7 @@
     }
   },
   {
-    "id": "ops.0064",
+    "id": "ops.0065",
     "section": "§5.14",
     "profile": "extended",
     "operation": "rename.apply",
@@ -1725,7 +1751,7 @@
     }
   },
   {
-    "id": "ops.0065",
+    "id": "ops.0066",
     "section": "§5.4.4",
     "profile": "extended",
     "operation": "rename.title_storage_interaction",
@@ -1757,7 +1783,7 @@
     }
   },
   {
-    "id": "ops.0066",
+    "id": "ops.0067",
     "section": "§5.4.4",
     "profile": "extended",
     "operation": "rename.title_storage_interaction",
@@ -1787,7 +1813,7 @@
     }
   },
   {
-    "id": "ops.0067",
+    "id": "ops.0068",
     "section": "§5.15",
     "profile": "extended",
     "operation": "batch.apply",
@@ -1832,7 +1858,7 @@
     }
   },
   {
-    "id": "ops.0068",
+    "id": "ops.0069",
     "section": "§5.15",
     "profile": "extended",
     "operation": "batch.apply",
@@ -1870,7 +1896,7 @@
     }
   },
   {
-    "id": "ops.0069",
+    "id": "ops.0070",
     "section": "§5.15",
     "profile": "extended",
     "operation": "batch.apply",
@@ -1908,7 +1934,7 @@
     }
   },
   {
-    "id": "ops.0070",
+    "id": "ops.0071",
     "section": "§5.15",
     "profile": "extended",
     "operation": "batch.apply",
@@ -1930,7 +1956,7 @@
     }
   },
   {
-    "id": "ops.0071",
+    "id": "ops.0072",
     "section": "§5.16",
     "profile": "extended",
     "operation": "op.detect_conflict",
@@ -1950,7 +1976,7 @@
     }
   },
   {
-    "id": "ops.0072",
+    "id": "ops.0073",
     "section": "§5.16",
     "profile": "extended",
     "operation": "op.detect_conflict",
@@ -1971,7 +1997,7 @@
     }
   },
   {
-    "id": "ops.0073",
+    "id": "ops.0074",
     "section": "§5.16",
     "profile": "extended",
     "operation": "op.detect_conflict",
@@ -1992,7 +2018,7 @@
     }
   },
   {
-    "id": "ops.0074",
+    "id": "ops.0075",
     "section": "§5.17",
     "profile": "extended",
     "operation": "op.dry_run",
@@ -2019,7 +2045,7 @@
     }
   },
   {
-    "id": "ops.0075",
+    "id": "ops.0076",
     "section": "§5.17",
     "profile": "extended",
     "operation": "op.dry_run",
@@ -2048,7 +2074,7 @@
     }
   },
   {
-    "id": "ops.0076",
+    "id": "ops.0077",
     "section": "§5.18",
     "profile": "core-lite",
     "operation": "op.error_shape",
@@ -2071,7 +2097,7 @@
     }
   },
   {
-    "id": "ops.0077",
+    "id": "ops.0078",
     "section": "§5.18",
     "profile": "core-lite",
     "operation": "op.error_shape",
@@ -2093,7 +2119,7 @@
     }
   },
   {
-    "id": "ops.0078",
+    "id": "ops.0079",
     "section": "§5.18",
     "profile": "core-lite",
     "operation": "op.error_shape",
@@ -2114,7 +2140,7 @@
     }
   },
   {
-    "id": "ops.0079",
+    "id": "ops.0080",
     "section": "§5.19.1",
     "profile": "extended",
     "operation": "time.start",
@@ -2142,7 +2168,7 @@
     }
   },
   {
-    "id": "ops.0080",
+    "id": "ops.0081",
     "section": "§5.19.1",
     "profile": "extended",
     "operation": "time.start",
@@ -2165,7 +2191,7 @@
     }
   },
   {
-    "id": "ops.0081",
+    "id": "ops.0082",
     "section": "§5.19.2",
     "profile": "extended",
     "operation": "time.stop",
@@ -2198,7 +2224,7 @@
     }
   },
   {
-    "id": "ops.0082",
+    "id": "ops.0083",
     "section": "§5.19.2",
     "profile": "extended",
     "operation": "time.stop",
@@ -2217,7 +2243,7 @@
     }
   },
   {
-    "id": "ops.0083",
+    "id": "ops.0084",
     "section": "§5.19.3",
     "profile": "extended",
     "operation": "time.replace_entries",
@@ -2251,7 +2277,7 @@
     }
   },
   {
-    "id": "ops.0084",
+    "id": "ops.0085",
     "section": "§5.19.4",
     "profile": "extended",
     "operation": "time.remove_entry",
@@ -2289,7 +2315,7 @@
     }
   },
   {
-    "id": "ops.0085",
+    "id": "ops.0086",
     "section": "§5.19.5",
     "profile": "extended",
     "operation": "time.auto_stop_on_complete",
@@ -2315,7 +2341,7 @@
     }
   },
   {
-    "id": "ops.0086",
+    "id": "ops.0087",
     "section": "§5.19.6",
     "profile": "extended",
     "operation": "time.report_totals",
@@ -2343,7 +2369,7 @@
     }
   },
   {
-    "id": "ops.0087",
+    "id": "ops.0088",
     "section": "§5.19.6",
     "profile": "extended",
     "operation": "time.report_totals",
@@ -2372,7 +2398,7 @@
     }
   },
   {
-    "id": "ops.0088",
+    "id": "ops.0089",
     "section": "§5.19.1",
     "profile": "extended",
     "operation": "time.start",
@@ -2417,7 +2443,7 @@
     }
   },
   {
-    "id": "ops.0089",
+    "id": "ops.0090",
     "section": "§5.19.2",
     "profile": "extended",
     "operation": "time.stop",
@@ -2458,7 +2484,7 @@
     }
   },
   {
-    "id": "ops.0090",
+    "id": "ops.0091",
     "section": "§5.19.3",
     "profile": "extended",
     "operation": "time.replace_entries",
@@ -2481,7 +2507,7 @@
     }
   },
   {
-    "id": "ops.0091",
+    "id": "ops.0092",
     "section": "§5.19.3",
     "profile": "extended",
     "operation": "time.replace_entries",
@@ -2520,7 +2546,7 @@
     }
   },
   {
-    "id": "ops.0092",
+    "id": "ops.0093",
     "section": "§5.19.4",
     "profile": "extended",
     "operation": "time.remove_entry",
@@ -2551,7 +2577,7 @@
     }
   },
   {
-    "id": "ops.0093",
+    "id": "ops.0094",
     "section": "§5.19.4",
     "profile": "extended",
     "operation": "time.remove_entry",
@@ -2578,7 +2604,7 @@
     }
   },
   {
-    "id": "ops.0094",
+    "id": "ops.0095",
     "section": "§5.19.5",
     "profile": "extended",
     "operation": "time.auto_stop_on_complete",
@@ -2604,7 +2630,7 @@
     }
   },
   {
-    "id": "ops.0095",
+    "id": "ops.0096",
     "section": "§5.19.5",
     "profile": "extended",
     "operation": "time.auto_stop_on_complete",
@@ -2630,7 +2656,7 @@
     }
   },
   {
-    "id": "ops.0096",
+    "id": "ops.0097",
     "section": "§5.19.5",
     "profile": "extended",
     "operation": "time.auto_stop_on_complete",
@@ -2657,7 +2683,7 @@
     }
   },
   {
-    "id": "ops.0097",
+    "id": "ops.0098",
     "section": "§5.19.6",
     "profile": "extended",
     "operation": "time.report_totals",
@@ -2676,7 +2702,7 @@
     }
   },
   {
-    "id": "ops.0098",
+    "id": "ops.0099",
     "section": "§5.19.6",
     "profile": "extended",
     "operation": "time.report_totals",
@@ -2701,7 +2727,7 @@
     }
   },
   {
-    "id": "ops.0099",
+    "id": "ops.0100",
     "section": "§5.19.6",
     "profile": "extended",
     "operation": "time.report_totals",

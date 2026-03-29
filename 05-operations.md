@@ -79,6 +79,7 @@ Rules:
 - If `title.storage=filename`:
   - basename MUST derive from semantic title,
   - title changes after create are handled by update semantics (§5.4.4),
+  - implementations MAY also persist mapped `title` as a synchronized compatibility mirror,
   - `title.filename_format` and `title.custom_filename_template` MUST be ignored.
 - If `title.storage=frontmatter`, create-time basename MUST follow `title.filename_format`:
   - `title`: sanitized semantic title,
@@ -296,6 +297,7 @@ Next-occurrence recalculation in this mode MUST follow §4.4.4.
 ## 5.8 Uncomplete instance (recurring)
 
 For recurring tasks, uncomplete with resolved target date `D` (§5.2.1) MUST follow §4.8.
+For `recurrence_anchor=completion`, ordinary uncomplete is intentionally non-reversible and MUST NOT roll back `DTSTART`.
 
 ## 5.9 Skip and unskip instance
 
@@ -505,6 +507,7 @@ Before:
 ```yaml
 title: Weekly review
 status: open
+scheduled: 2026-02-20
 recurrence: FREQ=WEEKLY;BYDAY=FR
 completeInstances: []
 skippedInstances: []
@@ -516,7 +519,8 @@ After complete instance on `2026-02-20`:
 ```yaml
 title: Weekly review
 status: open
-recurrence: FREQ=WEEKLY;BYDAY=FR
+scheduled: 2026-02-20
+recurrence: DTSTART:20260220;FREQ=WEEKLY;BYDAY=FR
 completeInstances: [2026-02-20]
 skippedInstances: []
 dateModified: 2026-02-20T08:10:00Z

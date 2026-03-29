@@ -121,8 +121,8 @@ A default tasknotes vault looks like this:
 MyVault/
 ├── TaskNotes/
 │   ├── Tasks/
-│   │   ├── 260220abc1.md       ← task file (zettel filename by default)
-│   │   └── 260220abc2.md
+│   │   ├── buy-groceries.md    ← task file (title-derived filename by default)
+│   │   └── weekly-review.md
 │   └── Archive/                ← archive folder (if moveArchivedTasks=true)
 ├── .obsidian/
 │   └── plugins/

@@ -222,8 +222,9 @@
     ],
     "input": {
       "value": {
-        "combine": "or",
-        "path_glob": "tasks/**/*.md"
+        "method": "tag",
+        "tag": "task",
+        "combine": "or"
       },
       "kind": "task_detection"
     },

@@ -62,7 +62,7 @@ The TaskNotes plugin stores settings in `.obsidian/plugins/tasknotes/data.json` 
 |---|---|---|
 | `fieldMapping` | `mapping` | Normalize role names: `dateCreated`→`date_created`, `completedDate`→`completed_date`, `recurrenceAnchor`→`recurrence_anchor`, `completeInstances`→`complete_instances`, `skippedInstances`→`skipped_instances`, `blockedBy`→`blocked_by`, `timeEntries`→`time_entries`, `timeEstimate`→`time_estimate` |
 | `storeTitleInFilename` | `title.storage` | `true` → `"filename"`, `false` → `"frontmatter"` |
-| `taskFilenameFormat` | `title.filename_format` | Values: `"title"`, `"zettel"`, `"timestamp"`, `"custom"`; used only when `title.storage=frontmatter` |
+| `taskFilenameFormat` | `title.filename_format` | Values: `"title"`, `"zettel"`, `"timestamp"`, `"custom"`; used only when `title.storage=frontmatter` for canonical writes, but preserved as compatibility input when present |
 | `customFilenameTemplate` | `title.custom_filename_template` | Template string, e.g. `"{title}"`; used only when `title.storage=frontmatter` and `filename_format=custom` |
 | `taskCreationDefaults.useBodyTemplate` | `templating.enabled` | boolean |
 | `taskCreationDefaults.bodyTemplate` | `templating.template_path` | Path to template file |
@@ -92,7 +92,7 @@ The TaskNotes plugin stores settings in `.obsidian/plugins/tasknotes/data.json` 
 | `taskPropertyName` | string | `""` | Frontmatter key for property-based identification |
 | `taskPropertyValue` | string | `""` | Expected value for property-based identification (empty = key presence) |
 | `storeTitleInFilename` | boolean | `true` | Title storage mode |
-| `taskFilenameFormat` | `"title" \| "zettel" \| "timestamp" \| "custom"` | `"zettel"` | Filename generation format |
+| `taskFilenameFormat` | `"title" \| "zettel" \| "timestamp" \| "custom"` | `"title"` | Filename generation format |
 | `customFilenameTemplate` | string | `"{title}"` | Template for `"custom"` filename format |
 | `defaultTaskStatus` | string | `"open"` | Default status on create |
 | `defaultTaskPriority` | string | `"normal"` | Default priority on create |
@@ -222,7 +222,6 @@ Schema and selection rules:
 5. `methods` entries MUST be unique and MUST be from:
    - `tag`
    - `property`
-   - `path_glob`
    - `field_presence`
    - `field_match`
 6. Method-specific required keys:
@@ -259,13 +258,11 @@ When property detection is enabled (`method=property` or `methods` includes `pro
 
 `tasknotes.yaml`-level providers MAY additionally support:
 
-- `path_glob` (example: `tasks/**/*.md`)
 - `field_presence` (example: required key `status`)
 - `field_match` (example: `type == "task"`)
 
 Extension-key shape:
 
-- `path_glob`: string or list<string> of collection-relative glob patterns.
 - `field_presence`: string or list<string> of required frontmatter keys.
 - `field_match`: object map of `key -> expected scalar value` for exact semantic equality checks.
 
@@ -540,8 +537,9 @@ mapping:
   reminders: reminders
 
 task_detection:
-  combine: or
-  path_glob: tasks/**/*.md
+  method: tag
+  tag: task
+  default_folder: TaskNotes/Tasks
 
 defaults:
   status: open
@@ -697,9 +695,11 @@ Default priority on create: `normal`.
 
 ### Title and filename defaults
 
-- `title.storage`: `filename` (titles stored in filename, not frontmatter)
-- TaskNotes `data.json` may contain `taskFilenameFormat` (default `zettel`), but this value is ignored by canonical writes while `title.storage=filename`
-- Title is read from filename first; frontmatter `title` is compatibility fallback when filename-derived title is unavailable (§2.2.2)
+- `title.storage`: `filename` (filename/path is the authoritative title source)
+- default basename generation under `title.storage=filename` derives from semantic title using filename-safe sanitization
+- implementations MAY also keep mapped `title` in frontmatter as a synchronized compatibility mirror
+- TaskNotes `data.json` may still contain legacy `taskFilenameFormat` values such as `zettel`, but these are compatibility inputs rather than the forward default when `title.storage=filename`
+- title is read from filename first; frontmatter `title` is compatibility fallback when filename-derived title is unavailable (§2.2.2)
 
 ### Time tracking defaults
 

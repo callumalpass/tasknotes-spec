@@ -903,7 +903,7 @@
     "section": "§11",
     "profile": "extended",
     "operation": "link.resolve",
-    "assertion": "envelope_equals",
+    "assertion": "envelope_error",
     "requires": [
       "links"
     ],
@@ -915,12 +915,11 @@
         "notes/shared.md",
         "tasks/sub/shared.md"
       ],
-      "expectedPath": "tasks/sub/shared.md"
+      "errorRegex": "ambiguous_link"
     },
     "expect": {
-      "ok": true,
-      "result": {
-        "path": "tasks/sub/shared.md"
+      "error": {
+        "$regex": "ambiguous_link"
       }
     }
   },
@@ -929,7 +928,7 @@
     "section": "§11",
     "profile": "extended",
     "operation": "link.resolve",
-    "assertion": "envelope_equals",
+    "assertion": "envelope_error",
     "requires": [
       "links"
     ],
@@ -941,12 +940,11 @@
         "lib/util.md",
         "lib/nested/extra/util.md"
       ],
-      "expectedPath": "lib/util.md"
+      "errorRegex": "ambiguous_link"
     },
     "expect": {
-      "ok": true,
-      "result": {
-        "path": "lib/util.md"
+      "error": {
+        "$regex": "ambiguous_link"
       }
     }
   },

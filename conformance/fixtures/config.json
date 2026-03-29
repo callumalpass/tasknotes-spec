@@ -18509,7 +18509,7 @@
         "archiveFolder": "TaskNotes/Archive",
         "moveArchivedTasks": false,
         "storeTitleInFilename": true,
-        "taskFilenameFormat": "zettel",
+        "taskFilenameFormat": "title",
         "defaultTaskStatus": "open",
         "defaultTaskPriority": "normal",
         "autoStopTimeTrackingOnComplete": true,
@@ -18532,7 +18532,7 @@
             },
             "title": {
               "storage": "filename",
-              "filename_format": "zettel"
+              "filename_format": "title"
             },
             "defaults": {
               "status": "open",

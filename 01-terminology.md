@@ -60,8 +60,8 @@ A **target date** is the calendar date to which a recurrence instance operation 
 
 ## 1.13 Recurrence rule
 
-A **recurrence rule** is an RFC 5545 RRULE-compatible string stored in the recurrence semantic role.
-It MAY include an explicit `DTSTART` prefix.
+A **recurrence rule** is a tasknotes recurrence string stored in the recurrence semantic role.
+It uses RFC 5545 RRULE-style parameters inside a single semicolon-delimited field value and MAY include an explicit inline `DTSTART` prefix segment as defined in §4.3.
 
 ## 1.14 Recurrence anchor
 

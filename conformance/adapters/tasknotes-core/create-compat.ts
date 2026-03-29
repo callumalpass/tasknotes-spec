@@ -7,7 +7,6 @@ type UnknownRecord = Record<string, unknown>;
 interface TaskTypeDefLike {
   path_pattern?: string;
   match?: {
-    path_glob?: string;
     where?: Record<string, unknown>;
   };
   fields?: Record<string, { type?: string; default?: unknown }>;

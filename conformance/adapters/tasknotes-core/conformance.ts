@@ -851,29 +851,6 @@ function chooseCandidateByExtension(target: string, candidates: string[], extens
   return null;
 }
 
-function chooseByTiebreakers(candidates: string[], sourcePath: string): string | "ambiguous" {
-  if (candidates.length === 1) return candidates[0];
-  if (candidates.length === 0) return "ambiguous";
-
-  const sourceDir = sourcePath ? dirname(sourcePath).replace(/\\/g, "/") : "";
-  const sameDir = candidates.filter((candidate) => dirname(candidate).replace(/\\/g, "/") === sourceDir);
-  let pool = candidates;
-  if (sameDir.length === 1) return sameDir[0];
-  if (sameDir.length > 1) pool = sameDir;
-
-  const segmentCount = (pathValue: string) => pathValue.split("/").filter(Boolean).length;
-  const minSegments = Math.min(...pool.map((candidate) => segmentCount(candidate)));
-  const shortest = pool.filter((candidate) => segmentCount(candidate) === minSegments);
-  if (shortest.length === 1) return shortest[0];
-
-  const sorted = [...shortest].sort((a, b) => a.localeCompare(b));
-  if (sorted.length > 0) {
-    return sorted[0];
-  }
-
-  return "ambiguous";
-}
-
 function resolveLink(input: unknown): Envelope {
   const payload = isPlainObject(input) ? input : {};
   const parsed = parseLinkRaw(payload.raw);
@@ -925,16 +902,10 @@ function resolveLink(input: unknown): Envelope {
           return envelopeErr("ambiguous_link");
         } else {
           const selected = chooseCandidateByExtension(target, candidates, extensions);
-          if (selected === "ambiguous") {
-            const tieBroken = chooseByTiebreakers(candidates, sourcePath);
-            if (tieBroken === "ambiguous") return envelopeErr("ambiguous_link");
-            resolved = tieBroken;
-          } else if (typeof selected === "string") {
+          if (typeof selected === "string") {
             resolved = selected;
           } else {
-            const tieBroken = chooseByTiebreakers(candidates, sourcePath);
-            if (tieBroken === "ambiguous") return envelopeErr("ambiguous_link");
-            resolved = tieBroken;
+            return envelopeErr("ambiguous_link");
           }
         }
       } else if (candidates.length === 1) {
@@ -1703,7 +1674,11 @@ function executeRecurrenceUncompleteInstance(input: unknown): Envelope {
   const targetDate = typeof payload.targetDate === "string" ? payload.targetDate : "";
   const completeInstances = toUniqueStringArray(payload.completeInstances).filter((date) => date !== targetDate);
   const skippedInstances = toUniqueStringArray(payload.skippedInstances);
-  return envelopeOk({ completeInstances, skippedInstances });
+  return envelopeOk({
+    completeInstances,
+    skippedInstances,
+    ...(typeof payload.recurrence === "string" ? { updatedRecurrence: payload.recurrence } : {}),
+  });
 }
 
 function executeRecurrenceSkipInstance(input: unknown): Envelope {

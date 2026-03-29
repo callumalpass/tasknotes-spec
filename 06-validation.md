@@ -35,7 +35,7 @@ A conforming validator MUST implement checks required by the claimed profile(s):
 | 1b | `title` resolves via active title policy (§2.2.2 and §9.13): storage-mode-aware precedence and fallback. | `core-lite` and above |
 | 2 | Field values match role type requirements. | `core-lite` and above |
 | 3 | Temporal values conform to §3. | `core-lite` and above |
-| 4 | Recurrence values conform to §4 (including anchor-seed resolution rules). | `recurrence` and above |
+| 4 | Recurrence values conform to §4 (including tasknotes recurrence-string syntax and anchor-seed resolution rules). | `recurrence` and above |
 | 5 | Per-instance lists contain valid dates with no overlap. | `recurrence` and above |
 | 6 | `date_modified` is not earlier than `date_created` when both exist. | `core-lite` and above |
 | 7 | `time_estimate` is non-negative when present. | any profile that supports `time_estimate` |
@@ -77,7 +77,7 @@ Issues SHOULD include:
 | `invalid_enum_value` | error | value not in configured set |
 | `invalid_date_value` | error | malformed or impossible date |
 | `invalid_datetime_value` | error | malformed datetime |
-| `invalid_recurrence_rule` | error | recurrence not RRULE-compatible |
+| `invalid_recurrence_rule` | error | recurrence not valid tasknotes recurrence syntax |
 | `missing_recurrence_seed` | error | recurrence has no resolvable seed/start date |
 | `invalid_recurrence_anchor` | error | anchor not allowed |
 | `instance_state_overlap` | error | same date in complete and skipped lists |

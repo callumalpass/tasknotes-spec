@@ -1,3 +1,4 @@
 /.ops
 node_modules/
 tasknotes-conformance-*.tar.gz
+conformance/adapters/.generated/

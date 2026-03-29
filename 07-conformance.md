@@ -31,7 +31,7 @@ Required capabilities:
 
 Additional required capabilities:
 
-- RRULE-compatible recurrence parsing/validation
+- tasknotes recurrence-string parsing/validation, including RRULE parameter syntax and inline `DTSTART` handling
 - recurrence anchor semantics, including seed precedence and completion-anchor progression
 - complete/uncomplete instance
 - skip/unskip instance
@@ -144,7 +144,7 @@ Conformance claims MUST indicate whether `permissive` mode is also supported.
 | recurring instance complete/skip | - | required | optional | required |
 | template expansion/merge (§5.3.5) | - | - | required | optional |
 | double-brace portable variable support | - | - | required | optional |
-| RRULE validation | - | required | optional | required |
+| recurrence-string validation | - | required | optional | required |
 | link parsing/resolution (§11) | - | - | optional | required |
 | dependency schema and ops | - | - | optional | required |
 | reminder schema and ops | - | - | optional | required |

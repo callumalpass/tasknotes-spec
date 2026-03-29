@@ -6,7 +6,7 @@ This section defines recurrence semantics, including rule representation, anchor
 
 ## 4.2 Recurrence applicability
 
-A task is recurring when semantic role `recurrence` contains a valid RRULE-compatible string.
+A task is recurring when semantic role `recurrence` contains a valid tasknotes recurrence string.
 
 If `recurrence` is absent or empty, the task is non-recurring.
 
@@ -14,8 +14,10 @@ If `recurrence` is absent or empty, the task is non-recurring.
 
 ### 4.3.1 Required format
 
-`recurrence` MUST be an RFC 5545 RRULE-compatible string.
-It MAY include a leading `DTSTART` segment.
+`recurrence` MUST be a tasknotes recurrence string.
+This syntax is RRULE-derived but is not a full RFC 5545 content line or multi-line iCalendar fragment.
+The RRULE parameter portion MUST use RFC 5545 RRULE property syntax.
+It MAY include a leading inline `DTSTART` segment.
 
 If `DTSTART` is present, it MUST use one of:
 
@@ -26,7 +28,7 @@ Canonical combined form is:
 
 - `DTSTART:...;FREQ=...`
 
-Implementations MAY accept inbound `RRULE:` prefixes for compatibility, but canonical writes SHOULD use the combined form above.
+Implementations MAY accept inbound `RRULE:` prefixes or multi-line iCalendar-like inputs for compatibility, but canonical writes SHOULD use the combined single-field form above.
 
 Examples:
 
@@ -84,6 +86,7 @@ When calculating the next candidate occurrence for `recurrence_anchor=completion
 4. Candidate selection MUST choose the first RRULE occurrence strictly after the current `DTSTART` anchor (or resolved seed if `DTSTART` is absent).
 
 This matches the completion-anchor progression model where each completion advances the chain by rewriting `DTSTART`.
+This model is intentionally not fully reversible via ordinary `uncomplete instance`; progression history lives in `DTSTART`, not only in `complete_instances`.
 
 ### 4.4.5 `DTSTART` canonicalization on recurring writes
 
@@ -135,7 +138,8 @@ Conforming behavior:
 
 1. Remove `D` from `complete_instances` if present.
 2. Do not add `D` to `skipped_instances` implicitly.
-3. Update `date_modified` when state changes.
+3. For `recurrence_anchor=completion`, uncomplete MUST NOT rewrite or roll back `DTSTART`; restoring prior progression requires an explicit recurrence edit or implementation-specific rewind operation.
+4. Update `date_modified` when state changes.
 
 Operation MUST be idempotent.
 

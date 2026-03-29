@@ -133,14 +133,9 @@ For simple wikilink names (no path separator):
    - If multiple matches: fail with `ambiguous_link`
 
 3. **Filename match pass:** if no ID match, search scoped markdown files by filename (without extension).
-
-4. **Tiebreakers** (when multiple filename candidates remain):
-   a. Same directory as source file
-   b. Shortest path (fewest path segments)
-   c. Lexicographically smallest path
-
-5. Implementations MUST deduplicate normalized candidate paths before applying tiebreakers.
-6. If candidate selection is still non-singleton after deduplication and all tiebreakers (for example equivalent-path collisions under implementation-specific normalization), resolve to `null` and emit `ambiguous_link`.
+4. Implementations MUST deduplicate normalized candidate paths before final selection.
+5. If exactly one filename candidate remains after normalization and extension handling, resolve to that file.
+6. If multiple filename candidates remain, resolve to `null` and emit `ambiguous_link`. Callers SHOULD use a path-qualified or relative target to disambiguate.
 
 ### Step 4: Extension handling
 
@@ -316,7 +311,7 @@ Link validation issues:
 | Code | Severity | Trigger |
 |---|---|---|
 | `invalid_link_format` | error | Link value cannot be parsed as any supported format |
-| `ambiguous_link` | warning | Simple-name resolution found multiple candidates after all tiebreakers |
+| `ambiguous_link` | warning | Simple-name resolution found multiple candidates after normalization |
 | `unresolved_link_target` | warning | Link target cannot be resolved to an existing file |
 | `path_traversal` | error | Resolved path escapes collection root |
 

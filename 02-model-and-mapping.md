@@ -43,6 +43,7 @@ Semantic `title` is always required, with deterministic read resolution and stor
   1. when `title.storage=frontmatter`: mapped `title` key when present and non-empty, then file basename fallback;
   2. when `title.storage=filename`: file basename first, then mapped `title` fallback when basename is unavailable.
 - If mapped title and filename-derived title both exist and differ, the source authoritative for active `title.storage` MUST win and implementations SHOULD emit `title_source_conflict`.
+- When `title.storage=filename`, implementations MAY keep mapped `title` as a synchronized compatibility mirror, but filename-derived title remains authoritative.
 - Title storage mode controls canonical writes (§9.13): `frontmatter` favors mapped-key writes; `filename` favors filename-derived title with rename-on-title-change behavior.
 
 Validators MUST enforce semantic title presence using the active title-resolution policy (§9.13), not frontmatter key presence alone.
@@ -62,7 +63,7 @@ Implementations conforming beyond minimal scope SHOULD support:
 | `projects` | list<link-or-string> | project references, see §11 |
 | `time_estimate` | integer >= 0 | minutes |
 | `time_entries` | list<object> | see §2.6 |
-| `recurrence` | string | RRULE-compatible |
+| `recurrence` | string | tasknotes recurrence string; see §4 |
 | `recurrence_anchor` | enum | `scheduled` or `completion` |
 | `complete_instances` | list<date> | recurring completion state |
 | `skipped_instances` | list<date> | recurring skip state |

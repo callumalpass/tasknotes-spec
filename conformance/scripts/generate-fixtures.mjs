@@ -1762,7 +1762,7 @@ function buildConfigFixtures() {
         archiveFolder: "TaskNotes/Archive",
         moveArchivedTasks: false,
         storeTitleInFilename: true,
-        taskFilenameFormat: "zettel",
+        taskFilenameFormat: "title",
         defaultTaskStatus: "open",
         defaultTaskPriority: "normal",
         autoStopTimeTrackingOnComplete: true,
@@ -1780,7 +1780,7 @@ function buildConfigFixtures() {
         },
         title: {
           storage: "filename",
-          filename_format: "zettel",
+          filename_format: "title",
         },
         defaults: {
           status: "open",
@@ -2695,21 +2695,21 @@ function buildLinkFixtures() {
       idIndex: { "tasks/task-002.md": "my-task-id" },
       expectedPath: "tasks/task-002.md",
     },
-    // Same-directory tiebreaker: two candidates, one in same dir as source wins
+    // Ambiguous basename: callers must disambiguate with a path-qualified or relative link
     {
       raw: "[[shared]]",
       sourcePath: "tasks/sub/task-001.md",
       collectionRoot: "/vault",
       candidates: ["notes/shared.md", "tasks/sub/shared.md"],
-      expectedPath: "tasks/sub/shared.md",
+      errorRegex: "ambiguous_link",
     },
-    // Shortest-path tiebreaker: when same-dir doesn't apply, shortest path wins
+    // Ambiguous basename remains ambiguous even when one candidate has a shorter path
     {
       raw: "[[util]]",
       sourcePath: "archive/old/task.md",
       collectionRoot: "/vault",
       candidates: ["lib/util.md", "lib/nested/extra/util.md"],
-      expectedPath: "lib/util.md",
+      errorRegex: "ambiguous_link",
     },
     // Absolute wikilink (contains slash, not relative) resolves from collection root
     {
@@ -3250,6 +3250,29 @@ function buildOperationFixtures() {
         },
       },
     });
+
+    if (day === "2026-02-21") {
+      w.add({
+        section: "§5.8",
+        profile: "recurrence",
+        operation: "recurrence.uncomplete_instance",
+        assertion: "envelope_equals",
+        input: {
+          targetDate: day,
+          recurrenceAnchor: "completion",
+          recurrence: "DTSTART:20260221;FREQ=DAILY",
+          completeInstances: ["2026-02-20", "2026-02-21"],
+          skippedInstances: [],
+        },
+        expect: {
+          ok: true,
+          result: {
+            completeInstances: ["2026-02-20"],
+            updatedRecurrence: "DTSTART:20260221;FREQ=DAILY",
+          },
+        },
+      });
+    }
 
     w.add({
       section: "§5.9",
@@ -4595,7 +4618,7 @@ function buildConfigSchemaFixtures() {
       kind: "status",
     },
     {
-      value: { combine: "or", path_glob: "tasks/**/*.md" },
+      value: { method: "tag", tag: "task", combine: "or" },
       kind: "task_detection",
     },
     {
