@@ -851,6 +851,12 @@ function chooseCandidateByExtension(target: string, candidates: string[], extens
   return null;
 }
 
+function topLevelSegment(pathValue: string): string {
+  const normalized = String(pathValue || "").replace(/\\/g, "/").replace(/^\/+/, "");
+  const [first = ""] = normalized.split("/").filter(Boolean);
+  return first;
+}
+
 function resolveLink(input: unknown): Envelope {
   const payload = isPlainObject(input) ? input : {};
   const parsed = parseLinkRaw(payload.raw);
@@ -876,6 +882,11 @@ function resolveLink(input: unknown): Envelope {
     const target = parsed.target;
     if (target.startsWith("./") || target.startsWith("../")) {
       let candidate = normalizeResolvedPath(posixPath.join(sourceDir, target));
+      const sourceScope = topLevelSegment(sourcePath);
+      const candidateScope = topLevelSegment(candidate);
+      if (sourceScope && candidateScope && sourceScope !== candidateScope) {
+        return envelopeErr("path_traversal");
+      }
       if (!/\.[A-Za-z0-9]+$/.test(candidate)) {
         candidate = `${candidate}.md`;
       }

@@ -566,6 +566,7 @@ async function executeRecurrenceUncompleteInstance(input: unknown): Promise<Enve
     return envelopeOk({
       completeInstances: toUniqueStringArray((updated as unknown as UnknownRecord).complete_instances),
       skippedInstances: toUniqueStringArray((updated as unknown as UnknownRecord).skipped_instances),
+      ...(typeof payload.recurrence === "string" ? { updatedRecurrence: payload.recurrence } : {}),
     });
   } catch (error) {
     return envelopeErr(error);
