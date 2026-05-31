@@ -60,7 +60,7 @@ The TaskNotes plugin stores settings in `.obsidian/plugins/tasknotes/data.json` 
 
 | `data.json` key | Spec key | Notes |
 |---|---|---|
-| `fieldMapping` | `mapping` | Normalize role names: `dateCreated`→`date_created`, `completedDate`→`completed_date`, `recurrenceAnchor`→`recurrence_anchor`, `completeInstances`→`complete_instances`, `skippedInstances`→`skipped_instances`, `blockedBy`→`blocked_by`, `timeEntries`→`time_entries`, `timeEstimate`→`time_estimate` |
+| `fieldMapping` | `mapping` | Normalize role names: `dateCreated`→`date_created`, `completedDate`→`completed_date`, `recurrenceAnchor`→`recurrence_anchor`, `completeInstances`→`complete_instances`, `skippedInstances`→`skipped_instances`, `recurrenceParent`→`recurrence_parent`, `occurrenceDate`→`occurrence_date`, `occurrenceMaterialization`→`occurrence_materialization`, `occurrenceNextTrigger`→`occurrence_next_trigger`, `occurrenceTemplate`→`occurrence_template`, `occurrencePastHorizon`→`occurrence_past_horizon`, `occurrenceFutureHorizon`→`occurrence_future_horizon`, `blockedBy`→`blocked_by`, `timeEntries`→`time_entries`, `timeEstimate`→`time_estimate` |
 | `storeTitleInFilename` | `title.storage` | `true` → `"filename"`, `false` → `"frontmatter"` |
 | `taskFilenameFormat` | `title.filename_format` | Values: `"title"`, `"zettel"`, `"timestamp"`, `"custom"`; used only when `title.storage=frontmatter` for canonical writes, but preserved as compatibility input when present |
 | `customFilenameTemplate` | `title.custom_filename_template` | Template string, e.g. `"{title}"`; used only when `title.storage=frontmatter` and `filename_format=custom` |
@@ -96,7 +96,7 @@ The TaskNotes plugin stores settings in `.obsidian/plugins/tasknotes/data.json` 
 | `customFilenameTemplate` | string | `"{title}"` | Template for `"custom"` filename format |
 | `defaultTaskStatus` | string | `"open"` | Default status on create |
 | `defaultTaskPriority` | string | `"normal"` | Default priority on create |
-| `customStatuses` | StatusConfig[] | see §9.20 | Ordered status definitions |
+| `customStatuses` | StatusConfig[] | see object shape below | Ordered status definitions |
 | `autoStopTimeTrackingOnComplete` | boolean | `true` | Auto-stop active session on completion |
 | `autoStopTimeTrackingNotification` | boolean | `false` | Show notification when auto-stopping |
 | `useFrontmatterMarkdownLinks` | boolean | `false` | Use markdown links in frontmatter (requires obsidian-frontmatter-markdown-links plugin) |
@@ -147,12 +147,13 @@ Required keys apply to the effective configuration after provider resolution.
 | `dependencies` | object | dependency behavior policy |
 | `reminders` | object | reminder behavior policy |
 | `time_tracking` | object | time-tracking management behavior policy |
+| `occurrences` | object | recurrence materialization defaults and bounds |
 | `compatibility` | object | legacy alias/behavior switches |
 
 ## 9.5 spec_version behavior
 
 `spec_version` MUST be a semantic version string.
-Pre-release identifiers are valid (for example `0.1.0-draft`).
+Pre-release identifiers are valid (for example `0.2.0-draft`).
 
 Implementations in strict mode MUST reject unsupported major versions.
 
@@ -180,6 +181,7 @@ Minimum required roles in mapping:
 - `date_modified`
 
 If semantic role `id` is supported (§2.6.5), mapping SHOULD include `id`.
+If profile `materialized-occurrences` is claimed, mapping MUST include `recurrence_parent` and `occurrence_date`, and SHOULD include parent policy roles (`occurrence_materialization`, `occurrence_next_trigger`, `occurrence_template`, `occurrence_past_horizon`, `occurrence_future_horizon`).
 
 Example:
 
@@ -194,6 +196,13 @@ mapping:
   recurrence_anchor: recurrenceAnchor
   complete_instances: completeInstances
   skipped_instances: skippedInstances
+  recurrence_parent: recurrence_parent
+  occurrence_date: occurrence_date
+  occurrence_materialization: occurrence_materialization
+  occurrence_next_trigger: occurrence_next_trigger
+  occurrence_template: occurrence_template
+  occurrence_past_horizon: occurrence_past_horizon
+  occurrence_future_horizon: occurrence_future_horizon
   time_entries: timeEntries
   blocked_by: blockedBy
   reminders: reminders
@@ -327,7 +336,9 @@ Example:
 status:
   values: [open, in-progress, done, cancelled]
   default: open
-  completed_values: [done, cancelled]
+  completed_values: [done]
+  skipped_values: [cancelled]
+  default_skipped: cancelled
 ```
 
 Rules:
@@ -335,8 +346,13 @@ Rules:
 - `default` MUST be one of `values`.
 - `completed_values` MUST be a non-empty list.
 - Each `completed_values` entry MUST be in `values`.
+- `skipped_values`, when present, MUST be a list whose entries are in `values`.
+- `default_skipped`, when present, MUST be in `skipped_values`.
+- For implementations claiming `materialized-occurrences`, `skipped_values` MUST NOT overlap `completed_values`.
+- Implementations claiming `materialized-occurrences` MUST provide at least one skipped value or fail skip of materialized occurrence notes deterministically (§5.20.3).
 - Non-recurring completion MUST use this list, not hardcoded literals.
 - When a complete operation does not provide an explicit target status, writers MUST use the first entry of `completed_values`.
+- When a materialized occurrence skip operation does not provide an explicit skipped status, writers MUST use `default_skipped` when present, otherwise the first entry of `skipped_values`.
 
 ## 9.10 validation schema
 
@@ -496,7 +512,33 @@ Rules:
 - if `auto_stop_on_complete=true`, completion-triggered stop behavior MUST follow §5.19.5.
 - if `auto_stop_notification` is absent, effective value MUST default to `false`.
 
-## 9.17 compatibility schema
+## 9.17 occurrences schema
+
+`occurrences` defines collection-level defaults for recurrence materialization.
+This schema is required only for implementations claiming profile `materialized-occurrences` (§7.3.4).
+
+Example:
+
+```yaml
+occurrences:
+  default_materialization: manual
+  default_next_trigger: completion
+  past_horizon: P0D
+  future_horizon: P14D
+```
+
+Rules:
+
+- `default_materialization` MUST be one of `manual`, `on_completion`, or `rolling`.
+- If `default_materialization` is absent, effective value MUST default to `manual`.
+- `default_next_trigger` MUST be `completion` or `completion_or_skip`.
+- If `default_next_trigger` is absent, effective value MUST default to `completion`.
+- `past_horizon` and `future_horizon`, when present, MUST be ISO 8601 duration strings.
+- If `default_materialization=rolling`, implementations MUST use finite rolling bounds. If bounds are absent, documented finite defaults MUST be used.
+- Parent task fields override collection defaults: `occurrence_materialization` overrides `occurrences.default_materialization`; `occurrence_next_trigger` overrides `occurrences.default_next_trigger`; `occurrence_past_horizon` and `occurrence_future_horizon` override `occurrences.past_horizon` and `occurrences.future_horizon`.
+- If `occurrences` is absent, the effective behavior is `manual` materialization and `completion` next trigger.
+
+## 9.18 compatibility schema
 
 Example:
 
@@ -513,10 +555,10 @@ Rules:
 - `legacy_local_datetime_input=true` MAY relax strict parsing for offset-less datetimes only in permissive mode; strict mode parsing rules in §3.4.2 still apply.
 - Enabled compatibility flags SHOULD be disclosed in conformance output (§7).
 
-## 9.18 Complete configuration example (`yaml_file` provider)
+## 9.19 Complete configuration example (`yaml_file` provider)
 
 ```yaml
-spec_version: 0.1.0-draft
+spec_version: 0.2.0-draft
 runtime_timezone: America/Los_Angeles
 
 mapping:
@@ -532,6 +574,13 @@ mapping:
   recurrence_anchor: recurrenceAnchor
   complete_instances: completeInstances
   skipped_instances: skippedInstances
+  recurrence_parent: recurrence_parent
+  occurrence_date: occurrence_date
+  occurrence_materialization: occurrence_materialization
+  occurrence_next_trigger: occurrence_next_trigger
+  occurrence_template: occurrence_template
+  occurrence_past_horizon: occurrence_past_horizon
+  occurrence_future_horizon: occurrence_future_horizon
   time_entries: timeEntries
   blocked_by: blockedBy
   reminders: reminders
@@ -554,7 +603,9 @@ defaults:
 status:
   values: [open, in-progress, done, cancelled]
   default: open
-  completed_values: [done, cancelled]
+  completed_values: [done]
+  skipped_values: [cancelled]
+  default_skipped: cancelled
 
 validation:
   mode: strict
@@ -588,12 +639,18 @@ time_tracking:
   auto_stop_on_complete: true
   auto_stop_notification: false
 
+occurrences:
+  default_materialization: manual
+  default_next_trigger: completion
+  past_horizon: P0D
+  future_horizon: P14D
+
 compatibility:
   read_aliases: true
   legacy_duration_field: true
 ```
 
-## 9.19 Configuration errors
+## 9.20 Configuration errors
 
 Configuration validation MUST report structured errors with key path context.
 
@@ -603,6 +660,10 @@ Examples:
 - required effective key unresolved after provider resolution (`spec_version` or `mapping`)
 - missing `mapping.title`
 - `status.default` not present in `status.values`
+- `status.completed_values` contains a value not present in `status.values`
+- `status.skipped_values` contains a value not present in `status.values`
+- `status.default_skipped` not present in `status.skipped_values`
+- `status.skipped_values` overlaps `status.completed_values` when `materialized-occurrences` is claimed
 - unsupported `validation.mode`
 - `validation.mode=permissive` but permissive mode is not implemented
 - invalid `task_detection.method`
@@ -624,8 +685,12 @@ Examples:
 - invalid `reminders.apply_defaults_when_explicit`
 - invalid `time_tracking.auto_stop_on_complete`
 - invalid `time_tracking.auto_stop_notification`
+- invalid `occurrences.default_materialization`
+- invalid `occurrences.default_next_trigger`
+- invalid `occurrences.past_horizon`
+- invalid `occurrences.future_horizon`
 
-## 9.20 Default collection state
+## 9.21 Default collection state
 
 This section describes what a fresh tasknotes vault looks like before any user customization. Implementations that read an existing tasknotes vault without a `tasknotes.yaml` SHOULD apply these defaults when `data.json` is absent or fields are missing.
 
@@ -665,6 +730,13 @@ Default method: `tag`. A file is a task if it contains the tag `#task` in its fr
 | `recurrence_anchor` | `recurrence_anchor` |
 | `complete_instances` | `complete_instances` |
 | `skipped_instances` | `skipped_instances` |
+| `recurrence_parent` | `recurrence_parent` |
+| `occurrence_date` | `occurrence_date` |
+| `occurrence_materialization` | `occurrence_materialization` |
+| `occurrence_next_trigger` | `occurrence_next_trigger` |
+| `occurrence_template` | `occurrence_template` |
+| `occurrence_past_horizon` | `occurrence_past_horizon` |
+| `occurrence_future_horizon` | `occurrence_future_horizon` |
 | `time_entries` | `timeEntries` |
 | `blocked_by` | `blockedBy` |
 | `reminders` | `reminders` |
@@ -681,6 +753,7 @@ Note: `recurrenceAnchor`, `completeInstances`, and `skippedInstances` are accept
 | `done` | Done | true | 3 |
 
 Default status on create: `open`. Default completed status (first `isCompleted=true`): `done`.
+No skipped status is configured by default; implementations that support materialized occurrence skips MUST require configuration or expose a documented default before writing skipped occurrence state.
 
 ### Default priorities
 
@@ -716,7 +789,7 @@ Default priority on create: `normal`.
 When neither `data.json` nor `tasknotes.yaml` is present, implementations MUST use the following effective configuration:
 
 ```yaml
-spec_version: 0.1.0-draft   # synthesized
+spec_version: 0.2.0-draft   # synthesized
 mapping:
   title: title
   status: status
@@ -733,6 +806,13 @@ mapping:
   recurrence_anchor: recurrence_anchor
   complete_instances: complete_instances
   skipped_instances: skipped_instances
+  recurrence_parent: recurrence_parent
+  occurrence_date: occurrence_date
+  occurrence_materialization: occurrence_materialization
+  occurrence_next_trigger: occurrence_next_trigger
+  occurrence_template: occurrence_template
+  occurrence_past_horizon: occurrence_past_horizon
+  occurrence_future_horizon: occurrence_future_horizon
   time_entries: timeEntries
   blocked_by: blockedBy
   reminders: reminders

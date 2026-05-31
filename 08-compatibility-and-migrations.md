@@ -80,7 +80,20 @@ Recommended resolution policy:
 
 Policy choice MUST be documented.
 
-## 8.7 Dependency migration
+## 8.7 Materialized occurrence migration
+
+When introducing materialized occurrence notes into an existing collection, implementations SHOULD avoid automatic bulk creation.
+Recommended migration behavior:
+
+- do not materialize historical or future occurrence notes unless explicitly requested;
+- preserve existing parent `complete_instances` and `skipped_instances`;
+- when importing existing per-occurrence task files, require deterministic parent/date matching before adding `recurrence_parent` and `occurrence_date`;
+- when materialized occurrence state conflicts with parent instance lists, prefer the occurrence note for that date and report `occurrence_state_conflict`;
+- provide a dry-run report before converting existing task files into materialized occurrence notes.
+
+Migration tooling MUST NOT silently delete occurrence notes or parent recurring tasks.
+
+## 8.8 Dependency migration
 
 When migrating legacy dependency data, implementations SHOULD:
 
@@ -91,7 +104,7 @@ When migrating legacy dependency data, implementations SHOULD:
 
 If historical data omits `reltype`, migration MAY apply `dependencies.default_reltype` and SHOULD report count of inferred values.
 
-## 8.8 Reminder migration
+## 8.9 Reminder migration
 
 When migrating legacy reminder data, implementations SHOULD:
 
@@ -103,7 +116,7 @@ When migrating legacy reminder data, implementations SHOULD:
 
 If reminder `id` values are missing, migration MAY generate IDs and MUST report generated count.
 
-## 8.9 Link migration
+## 8.10 Link migration
 
 When migrating legacy link values, implementations SHOULD:
 
@@ -112,7 +125,7 @@ When migrating legacy link values, implementations SHOULD:
 - normalize resolved targets into canonical write format by policy,
 - detect and report ambiguous links instead of silently choosing non-deterministically.
 
-## 8.10 Divergence register
+## 8.11 Divergence register
 
 Implementations SHOULD maintain a divergence register with columns:
 
@@ -122,7 +135,7 @@ Implementations SHOULD maintain a divergence register with columns:
 - migration strategy
 - deprecation timeline
 
-## 8.11 Deprecation policy
+## 8.12 Deprecation policy
 
 For any behavior deprecated by the specification:
 
@@ -131,38 +144,42 @@ For any behavior deprecated by the specification:
 3. provide migration tooling where feasible,
 4. remove deprecated behavior only in a version aligned with compatibility commitments.
 
-## 8.12 Data safety requirements
+## 8.13 Data safety requirements
 
 Migrations MUST NOT:
 
 - silently drop unknown fields,
 - silently convert valid date-only fields to datetime,
 - silently rewrite recurrence semantics without explicit policy,
+- silently materialize occurrence notes outside explicit user/configured materialization policy,
+- silently delete materialized occurrence notes during recurrence edits,
 - silently drop unresolved dependency entries,
 - silently rewrite link targets to different destinations without explicit policy,
 - silently delete reminders unless explicitly requested.
 
-## 8.13 Suggested migration report format
+## 8.14 Suggested migration report format
 
 ```yaml
 spec_version_from: 0.1.0-draft
-spec_version_to: 0.1.0
+spec_version_to: 0.2.0-draft
 files_scanned: 214
 files_changed: 67
 warnings:
   alias_conflict_ignored: 3
   instance_state_overlap_resolved: 2
+  occurrence_state_conflict: 1
   unresolved_dependency_target: 4
 changes:
   normalized_datetime_fields: 41
   alias_keys_removed: 29
   instance_overlaps_fixed: 2
+  occurrence_state_conflicts: 1
   inferred_dependency_reltype: 5
   generated_reminder_ids: 8
   normalized_link_targets: 14
 ```
 
-## 8.14 Compatibility statement example
+## 8.15 Compatibility statement example
 
 ```text
 Compatibility mode: legacy-aliases=true, legacy-timeentry-duration=true

@@ -99,7 +99,7 @@ function getClaim() {
   return {
     implementation: conformanceMetadata.implementation,
     version: conformanceMetadata.version,
-    spec_version: "0.1.0-draft",
+    spec_version: "0.2.0-draft",
     profiles: [...conformanceMetadata.profiles],
     capabilities: [...conformanceMetadata.capabilities],
     validation_modes: ["strict"],
@@ -128,6 +128,13 @@ function mapTasknotesRoleToSpecRole(roleKey: string) {
     recurrenceAnchor: "recurrence_anchor",
     completeInstances: "complete_instances",
     skippedInstances: "skipped_instances",
+    recurrenceParent: "recurrence_parent",
+    occurrenceDate: "occurrence_date",
+    occurrenceMaterialization: "occurrence_materialization",
+    occurrenceNextTrigger: "occurrence_next_trigger",
+    occurrenceTemplate: "occurrence_template",
+    occurrencePastHorizon: "occurrence_past_horizon",
+    occurrenceFutureHorizon: "occurrence_future_horizon",
     timeEntries: "time_entries",
     timeEstimate: "time_estimate",
     blockedBy: "blocked_by",
@@ -1318,7 +1325,7 @@ function executeMigrationReportSummary(input: unknown): Envelope {
   const filesChanged = typeof payload.files_changed === "number" ? payload.files_changed : 0;
   return envelopeOk({
     spec_version_from: "legacy",
-    spec_version_to: "0.1.0-draft",
+    spec_version_to: "0.2.0-draft",
     files_scanned: filesScanned,
     files_changed: filesChanged,
     warnings: isPlainObject(payload.warnings) ? payload.warnings : {},
@@ -1391,7 +1398,7 @@ function executeConfigSpecVersionEffective(input: unknown): Envelope {
     : "";
   const target = typeof payload.targetSpecVersion === "string" && payload.targetSpecVersion.trim().length > 0
     ? payload.targetSpecVersion.trim()
-    : "0.1.0-draft";
+    : "0.2.0-draft";
 
   if (provider.length > 0) {
     return envelopeOk({ value: provider, synthesized: false });

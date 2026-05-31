@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.0-draft - 2026-05-31
+
+- add optional `materialized-occurrences` profile for recurrence occurrence notes, on-completion materialization, and occurrence-state reconciliation
+
 ## 0.1.0-draft - 2026-02-20
 
 Initial standalone draft of `tasknotes-spec` including:

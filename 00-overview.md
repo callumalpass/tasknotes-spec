@@ -33,7 +33,7 @@ The tasknotes plugin is the primary reference for how this spec was derived, but
 
 ## 0.1 Status and authority
 
-This document is part of `tasknotes-spec` version `0.1.0-draft`.
+This document is part of `tasknotes-spec` version `0.2.0-draft`.
 
 This specification is normative for implementations that claim conformance.
 No single implementation is normative; implementations are expected to conform to the specification.
@@ -62,7 +62,7 @@ This specification defines a stable contract for:
 - Mapping storage keys to canonical semantic roles.
 - Defining effective collection configuration via provider model (for example `tasknotes.yaml` and/or TaskNotes `data.json`).
 - Interpreting date and datetime values consistently.
-- Applying recurrence and per-instance completion/skip behavior.
+- Applying recurrence, per-instance completion/skip behavior, and optional materialized occurrence notes.
 - Managing time tracking sessions and `time_entries` lifecycle behavior.
 - Parsing and resolving links consistently across task fields.
 - Defining dependency and reminder behavior.
@@ -131,7 +131,7 @@ MyVault/
 └── tasknotes.yaml              ← optional spec-level config (secondary provider)
 ```
 
-Task files are identified by the `#task` tag by default (configurable). The full default collection state is described in §9.20.
+Task files are identified by the `#task` tag by default (configurable). The full default collection state is described in §9.21.
 
 Configuration provider semantics and effective configuration rules are defined in §9. An implementation MAY use either provider, both, or additional providers, based on its documented precedence policy.
 

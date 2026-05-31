@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-03-30T18:40:41.376Z",
-  "totalCases": 4970,
+  "generatedAt": "2026-05-31T10:35:30.270Z",
+  "totalCases": 4972,
   "files": [
     {
       "file": "date.json",
@@ -20,7 +20,7 @@
     },
     {
       "file": "conformance.json",
-      "cases": 18
+      "cases": 20
     },
     {
       "file": "config.json",
@@ -60,10 +60,11 @@
     }
   ],
   "byProfile": {
-    "core-lite": 2873,
+    "core-lite": 2874,
     "recurrence": 1020,
     "extended": 1059,
-    "templating": 18
+    "templating": 18,
+    "materialized-occurrences": 1
   },
   "bySection": {
     "§3": 1595,
@@ -71,10 +72,11 @@
     "§2": 131,
     "§4": 996,
     "§5.3": 322,
-    "§7.10": 5,
+    "§7.10": 6,
     "§7.11": 11,
-    "§7.3.4": 1,
+    "§7.3.5": 1,
     "§7.3.3": 2,
+    "§7.3.4": 1,
     "§9": 667,
     "§9.2.4": 8,
     "§11.7": 1,
@@ -155,9 +157,9 @@
     "recurrence.complete": 760,
     "recurrence.recalculate": 240,
     "create_compat.create": 322,
-    "meta.claim": 3,
+    "meta.claim": 4,
     "meta.has_capability": 11,
-    "meta.has_profile": 4,
+    "meta.has_profile": 5,
     "config.resolve_collection_path": 648,
     "config.merge_top_level": 4,
     "config.spec_version_effective": 6,

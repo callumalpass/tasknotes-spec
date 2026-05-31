@@ -1401,6 +1401,7 @@ function buildConformanceFixtures() {
     "recurrence",
     "extended",
     "templating",
+    "materialized-occurrences",
   ];
 
   for (const profile of profileChecks) {
@@ -1416,7 +1417,7 @@ function buildConformanceFixtures() {
 
   // Claim consistency: extended profile implies required capability tokens.
   w.add({
-    section: "§7.3.4",
+    section: "§7.3.5",
     profile: "extended",
     operation: "meta.claim",
     assertion: "envelope_equals",
@@ -1442,6 +1443,22 @@ function buildConformanceFixtures() {
       result: {
         profiles: { $contains: ["templating"] },
         capabilities: { $contains: ["templating"] },
+      },
+    },
+  });
+
+  // Claim consistency: materialized-occurrences profile requires recurrence and its capability token.
+  w.add({
+    section: "§7.3.4",
+    profile: "materialized-occurrences",
+    operation: "meta.claim",
+    assertion: "envelope_equals",
+    input: {},
+    expect: {
+      ok: true,
+      result: {
+        profiles: { $contains: ["materialized-occurrences", "recurrence"] },
+        capabilities: { $contains: ["materialized-occurrences"] },
       },
     },
   });
@@ -1541,10 +1558,10 @@ function buildConfigFixtures() {
   }
 
   const specVersionCases = [
-    { providerSpecVersion: "0.1.0-draft", targetSpecVersion: "0.1.0-draft", expected: "0.1.0-draft", synthesized: false },
-    { providerSpecVersion: "0.2.0", targetSpecVersion: "0.1.0-draft", expected: "0.2.0", synthesized: false },
-    { providerSpecVersion: undefined, targetSpecVersion: "0.1.0-draft", expected: "0.1.0-draft", synthesized: true },
-    { providerSpecVersion: "", targetSpecVersion: "0.1.0-draft", expected: "0.1.0-draft", synthesized: true },
+    { providerSpecVersion: "0.2.0-draft", targetSpecVersion: "0.2.0-draft", expected: "0.2.0-draft", synthesized: false },
+    { providerSpecVersion: "0.2.0", targetSpecVersion: "0.2.0-draft", expected: "0.2.0", synthesized: false },
+    { providerSpecVersion: undefined, targetSpecVersion: "0.2.0-draft", expected: "0.2.0-draft", synthesized: true },
+    { providerSpecVersion: "", targetSpecVersion: "0.2.0-draft", expected: "0.2.0-draft", synthesized: true },
     { providerSpecVersion: undefined, targetSpecVersion: "1.0.0", expected: "1.0.0", synthesized: true },
     { providerSpecVersion: "2.1.3", targetSpecVersion: "1.0.0", expected: "2.1.3", synthesized: false },
   ];
@@ -1627,6 +1644,13 @@ function buildConfigFixtures() {
           recurrenceAnchor: "recurAnchor",
           completeInstances: "doneDates",
           skippedInstances: "skipDates",
+          recurrenceParent: "parentTask",
+          occurrenceDate: "occDate",
+          occurrenceMaterialization: "occMode",
+          occurrenceNextTrigger: "occNext",
+          occurrenceTemplate: "occTemplate",
+          occurrencePastHorizon: "occPast",
+          occurrenceFutureHorizon: "occFuture",
           timeEstimate: "estimate",
         },
         storeTitleInFilename: false,
@@ -1640,6 +1664,13 @@ function buildConfigFixtures() {
           recurrence_anchor: "recurAnchor",
           complete_instances: "doneDates",
           skipped_instances: "skipDates",
+          recurrence_parent: "parentTask",
+          occurrence_date: "occDate",
+          occurrence_materialization: "occMode",
+          occurrence_next_trigger: "occNext",
+          occurrence_template: "occTemplate",
+          occurrence_past_horizon: "occPast",
+          occurrence_future_horizon: "occFuture",
           time_estimate: "estimate",
         },
         title: {

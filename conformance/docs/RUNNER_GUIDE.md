@@ -119,6 +119,7 @@ Profile expansion rules:
 - `recurrence` implies `core-lite`
 - `extended` implies `recurrence` and `core-lite`
 - `templating` is non-cumulative (it implies only itself)
+- `materialized-occurrences` is non-cumulative and must be explicitly claimed alongside `recurrence`
 
 **Pseudocode**:
 ```

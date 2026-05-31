@@ -2,8 +2,8 @@
 
 A standalone specification for representing and operating on task data stored in markdown files with YAML frontmatter.
 
-**Version:** 0.1.0-draft  
-**Status:** Draft  
+**Version:** 0.2.0-draft
+**Status:** Draft
 **Canonical Source of Truth:** This specification
 
 ## Purpose
@@ -16,7 +16,7 @@ The specification focuses on:
 - Task data model and field semantics
 - Date, datetime, and timezone rules
 - Time tracking entry and session-management semantics
-- Recurrence and per-instance completion semantics
+- Recurrence, per-instance completion semantics, and optional materialized occurrence notes
 - Link parsing and resolution semantics
 - Dependencies and reminders semantics
 - Optional create-time templating semantics
@@ -41,7 +41,7 @@ This specification provides a precise contract so independent tools can make com
 | §1 | `01-terminology.md` | Normative definitions |
 | §2 | `02-model-and-mapping.md` | Task model, canonical semantic roles, field mapping |
 | §3 | `03-temporal-semantics.md` | Date/datetime/timezone semantics and serialization |
-| §4 | `04-recurrence.md` | RRULE semantics and per-instance state |
+| §4 | `04-recurrence.md` | RRULE semantics, per-instance state, and optional occurrence materialization |
 | §5 | `05-operations.md` | Create/update/complete/skip/delete/rename behaviors |
 | §6 | `06-validation.md` | Validation rules and issue model |
 | §7 | `07-conformance.md` | Conformance profiles and claims |

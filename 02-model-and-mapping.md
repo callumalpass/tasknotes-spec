@@ -67,6 +67,13 @@ Implementations conforming beyond minimal scope SHOULD support:
 | `recurrence_anchor` | enum | `scheduled` or `completion` |
 | `complete_instances` | list<date> | recurring completion state |
 | `skipped_instances` | list<date> | recurring skip state |
+| `recurrence_parent` | link-or-string | parent recurring task reference for materialized occurrence notes; see §4.18 |
+| `occurrence_date` | date | target date represented by a materialized occurrence note |
+| `occurrence_materialization` | enum | parent task materialization mode: `manual`, `on_completion`, or `rolling` |
+| `occurrence_next_trigger` | enum | parent task next-note trigger: `completion` or `completion_or_skip` |
+| `occurrence_template` | link-or-string | optional template used when creating materialized occurrence notes |
+| `occurrence_past_horizon` | duration | optional rolling materialization lookbehind bound |
+| `occurrence_future_horizon` | duration | optional rolling materialization lookahead bound |
 | `blocked_by` | list<object> | dependency records, see §10 and §11 |
 | `reminders` | list<object> | reminder records, see §10 |
 
@@ -107,6 +114,13 @@ Implementations SHOULD accept these aliases on read for interoperability:
 | `recurrence_anchor` | `recurrence_anchor` | `recurrenceAnchor` |
 | `complete_instances` | `complete_instances` | `completeInstances` |
 | `skipped_instances` | `skipped_instances` | `skippedInstances` |
+| `recurrence_parent` | `recurrence_parent` | `recurrenceParent` |
+| `occurrence_date` | `occurrence_date` | `occurrenceDate` |
+| `occurrence_materialization` | `occurrence_materialization` | `occurrenceMaterialization` |
+| `occurrence_next_trigger` | `occurrence_next_trigger` | `occurrenceNextTrigger` |
+| `occurrence_template` | `occurrence_template` | `occurrenceTemplate` |
+| `occurrence_past_horizon` | `occurrence_past_horizon` | `occurrencePastHorizon` |
+| `occurrence_future_horizon` | `occurrence_future_horizon` | `occurrenceFutureHorizon` |
 | `date_created` | `dateCreated` | `date_created` |
 | `date_modified` | `dateModified` | `date_modified` |
 | `completed_date` | `completedDate` | `completed_date` |
@@ -170,6 +184,28 @@ When semantic role `id` is present:
 - readers and link resolution MAY use it as an identity lookup key (see §11.4 Step 3).
 - implementations SHOULD keep `id` unique within a collection; duplicate IDs SHOULD produce a validation issue.
 
+### 2.6.6 Materialized occurrence roles
+
+The roles in this subsection are required only for implementations claiming profile `materialized-occurrences` (§7.3.4).
+
+Parent recurring task roles:
+
+- `occurrence_materialization`: enum `manual|on_completion|rolling`; controls when occurrence notes are created (§4.18.5).
+- `occurrence_next_trigger`: enum `completion|completion_or_skip`; controls whether skip/cancel transitions advance creation of the next occurrence note (§4.18.6).
+- `occurrence_template`: link-or-string reference to a template file used when creating occurrence notes. Link parsing/resolution follows §11 when supported.
+- `occurrence_past_horizon` and `occurrence_future_horizon`: ISO 8601 durations used by rolling materialization (§4.18.7).
+
+Materialized occurrence note roles:
+
+- `recurrence_parent`: link-or-string reference to the parent recurring task. Wikilinks are the default interoperable representation in Obsidian-oriented collections.
+- `occurrence_date`: date value identifying the target date this occurrence note represents.
+
+Implementations claiming `materialized-occurrences` MUST treat `recurrence_parent` and `occurrence_date` together as the occurrence identity key.
+Within a resolved parent task, at most one materialized occurrence note SHOULD exist for each `occurrence_date`; duplicate notes MUST be reported when detected (§6.4).
+
+Materialized occurrence notes MAY also use normal task roles such as `status`, `completed_date`, `scheduled`, `due`, `time_entries`, `reminders`, `contexts`, `projects`, and body content.
+For dates where a materialized occurrence note exists, its own task state is authoritative as defined in §4.18.3.
+
 ## 2.7 Unknown fields
 
 Unknown frontmatter keys MUST be preserved by default during updates, complete/uncomplete, skip/unskip, dependency mutations, reminder mutations, and archive operations.
@@ -195,6 +231,13 @@ mapping:
   recurrence_anchor: recurrence_anchor
   complete_instances: complete_instances
   skipped_instances: skipped_instances
+  recurrence_parent: recurrence_parent
+  occurrence_date: occurrence_date
+  occurrence_materialization: occurrence_materialization
+  occurrence_next_trigger: occurrence_next_trigger
+  occurrence_template: occurrence_template
+  occurrence_past_horizon: occurrence_past_horizon
+  occurrence_future_horizon: occurrence_future_horizon
   time_estimate: timeEstimate
   time_entries: timeEntries
   blocked_by: blockedBy

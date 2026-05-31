@@ -52,6 +52,7 @@ Profile-token consistency requirements:
 
 - If `profiles` includes `extended`, `capabilities` must include `dependencies`, `reminders`, `links`, and `time-tracking`.
 - If `profiles` includes `templating`, `capabilities` must include `templating`.
+- If `profiles` includes `materialized-occurrences`, `profiles` must also include `recurrence` and `capabilities` must include `materialized-occurrences`.
 
 ---
 
@@ -73,7 +74,7 @@ The runner locates the adapter module via the `TASKNOTES_ADAPTER` environment va
 export const metadata = {
   implementation: "my-tasknotes",
   version: "1.2.3",
-  spec_version: "0.1.0-draft",
+  spec_version: "0.2.0-draft",
   validation_modes: ["strict"],
   profiles: ["core-lite"],
   capabilities: [],
@@ -140,6 +141,12 @@ All operation names that appear in the fixture files are listed here. Operations
 - `recurrence.skip_instance`
 - `recurrence.unskip_instance`
 - `recurrence.effective_state`
+- `occurrence.materialize`
+- `occurrence.complete`
+- `occurrence.skip`
+- `occurrence.uncomplete`
+- `occurrence.unskip`
+- `occurrence.unmaterialize`
 - `create_compat.create`
 - `meta.claim`
 - `meta.has_capability`
@@ -180,6 +187,12 @@ All operation names that appear in the fixture files are listed here. Operations
 | `link.parse` | `links` |
 | `link.resolve` | `links` |
 | `link.update_references_on_rename` | `links` + `rename` |
+| `occurrence.materialize` | `materialized-occurrences` |
+| `occurrence.complete` | `materialized-occurrences` |
+| `occurrence.skip` | `materialized-occurrences` |
+| `occurrence.uncomplete` | `materialized-occurrences` |
+| `occurrence.unskip` | `materialized-occurrences` |
+| `occurrence.unmaterialize` | `materialized-occurrences` |
 | `templating.expand_variables` | `templating` |
 | `templating.merge_frontmatter` | `templating` |
 | `templating.handle_failure` | `templating` |

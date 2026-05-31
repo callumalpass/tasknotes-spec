@@ -1,8 +1,42 @@
 {
   "name": "tasknotes-spec",
-  "version": "0.1.0",
-  "private": true,
+  "version": "0.2.0",
+  "description": "Specification and conformance fixtures for TaskNotes-compatible markdown task files.",
+  "license": "MIT",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/callumalpass/tasknotes-spec.git"
+  },
+  "bugs": {
+    "url": "https://github.com/callumalpass/tasknotes-spec/issues"
+  },
+  "homepage": "https://github.com/callumalpass/tasknotes-spec#readme",
+  "files": [
+    "00-overview.md",
+    "01-terminology.md",
+    "02-model-and-mapping.md",
+    "03-temporal-semantics.md",
+    "04-recurrence.md",
+    "05-operations.md",
+    "06-validation.md",
+    "07-conformance.md",
+    "08-compatibility-and-migrations.md",
+    "09-configuration.md",
+    "10-dependencies-and-reminders.md",
+    "11-links.md",
+    "CHANGELOG.md",
+    "conformance/README.md",
+    "conformance/manifest.json",
+    "conformance/adapters/*.mjs",
+    "conformance/adapters/*.ts",
+    "conformance/adapters/tasknotes-core",
+    "conformance/docs",
+    "conformance/fixtures",
+    "conformance/lib",
+    "conformance/scripts",
+    "conformance/tests"
+  ],
   "scripts": {
     "conformance:generate": "node conformance/scripts/generate-fixtures.mjs",
     "conformance:test": "node --test conformance/tests/**/*.test.mjs",

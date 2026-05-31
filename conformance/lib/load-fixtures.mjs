@@ -2,7 +2,13 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 export function loadFixtures(fixturesDir) {
-  const validProfiles = new Set(["core-lite", "recurrence", "extended", "templating"]);
+  const validProfiles = new Set([
+    "core-lite",
+    "recurrence",
+    "extended",
+    "templating",
+    "materialized-occurrences",
+  ]);
   const files = readdirSync(fixturesDir)
     .filter((name) => name.endsWith(".json"))
     .sort();

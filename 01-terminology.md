@@ -78,24 +78,38 @@ It uses RFC 5545 RRULE-style parameters inside a single semicolon-delimited fiel
 
 **Skipped instances** is the set/list of target dates marked skipped for a recurring task.
 
-## 1.17 Effective status
+## 1.17 Materialized occurrence note
+
+A **materialized occurrence note** is a task file created for one target date of a recurring parent task.
+It stores user-authored per-occurrence content and, when supported by the implementation, owns the authoritative task state for that occurrence date.
+
+## 1.18 Recurrence parent
+
+A **recurrence parent** is the recurring task record referenced by a materialized occurrence note.
+The reference is stored in semantic role `recurrence_parent` and resolved as a link according to §11.
+
+## 1.19 Occurrence materialization
+
+**Occurrence materialization** is the creation and reconciliation of materialized occurrence notes from a recurring parent task according to §4.18 and §5.20.
+
+## 1.20 Effective status
 
 **Effective status** is the status presented for a given date context after applying recurrence instance state.
 
-## 1.18 Completed-status list
+## 1.21 Completed-status list
 
 The **completed-status list** is the configured ordered list of status values treated as completed for non-recurring completion semantics.
 When a single value must be chosen deterministically, the first list entry is used unless explicit operation input overrides it.
 
-## 1.19 Idempotent operation
+## 1.22 Idempotent operation
 
 An operation is **idempotent** if applying it multiple times with the same input produces the same persisted state as applying it once.
 
-## 1.20 Unknown field
+## 1.23 Unknown field
 
 An **unknown field** is a frontmatter property not mapped to a semantic role in current configuration.
 
-## 1.21 Validation issue
+## 1.24 Validation issue
 
 A **validation issue** is a structured report containing at least:
 
@@ -104,39 +118,39 @@ A **validation issue** is a structured report containing at least:
 - optional path/field context,
 - human-readable message.
 
-## 1.22 Strict validation mode
+## 1.25 Strict validation mode
 
 **Strict validation mode** is a mode where invalid required semantics are treated as hard errors and write operations fail.
 
-## 1.23 Legacy compatibility mode
+## 1.26 Legacy compatibility mode
 
 **Legacy compatibility mode** is a mode where specific historical behaviors or aliases are accepted for migration but are not canonical for new writes.
 
-## 1.24 Configuration provider
+## 1.27 Configuration provider
 
 A **configuration provider** is an adapter that loads configuration from a source (for example `tasknotes.yaml` or `.obsidian/plugins/tasknotes/data.json`) and normalizes it to the schema in §9.
 
-## 1.25 Effective configuration
+## 1.28 Effective configuration
 
 The **effective configuration** is the final resolved configuration after applying provider precedence and fallback rules.
 
-## 1.26 Template file
+## 1.29 Template file
 
 A **template file** is a markdown document used at create time to generate frontmatter and/or body content through variable expansion.
 When templating is enabled, template behavior is defined by §5.3.5 and §9.14.
 
-## 1.27 Template expansion
+## 1.30 Template expansion
 
 **Template expansion** is deterministic replacement of template variables with create-time task data and runtime date/time values, followed by template merge rules.
 
-## 1.28 Time entry
+## 1.31 Time entry
 
 A **time entry** is a structured record in `time_entries` containing `startTime`, optional `endTime`, and optional `description`.
 
-## 1.29 Active time entry
+## 1.32 Active time entry
 
 An **active time entry** is a time entry with `startTime` present and `endTime` absent.
 
-## 1.30 Time tracking management
+## 1.33 Time tracking management
 
 **Time tracking management** is the set of operations that start, stop, edit, and remove `time_entries`, including completion-triggered auto-stop behavior when configured.

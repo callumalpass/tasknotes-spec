@@ -7,8 +7,9 @@ Alignment with Obsidian and other ecosystems is informative context only; normat
 
 Applicability:
 
-- Implementations claiming profile `extended` (§7.3.4) MUST conform to this section for supported link-bearing roles.
-- Implementations that do not claim `extended` MAY treat link-shaped strings as opaque data and are not required to implement §11 behavior.
+- Implementations claiming profile `extended` (§7.3.5) MUST conform to this section for supported link-bearing roles.
+- Implementations claiming profile `materialized-occurrences` (§7.3.4) MUST conform to this section for `recurrence_parent` links, but are not required to support unrelated extended link-bearing roles solely because of that profile.
+- Implementations that claim neither `extended` nor `materialized-occurrences` MAY treat link-shaped strings as opaque data and are not required to implement §11 behavior.
 
 ---
 

@@ -24,7 +24,7 @@ Each fixture is a JSON object:
 |-------|------|----------|-------------|
 | `id` | string | yes | Unique fixture identifier, e.g. `date.parse_utc.valid.0001` |
 | `section` | string | yes | Spec section this fixture exercises, e.g. `§3` |
-| `profile` | string | yes | Conformance profile: `core-lite`, `recurrence`, `extended`, or `templating`; runner skips when adapter claim does not satisfy profile (including cumulative expansion rules) |
+| `profile` | string | yes | Conformance profile: `core-lite`, `recurrence`, `extended`, `templating`, or `materialized-occurrences`; runner skips when adapter claim does not satisfy profile (including cumulative expansion rules) |
 | `operation` | string | yes | Operation name passed to the adapter, e.g. `date.parse_utc` |
 | `assertion` | string | yes | Assertion kind; see below |
 | `requires` | string[] | no | Capability tokens required; after profile check, runner skips if the adapter does not claim all listed capabilities |

@@ -40,7 +40,7 @@ Additional required capabilities:
 
 ### 7.3.3 Profile: `templating` (non-cumulative extension)
 
-This profile is not cumulative; it MAY be claimed alongside `core-lite`, `recurrence`, and/or `extended`.
+This profile is not cumulative; it MAY be claimed alongside `core-lite`, `recurrence`, `materialized-occurrences`, and/or `extended`.
 `templating` MUST NOT be claimed alone.
 
 Required capabilities:
@@ -51,7 +51,27 @@ Required capabilities:
 - deterministic failure-mode behavior for template read/parse failures
 - support for portable double-brace template variables defined in §5.3.5
 
-### 7.3.4 Profile: `extended`
+### 7.3.4 Profile: `materialized-occurrences` (non-cumulative extension)
+
+This profile is not cumulative; it MUST be claimed alongside `recurrence`.
+It MAY be claimed alongside `extended` and/or `templating`, but it does not require either.
+
+Required capabilities:
+
+- materialized occurrence roles and identity semantics (§2.6.6)
+- recurrence materialization semantics (§4.18)
+- materialize/complete/skip/uncomplete/unskip materialized occurrence operations (§5.20)
+- `occurrences` configuration defaults (§9.17)
+- parent-reference link parsing/resolution for `recurrence_parent` (§11), without requiring full `extended`
+- validation checks for materialized occurrence identity, duplicates, and state conflicts (§6.4 items 16-18)
+
+Claiming `materialized-occurrences` also has required capability-token implications:
+
+- `meta.claim.capabilities` MUST include `materialized-occurrences`.
+- `meta.claim.profiles` MUST also include `recurrence`.
+- Omitting either token while claiming `materialized-occurrences` is a non-conformant claim.
+
+### 7.3.5 Profile: `extended`
 
 Additional required capabilities:
 
@@ -95,7 +115,7 @@ Example:
 
 ```text
 Implementation: example-task-cli v1.4.0
-Spec: tasknotes-spec 0.1.0-draft
+Spec: tasknotes-spec 0.2.0-draft
 Profiles: core-lite, recurrence, templating
 Validation modes: strict, permissive
 Known deviations: none
@@ -128,6 +148,7 @@ Implementations SHOULD expose machine-readable capability metadata, including:
 - templating support flags and effective templating failure mode
 - dependency and reminder support flags
 - time-tracking support flags, including active-session policy and auto-stop-on-complete behavior
+- materialized occurrence support flags, including materialization mode, next trigger, and rolling bounds
 
 ## 7.7 Strictness disclosure
 
@@ -137,23 +158,25 @@ Conformance claims MUST indicate whether `permissive` mode is also supported.
 
 ## 7.8 Example profile matrix
 
-| Capability | core-lite | recurrence | templating | extended |
-|---|---:|---:|---:|---:|
-| create/update/delete | required | required | companion-profile required | required |
-| non-recurring complete | required | required | companion-profile required | required |
-| recurring instance complete/skip | - | required | optional | required |
-| template expansion/merge (§5.3.5) | - | - | required | optional |
-| double-brace portable variable support | - | - | required | optional |
-| recurrence-string validation | - | required | optional | required |
-| link parsing/resolution (§11) | - | - | optional | required |
-| dependency schema and ops | - | - | optional | required |
-| reminder schema and ops | - | - | optional | required |
-| time tracking start/stop/edit semantics (§5.19) | - | - | optional | required |
-| rename updates dependency/project links | - | - | optional | optional via `rename` capability |
-| archive semantics (§5.12) | - | - | optional | optional via `archive` capability |
-| batch per-item outcomes (§5.15) | - | - | optional | optional via `batch` capability |
-| write-conflict detection (§5.16) | - | - | optional | optional via `concurrency` capability |
-| dry-run reporting (§5.17) | - | - | optional | optional via `dry-run` capability |
+| Capability | core-lite | recurrence | templating | materialized-occurrences | extended |
+|---|---:|---:|---:|---:|---:|
+| create/update/delete | required | required | companion-profile required | companion-profile required | required |
+| non-recurring complete | required | required | companion-profile required | companion-profile required | required |
+| recurring instance complete/skip | - | required | optional | required via companion `recurrence` claim | required |
+| materialize occurrence notes (§4.18, §5.20) | - | - | optional | required | optional |
+| recurrence parent link resolution | - | - | optional | required for `recurrence_parent` only | required |
+| template expansion/merge (§5.3.5) | - | - | required | optional | optional |
+| double-brace portable variable support | - | - | required | optional | optional |
+| recurrence-string validation | - | required | optional | required via companion `recurrence` claim | required |
+| link parsing/resolution (§11) | - | - | optional | required for `recurrence_parent` only | required |
+| dependency schema and ops | - | - | optional | optional | required |
+| reminder schema and ops | - | - | optional | optional | required |
+| time tracking start/stop/edit semantics (§5.19) | - | - | optional | optional | required |
+| rename updates dependency/project links | - | - | optional | optional | optional via `rename` capability |
+| archive semantics (§5.12) | - | - | optional | optional | optional via `archive` capability |
+| batch per-item outcomes (§5.15) | - | - | optional | optional | optional via `batch` capability |
+| write-conflict detection (§5.16) | - | - | optional | optional | optional via `concurrency` capability |
+| dry-run reporting (§5.17) | - | - | optional | optional | optional via `dry-run` capability |
 
 ## 7.9 Executable fixture suite
 
@@ -189,7 +212,7 @@ Output:
   "result": {
     "implementation": "my-tool",
     "version": "1.0.0",
-    "spec_version": "0.1.0-draft",
+    "spec_version": "0.2.0-draft",
     "validation_modes": ["strict"],
     "profiles": ["core-lite", "recurrence"],
     "capabilities": ["dependencies", "links"]
@@ -205,7 +228,7 @@ Fields:
 | `version` | string | yes | Implementation version string |
 | `spec_version` | string | yes | `tasknotes-spec` version targeted by this adapter |
 | `validation_modes` | string[] | yes | Supported validation modes; MUST include `strict` |
-| `profiles` | string[] | yes | Claimed conformance profiles; valid values: `core-lite`, `recurrence`, `extended`, `templating` |
+| `profiles` | string[] | yes | Claimed conformance profiles; valid values: `core-lite`, `recurrence`, `extended`, `templating`, `materialized-occurrences` |
 | `capabilities` | string[] | yes | Optional capability tokens; known tokens listed in §7.11 |
 
 `profiles` lists explicitly claimed profiles. Cumulative profile expansion is applied by runners for fixture selection (§7.3, §7.9), but does not change literal membership semantics of `meta.has_profile`.
@@ -214,6 +237,7 @@ Profile-token consistency rules:
 
 - If `profiles` contains `extended`, `capabilities` MUST include `dependencies`, `reminders`, `links`, and `time-tracking`.
 - If `profiles` contains `templating`, `capabilities` MUST include `templating`.
+- If `profiles` contains `materialized-occurrences`, `profiles` MUST also contain `recurrence` and `capabilities` MUST include `materialized-occurrences`.
 - Runners and fixture suites SHOULD validate these claim-consistency rules directly from `meta.claim`, not only by capability-gating feature fixtures.
 
 ### `meta.has_capability`
@@ -258,6 +282,7 @@ The following capability tokens are defined by this specification. Implementatio
 | `reminders` | `extended` | Supports `reminders`, reminder operations, and reminder validation |
 | `links` | `extended` | Supports link parsing and resolution (§11) |
 | `time-tracking` | `extended` | Supports time-tracking management operations (§5.19) |
+| `materialized-occurrences` | `materialized-occurrences` | Supports recurrence materialization and materialized occurrence operations (§4.18, §5.20) |
 | `rename` | optional extension under `extended` | Supports file rename with reference updates |
 | `archive` | optional extension under `extended` | Supports archive semantics (§5.12) |
 | `batch` | optional extension under `extended` | Supports batch operations with per-item outcomes (§5.15) |

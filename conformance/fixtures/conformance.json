@@ -349,7 +349,28 @@
   },
   {
     "id": "conformance.0017",
-    "section": "§7.3.4",
+    "section": "§7.10",
+    "profile": "core-lite",
+    "operation": "meta.has_profile",
+    "assertion": "envelope_equals",
+    "input": {
+      "profile": "materialized-occurrences"
+    },
+    "expect": {
+      "ok": true,
+      "result": {
+        "value": {
+          "$oneOf": [
+            true,
+            false
+          ]
+        }
+      }
+    }
+  },
+  {
+    "id": "conformance.0018",
+    "section": "§7.3.5",
     "profile": "extended",
     "operation": "meta.claim",
     "assertion": "envelope_equals",
@@ -374,7 +395,7 @@
     }
   },
   {
-    "id": "conformance.0018",
+    "id": "conformance.0019",
     "section": "§7.3.3",
     "profile": "templating",
     "operation": "meta.claim",
@@ -391,6 +412,30 @@
         "capabilities": {
           "$contains": [
             "templating"
+          ]
+        }
+      }
+    }
+  },
+  {
+    "id": "conformance.0020",
+    "section": "§7.3.4",
+    "profile": "materialized-occurrences",
+    "operation": "meta.claim",
+    "assertion": "envelope_equals",
+    "input": {},
+    "expect": {
+      "ok": true,
+      "result": {
+        "profiles": {
+          "$contains": [
+            "materialized-occurrences",
+            "recurrence"
+          ]
+        },
+        "capabilities": {
+          "$contains": [
+            "materialized-occurrences"
           ]
         }
       }

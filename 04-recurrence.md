@@ -270,3 +270,129 @@ completeInstances: [2026-02-30]
 ```
 
 Result: validation error `invalid_date_value`.
+
+## 4.18 Recurrence materialization
+
+This subsection is required only for implementations claiming profile `materialized-occurrences` (§7.3.4).
+
+Recurrence materialization creates ordinary task files for specific target dates of a recurring parent task.
+It is additive behavior: implementations that do not claim `materialized-occurrences` continue to use the instance-list model in §4.5-§4.12.
+Materialized occurrence notes MUST be task files according to the collection's task-detection rules (§9.7).
+
+### 4.18.1 Parent and occurrence ownership
+
+The parent recurring task owns series-level semantics:
+
+- `recurrence`
+- `recurrence_anchor`
+- recurrence generation and `DTSTART` progression
+- parent instance-list compatibility state (`complete_instances`, `skipped_instances`)
+- materialization policy fields (`occurrence_materialization`, `occurrence_next_trigger`, `occurrence_template`, `occurrence_past_horizon`, `occurrence_future_horizon`)
+
+A materialized occurrence note owns per-date task semantics for its `occurrence_date`, including:
+
+- `status`
+- `completed_date`
+- body content and checklists
+- `time_entries`
+- per-occurrence `due`, `scheduled`, `reminders`, `contexts`, `projects`, and unknown fields
+
+### 4.18.2 Occurrence identity and parent reference
+
+A materialized occurrence note MUST store:
+
+- `recurrence_parent`: a link-or-string reference to the parent recurring task
+- `occurrence_date`: the target date represented by the occurrence note
+
+The preferred Obsidian-compatible representation for `recurrence_parent` is a wikilink, for example:
+
+```yaml
+recurrence_parent: "[[Weekly Review]]"
+occurrence_date: 2026-02-27
+```
+
+Implementations claiming `materialized-occurrences` MUST resolve `recurrence_parent` using §11 link semantics for this role, even if they do not claim full `extended`.
+If the parent cannot be resolved, validation SHOULD report `invalid_recurrence_parent`.
+
+For one resolved parent, there SHOULD be at most one materialized occurrence note per `occurrence_date`.
+Duplicate detected occurrence notes SHOULD report `duplicate_occurrence_note` and MUST NOT be chosen nondeterministically for writes.
+
+### 4.18.3 Effective state precedence
+
+For target date `D`, recurrence-aware effective state MUST be resolved in this order:
+
+1. If a materialized occurrence note exists for `(parent, D)`, derive state from that note's own task state:
+   - `completed` when its `status` is in `status.completed_values`;
+   - `skipped` when its `status` is in `status.skipped_values`;
+   - otherwise unresolved/default for that instance.
+2. Else if `D` is in parent `complete_instances`: state is `completed`.
+3. Else if `D` is in parent `skipped_instances`: state is `skipped`.
+4. Else: state is unresolved/default for that instance.
+
+If a materialized occurrence note disagrees with the parent instance lists, the materialized occurrence note wins for `D`.
+Validators SHOULD report `occurrence_state_conflict`, and repair/normalization operations MAY update parent lists to match occurrence notes.
+
+### 4.18.4 Parent instance lists as compatibility state
+
+When materialized occurrence notes are supported, parent `complete_instances` and `skipped_instances` remain part of canonical persisted state.
+They serve as interoperability state for unmaterialized occurrences and as a compatibility index for clients that do not read occurrence notes.
+
+Conforming writers SHOULD reconcile parent lists after materialized occurrence completion, skip, uncompletion, or unskip:
+
+- completed child state: add `D` to `complete_instances`, remove `D` from `skipped_instances`;
+- skipped child state: add `D` to `skipped_instances`, remove `D` from `complete_instances`;
+- active/unresolved child state after uncompletion/unskip: remove `D` from the relevant parent list.
+
+Reconciliation failure MUST NOT silently change the occurrence note state.
+Implementations SHOULD surface a recoverable error or warning.
+
+### 4.18.5 Materialization modes
+
+`occurrence_materialization` controls when materialized occurrence notes are created.
+Allowed values:
+
+- `manual`: occurrence notes are created only by explicit user or API action.
+- `on_completion`: completing a materialized occurrence note creates the next occurrence note.
+- `rolling`: the implementation maintains a bounded materialized window, such as today through the next 14 days.
+
+If absent, `occurrence_materialization` MUST default to `manual`.
+
+`on_completion` does not by itself create the first occurrence note in a series.
+The first materialized occurrence MUST be created by explicit materialization, rolling materialization, or a documented create-time option.
+
+Conforming implementations MUST NOT create occurrence notes merely as a side effect of read-only browsing.
+
+### 4.18.6 Next-occurrence trigger
+
+`occurrence_next_trigger` controls whether skip/cancel transitions also create the next occurrence note when `occurrence_materialization=on_completion`.
+Allowed values:
+
+- `completion`: only completion creates the next occurrence note.
+- `completion_or_skip`: completion and skip/cancel create the next occurrence note.
+
+If absent, `occurrence_next_trigger` MUST default to `completion`.
+
+The next occurrence MUST be computed from the parent recurring task after applying the triggering state transition and §4.4 anchor semantics.
+Materializing the next occurrence MUST be idempotent: if the next occurrence note already exists, the operation MUST return or reuse it rather than creating a duplicate.
+
+### 4.18.7 Rolling materialization bounds
+
+For `occurrence_materialization=rolling`, implementations MUST enforce finite bounds.
+Unbounded future materialization is non-conformant.
+
+Bounds SHOULD be expressed with ISO 8601 durations such as:
+
+```yaml
+occurrence_past_horizon: P0D
+occurrence_future_horizon: P14D
+```
+
+If bounds are absent and rolling mode is enabled, implementations MUST use documented finite defaults.
+
+### 4.18.8 Recurrence edits and historical notes
+
+Materialized occurrence notes are durable task files.
+Editing the parent recurrence rule MUST NOT silently delete, rewrite, or move existing materialized occurrence notes.
+
+If an existing occurrence note's `occurrence_date` is no longer generated by the current parent recurrence rule, validators MAY report `materialization_target_not_generated` as a warning.
+This condition MUST NOT be treated as an error by default because recurrence edits can make historical notes intentionally non-generated.
