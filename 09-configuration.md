@@ -538,6 +538,51 @@ Rules:
 - Parent task fields override collection defaults: `occurrence_materialization` overrides `occurrences.default_materialization`; `occurrence_next_trigger` overrides `occurrences.default_next_trigger`; `occurrence_past_horizon` and `occurrence_future_horizon` override `occurrences.past_horizon` and `occurrences.future_horizon`.
 - If `occurrences` is absent, the effective behavior is `manual` materialization and `completion` next trigger.
 
+## 9.17.1 nlp schema
+
+`nlp` advertises optional natural-language capture triggers. These settings
+allow another TaskNotes client to preserve the same capture vocabulary without
+making natural-language parsing a requirement of the core profile.
+
+Example:
+
+```yaml
+nlp:
+  triggers:
+    - property_id: tags
+      trigger: "#"
+      enabled: true
+    - property_id: contexts
+      trigger: "@"
+      enabled: true
+    - property_id: priority
+      trigger: "!"
+      enabled: false
+```
+
+Rules:
+
+- `triggers` MUST be a list when present.
+- Every trigger entry MUST contain non-empty `property_id` and `trigger`
+  strings.
+- `property_id` SHOULD use a stable TaskNotes role (`tags`, `contexts`,
+  `projects`, `status`, or `priority`) or the stable identifier of a configured
+  user field.
+- `enabled` MUST be boolean when present and MUST default to `true`.
+- Trigger strings MAY contain more than one character.
+- Trigger entries with unknown `property_id` values MUST be preserved by
+  configuration round-trips and MAY be ignored by clients that cannot resolve
+  the property.
+- If `nlp` is absent, clients MAY use documented local defaults.
+- This block controls capture parsing and suggestions only. It MUST NOT change
+  persisted task field names or values.
+
+Informative mapping to TaskNotes settings:
+
+- `nlp.triggers` corresponds to `nlpTriggers.triggers`.
+- `property_id`, `trigger`, and `enabled` correspond to the plugin fields
+  `propertyId`, `trigger`, and `enabled`.
+
 ## 9.18 compatibility schema
 
 Example:
@@ -645,6 +690,24 @@ occurrences:
   past_horizon: P0D
   future_horizon: P14D
 
+nlp:
+  triggers:
+    - property_id: tags
+      trigger: "#"
+      enabled: true
+    - property_id: contexts
+      trigger: "@"
+      enabled: true
+    - property_id: projects
+      trigger: "+"
+      enabled: true
+    - property_id: status
+      trigger: "*"
+      enabled: true
+    - property_id: priority
+      trigger: "!"
+      enabled: false
+
 compatibility:
   read_aliases: true
   legacy_duration_field: true
@@ -689,6 +752,10 @@ Examples:
 - invalid `occurrences.default_next_trigger`
 - invalid `occurrences.past_horizon`
 - invalid `occurrences.future_horizon`
+- invalid `nlp.triggers`
+- empty `nlp.triggers[].property_id`
+- empty `nlp.triggers[].trigger`
+- invalid `nlp.triggers[].enabled`
 
 ## 9.21 Default collection state
 

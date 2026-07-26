@@ -149,6 +149,8 @@ Implementations SHOULD expose machine-readable capability metadata, including:
 - dependency and reminder support flags
 - time-tracking support flags, including active-session policy and auto-stop-on-complete behavior
 - materialized occurrence support flags, including materialization mode, next trigger, and rolling bounds
+- configured natural-language capture triggers when the optional `nlp` block is
+  present
 
 ## 7.7 Strictness disclosure
 
