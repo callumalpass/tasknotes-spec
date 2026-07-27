@@ -3,6 +3,10 @@
 ## 0.2.0-draft - 2026-05-31
 
 - add optional `materialized-occurrences` profile for recurrence occurrence notes, on-completion materialization, and occurrence-state reconciliation
+- add a draft mdbase v0.3 type-file binding and machine-readable schema for the
+  `x-tasknotes` domain extension
+- document the precedence and consistency rules between JSON Schema,
+  `collection`, `lifecycle`, and TaskNotes-specific metadata
 
 ## 0.1.0-draft - 2026-02-20
 
