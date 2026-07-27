@@ -275,6 +275,12 @@ function makeRuntime(settingsPatch: UnknownRecord = {}) {
     emitter: {
       trigger: () => undefined,
     },
+    expandedProjectsService: {
+      renamePath: () => undefined,
+    },
+    projectSubtasksService: {
+      invalidateIndex: () => undefined,
+    },
     statusManager: {
       isCompletedStatus: (status: string) => {
         const current = String(status || "");
