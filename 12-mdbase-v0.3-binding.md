@@ -1,7 +1,9 @@
 # 12. mdbase v0.3 Type-File Binding
 
-**Status:** Draft  
-**Binding version:** `x-tasknotes.version: 1`  
+**Status:** Draft
+
+**Binding version:** `x-tasknotes.version: 1`
+
 **Target:** mdbase `0.3.x`
 
 ## 12.1 Purpose
