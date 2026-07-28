@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.3.0-rc.1 - 2026-07-28
+
+- adopt the discriminated first-class mdbase contract shape for
+  `tasknotes.task`, including explicit `contract_type: record`
+- add the `tasknotes.task.completed 1.0.0` event contract and minimal
+  privacy-preserving event-data schema for the mdbase interoperability profile
+- separate type-file record implementation bindings from application-level
+  event-source declarations
+
 ## 0.2.0-draft - 2026-05-31
 
 - add optional `materialized-occurrences` profile for recurrence occurrence notes, on-completion materialization, and occurrence-state reconciliation

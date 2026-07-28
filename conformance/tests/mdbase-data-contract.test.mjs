@@ -11,13 +11,15 @@ async function schema(name) {
 	);
 }
 
-test("publishes valid JSON Schemas for the portable task view and binding", async () => {
+test("publishes valid JSON Schemas for the portable task view, binding, and completion event", async () => {
 	const ajv = new Ajv2020({ allErrors: true, strict: true });
 	addFormats(ajv);
 	const taskSchema = await schema("tasknotes-task.schema.json");
 	const bindingSchema = await schema("tasknotes-task-binding.schema.json");
+	const completedSchema = await schema("tasknotes-task-completed.schema.json");
 	const validateTask = ajv.compile(taskSchema);
 	const validateBinding = ajv.compile(bindingSchema);
+	const validateCompleted = ajv.compile(completedSchema);
 
 	assert.equal(
 		validateTask({
@@ -72,6 +74,18 @@ test("publishes valid JSON Schemas for the portable task view and binding", asyn
 		false,
 		"the old private discovery envelope is deliberately rejected"
 	);
+	assert.equal(
+		validateCompleted({
+			task_id: "Tasks/Ship contracts.md",
+			task_path: "Tasks/Ship contracts.md",
+			title: "Ship contracts",
+			status: "done",
+			completed_at: "2026-07-28T09:30:00+10:00",
+		}),
+		true,
+		validateCompleted.errors
+	);
+	assert.equal(validateCompleted({ task_path: "Tasks/Ship contracts.md" }), false);
 });
 
 test("the published contract uses one exact identity and the canonical schemas", async () => {
@@ -81,10 +95,29 @@ test("the published contract uses one exact identity and the canonical schemas",
 	);
 	assert.match(contract, /^kind: mdbase\.contract$/m);
 	assert.match(contract, /^id: tasknotes\.task$/m);
-	assert.match(contract, /^version: 0\.2\.0$/m);
+	assert.match(contract, /^contract_type: record$/m);
+	assert.match(contract, /^version: 0\.3\.0-rc\.1$/m);
+	assert.match(contract, /^record_schema:$/m);
 	assert.match(contract, /ref: \.\.\/schemas\/tasknotes-task\.schema\.json/);
 	assert.match(
 		contract,
 		/ref: \.\.\/schemas\/tasknotes-task-binding\.schema\.json/
 	);
+});
+
+test("publishes the completion event as a first-class event contract", async () => {
+	const contract = await readFile(
+		new URL("../../mdbase/tasknotes.task.completed.md", import.meta.url),
+		"utf8"
+	);
+	assert.match(contract, /^kind: mdbase\.contract$/m);
+	assert.match(contract, /^contract_type: event$/m);
+	assert.match(contract, /^id: tasknotes\.task\.completed$/m);
+	assert.match(contract, /^version: 1\.0\.0$/m);
+	assert.match(contract, /^data_schema:$/m);
+	assert.match(
+		contract,
+		/ref: \.\.\/schemas\/tasknotes-task-completed\.schema\.json/
+	);
+	assert.doesNotMatch(contract, /^binding_schema:/m);
 });

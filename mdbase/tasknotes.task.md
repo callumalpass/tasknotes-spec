@@ -1,10 +1,11 @@
 ---
 kind: mdbase.contract
+contract_type: record
 id: tasknotes.task
-version: 0.2.0
+version: 0.3.0-rc.1
 name: TaskNotes task
-description: Portable task data and behavior defined by tasknotes-spec 0.2.0.
-schema:
+description: Portable task data and behavior defined by tasknotes-spec 0.3.0-rc.1.
+record_schema:
   dialect: json-schema-2020-12
   ref: ../schemas/tasknotes-task.schema.json
 binding_schema:

@@ -2,7 +2,7 @@
 	"$schema": "https://json-schema.org/draft/2020-12/schema",
 	"$id": "https://tasknotes.dev/schemas/tasknotes-task.schema.json",
 	"title": "TaskNotes portable task view",
-	"description": "The storage-neutral record view exposed by the tasknotes.task 0.2.0 data contract.",
+	"description": "The storage-neutral record view exposed by the tasknotes.task 0.3.0-rc.1 record contract.",
 	"type": "object",
 	"required": ["status", "dateCreated"],
 	"additionalProperties": false,

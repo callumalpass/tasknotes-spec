@@ -17996,15 +17996,15 @@
       "config-lite"
     ],
     "input": {
-      "providerSpecVersion": "0.2.0-draft",
-      "targetSpecVersion": "0.2.0-draft",
-      "expected": "0.2.0-draft",
+      "providerSpecVersion": "0.3.0-rc.1",
+      "targetSpecVersion": "0.3.0-rc.1",
+      "expected": "0.3.0-rc.1",
       "synthesized": false
     },
     "expect": {
       "ok": true,
       "result": {
-        "value": "0.2.0-draft",
+        "value": "0.3.0-rc.1",
         "synthesized": false
       }
     }
@@ -18020,7 +18020,7 @@
     ],
     "input": {
       "providerSpecVersion": "0.2.0",
-      "targetSpecVersion": "0.2.0-draft",
+      "targetSpecVersion": "0.3.0-rc.1",
       "expected": "0.2.0",
       "synthesized": false
     },
@@ -18042,14 +18042,14 @@
       "config-lite"
     ],
     "input": {
-      "targetSpecVersion": "0.2.0-draft",
-      "expected": "0.2.0-draft",
+      "targetSpecVersion": "0.3.0-rc.1",
+      "expected": "0.3.0-rc.1",
       "synthesized": true
     },
     "expect": {
       "ok": true,
       "result": {
-        "value": "0.2.0-draft",
+        "value": "0.3.0-rc.1",
         "synthesized": true
       }
     }
@@ -18065,14 +18065,14 @@
     ],
     "input": {
       "providerSpecVersion": "",
-      "targetSpecVersion": "0.2.0-draft",
-      "expected": "0.2.0-draft",
+      "targetSpecVersion": "0.3.0-rc.1",
+      "expected": "0.3.0-rc.1",
       "synthesized": true
     },
     "expect": {
       "ok": true,
       "result": {
-        "value": "0.2.0-draft",
+        "value": "0.3.0-rc.1",
         "synthesized": true
       }
     }
