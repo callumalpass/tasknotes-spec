@@ -1,120 +1,138 @@
-# 12. mdbase v0.3 Type-File Binding
+# 12. mdbase v0.3 Data-Contract Binding
 
 **Status:** Draft
 
-**Binding version:** `x-tasknotes.version: 1`
+**Contract:** `tasknotes.task` `0.2.0`
 
 **Target:** mdbase `0.3.x`
 
 ## 12.1 Purpose
 
-This chapter defines how the storage-neutral TaskNotes model and effective
-configuration are represented in an mdbase v0.3 task type file.
+This chapter defines how a TaskNotes task model is exposed through mdbase
+without coupling TaskNotes to one record type or one application's private
+extension.
 
-The binding has two goals:
+The binding has three deliberately separate parts:
 
-1. generic mdbase implementations can validate and manage TaskNotes records
-   without understanding TaskNotes operations; and
-2. TaskNotes-aware implementations can discover the semantic role of custom
-   frontmatter properties and apply the same task behavior as the producing
-   application.
+1. the `tasknotes.task` data contract defines the portable task view;
+2. an mdbase type's `implements` entry maps that view to its own frontmatter
+   fields and supplies TaskNotes behavior; and
+3. the rest of the type file continues to define that type's storage,
+   matching, defaults, lifecycle, links, and paths.
 
-The normative schema for the TaskNotes domain extension is
-[`schemas/mdbase-v0.3-x-tasknotes.schema.json`](schemas/mdbase-v0.3-x-tasknotes.schema.json).
-The mdbase type-file schema remains authoritative for the surrounding type
-file.
+The normative artifacts are:
 
-## 12.2 Layering
+- [`mdbase/tasknotes.task.md`](mdbase/tasknotes.task.md), the mdbase contract;
+- [`schemas/tasknotes-task.schema.json`](schemas/tasknotes-task.schema.json),
+  the projected task-view schema; and
+- [`schemas/tasknotes-task-binding.schema.json`](schemas/tasknotes-task-binding.schema.json),
+  the implementation binding schema.
 
-An mdbase v0.3 TaskNotes type file MUST use the following separation of
-responsibilities:
+## 12.2 The mental model
+
+A contract is not another record type. It is a view that several record types
+can implement and several applications can consume.
+
+```text
+personal_task ─┐
+work_task ─────┼─ implements tasknotes.task 0.2.0 ── TaskNotes
+issue_task ────┘                                  ├─ automation
+                                                  └─ another task app
+```
+
+Reading or listing through the contract uses the union of all implementing
+types. Creating a task is different: the caller MUST choose one exact target
+type because the contract does not choose storage, paths, or lifecycle policy.
+
+The contract version is an exact semantic version. For this draft it is also
+the tasknotes-spec version whose task semantics the contract exposes. There is
+no independent `x-tasknotes.version` or `spec_version` mirror.
+
+## 12.3 Layering
+
+An implementing type MUST keep these responsibilities in their canonical
+locations:
 
 | Information | mdbase v0.3 location |
 |---|---|
-| Persisted frontmatter shape, required fields, enum values, formats | `schema.value` |
-| Task identification | `match` |
-| Display field, effective read defaults, links, and path generation | `collection` |
+| Persisted frontmatter shape, required fields, enum values, formats | `schema` |
+| Type identification | `match` |
+| Display field, defaults, links, uniqueness, and path generation | `collection` |
 | Managed create/update values | `lifecycle` |
-| TaskNotes semantic roles and domain policies | `x-tasknotes` |
+| Contract identity and custom field names | `implements[].contract`, `version`, and `fields` |
+| TaskNotes semantic behavior | `implements[].binding` |
 
-TaskNotes-specific metadata MUST NOT be added as custom JSON Schema keywords.
-A generic mdbase consumer MAY ignore `x-tasknotes`, but it MUST preserve the
-extension when rewriting the type file.
+TaskNotes metadata MUST NOT be encoded as custom JSON Schema keywords.
+`x-tasknotes` MUST NOT be used for contract discovery, field mapping,
+conformance, or authorization.
 
-## 12.3 Extension envelope
+## 12.4 Declaring an implementation
 
-The type file MUST contain one root-level `x-tasknotes` object:
-
-```yaml
-x-tasknotes:
-  contract: tasknotes.task
-  version: 1
-  spec_version: 0.2.0
-```
-
-`contract` identifies the domain contract. `version` versions this mdbase
-binding independently of both mdbase and tasknotes-spec. `spec_version`
-identifies the tasknotes-spec semantics used by the producer.
-
-Consumers MUST reject TaskNotes-aware writes for an unsupported major contract
-version. They MAY continue in read-only or generic mdbase mode, and MUST
-preserve unknown extension properties.
-
-## 12.4 Semantic profiles and capabilities
-
-`profiles` and `capabilities` describe the TaskNotes semantic surface that may
-be used by records of this type:
+An mdbase TaskNotes type declares one implementation:
 
 ```yaml
-x-tasknotes:
-  profiles: [core-lite, recurrence, templating, materialized-occurrences, extended]
-  capabilities:
-    - dependencies
-    - reminders
-    - links
-    - time-tracking
-    - materialized-occurrences
-    - archive
-    - templating
+implements:
+  - contract: tasknotes.task
+    version: 0.2.0
+    fields:
+      title: summary
+      status: state
+      priority: importance
+      dateCreated: created_at
+    binding:
+      # TaskNotes behavior; abbreviated here
+      profiles: [core-lite]
+      capabilities: []
+      title:
+        storage: frontmatter
+        filename_format: title
+      status:
+        values: [todo, doing, done]
+        default: todo
+        completed_values: [done]
+        definitions: []
+      priority:
+        values: [normal]
+        default: normal
+        definitions: []
 ```
 
-These arrays describe the collection contract; they are not a conformance
-claim by the consuming implementation. Before mutating fields governed by a
-profile or capability, a consumer SHOULD verify that it implements the
-corresponding semantics from §7. A consumer that lacks a capability MAY still
-perform unrelated operations if it preserves unsupported fields and their
-invariants.
+The contract file identified by the exact `contract` and `version` MUST exist
+in the collection contract registry. The `binding` MUST validate against that
+contract's `binding_schema`.
 
-## 12.5 Field roles
+Each type MUST declare at most one implementation of one exact contract
+identity. A type may implement several different contracts.
 
-`field_roles` maps TaskNotes contract role identifiers to actual frontmatter
-property names:
+## 12.5 Portable fields
+
+`fields` maps contract field paths to record field paths. Consumers access
+contract fields and MUST NOT assume that their names are also frontmatter
+property names.
 
 ```yaml
-schema:
-  dialect: json-schema-2020-12
-  value:
-    type: object
-    properties:
-      summary:
-        type: string
-      state:
-        enum: [todo, doing, done, cancelled]
-
-x-tasknotes:
-  field_roles:
-    title: summary
-    status: state
+fields:
+  title: summary
+  status: state
+  blockedBy: dependencies
 ```
 
-Consumers MUST resolve a field through `field_roles` and MUST NOT assume that a
-semantic role is stored under a property with the same name.
+Every unconditionally required contract field MUST be mapped. Every mapped
+contract field and record field MUST exist in its respective JSON Schema.
 
-Contract version 1 retains the role identifiers used by existing TaskNotes
-mdbase consumers. The following identifiers correspond to snake_case semantic
-roles in §2:
+The contract view contains only mapped fields. It does not expose unmapped
+frontmatter or the Markdown body. A consumer that requires either needs
+separate, explicit whole-record access.
 
-| Contract v1 role | tasknotes-spec role |
+`title` is optional in the portable schema because TaskNotes permits filename
+title storage. When `binding.title.storage` is `filename`, consumers derive
+the effective title from the record identity/path rules in §9.13 instead of
+expecting a projected frontmatter value.
+
+The camel-case contract field names are stable portable identifiers. Their
+snake-case tasknotes-spec counterparts include:
+
+| Contract field | tasknotes-spec role |
 |---|---|
 | `timeEstimate` | `time_estimate` |
 | `completedDate` | `completed_date` |
@@ -133,248 +151,152 @@ roles in §2:
 | `timeEntries` | `time_entries` |
 | `blockedBy` | `blocked_by` |
 
-All `field_roles` values MUST identify properties in
-`schema.value.properties`. A producer MAY omit a role that its collection does
-not support.
+## 12.6 Semantic profiles and capabilities
 
-## 12.6 Status semantics
-
-The JSON Schema enum for the mapped status field defines the legal persisted
-values. `x-tasknotes.status` defines how those values behave:
+`binding.profiles` and `binding.capabilities` describe semantics that records
+of this implementation may use:
 
 ```yaml
-collection:
-  read_defaults:
-    state: todo
+binding:
+  profiles: [core-lite, recurrence, materialized-occurrences]
+  capabilities:
+    - dependencies
+    - reminders
+    - links
+    - time-tracking
+    - materialized-occurrences
+    - archive
+```
 
-x-tasknotes:
-  field_roles:
-    status: state
+These are properties of the implementation, not claims that every consuming
+application supports them. Before mutating a governed field, a consumer SHOULD
+verify its own corresponding capability. It may still perform unrelated
+operations when it preserves unsupported fields and invariants.
+
+## 12.7 Status and priority semantics
+
+The implementing type schema defines the legal persisted values of the mapped
+fields. The binding gives those values TaskNotes meaning:
+
+```yaml
+binding:
   status:
+    values: [todo, doing, done, cancelled]
     default: todo
     completed_values: [done]
     skipped_values: [cancelled]
     default_skipped: cancelled
+    definitions: []
+  priority:
+    values: [low, normal, high]
+    default: normal
+    definitions: []
 ```
 
-The rules in §9.9 apply. In addition:
+The following consistency rules apply:
 
-- every completed or skipped value MUST occur in the mapped schema enum;
-- `default` MUST equal the mapped value in `collection.read_defaults` when both
-  are present;
-- `default_skipped` MUST occur in `skipped_values`; and
-- completed and skipped values MUST NOT overlap when
-  `materialized-occurrences` is listed.
+- binding values MUST equal the mapped type-schema enum values;
+- defaults MUST equal mapped `collection.read_defaults` values when present;
+- completed and skipped values MUST be members of `status.values`;
+- `default_skipped` MUST be a skipped value;
+- completed and skipped values MUST NOT overlap for materialized occurrences;
+  and
+- definition semantics MUST agree with completed/skipped membership.
 
-`definitions` MAY provide TaskNotes status cycling, automation, and
-presentation metadata:
+Status and priority labels, colors, and icons are presentation hints. Status
+cycle, completion, skipping, auto-archive, and priority weight are semantic.
 
-```yaml
-status:
-  definitions:
-    - value: doing
-      label: Doing
-      color: "#0066cc"
-      icon: circle-dot
-      order: 2
-      is_completed: false
-      is_skipped: false
-      exclude_from_cycle: false
-      next_status: done
-      auto_archive: false
-      auto_archive_delay_minutes: 5
-```
+## 12.8 Title, recurrence, links, and operations
 
-`value`, completion/skipping flags, ordering, cycle behavior, and auto-archive
-behavior are semantic. `label`, `color`, and `icon` are presentation hints;
-consumers MAY render them differently. Each definition's `is_completed` and
-`is_skipped` values MUST agree with membership in `completed_values` and
-`skipped_values`, respectively.
+The remaining binding sections project the effective TaskNotes behavior
+defined elsewhere in this specification:
 
-## 12.7 Priority semantics
+- `title` follows §9.13 and MUST agree with `collection.display` and
+  `collection.path`;
+- `recurrence` follows §4;
+- `occurrences` follows §2.6.6, §4.18, §5.20, and §9.17;
+- `links` follows §11;
+- `archive` follows §5.12;
+- `time_tracking` follows §5.19 and §9.16;
+- `templating` follows §5.3.5 and §9.14; and
+- optional `nlp` triggers follow §9.18.
 
-The mapped priority schema defines legal values. The extension supplies the
-TaskNotes default and stable sorting weight:
+Archive always operates on the portable `tags` contract field, so the binding
+does not repeat a record-specific `tags_field`. The implementation's `fields`
+map determines the actual frontmatter property.
 
-```yaml
-priority:
-  default: normal
-  definitions:
-    - value: high
-      label: High
-      color: "#ff0000"
-      icon: chevrons-up
-      weight: 3
-```
+Application-local notification preferences and generator bookkeeping MUST NOT
+be placed in the binding.
 
-Higher `weight` values sort as more important. `default` MUST equal the mapped
-`collection.read_defaults` value when both are present. Labels, colors, and
-icons are presentation hints.
+## 12.9 Multiple implementations
 
-## 12.8 Title and path policy
+A collection may contain any number of types implementing
+`tasknotes.task 0.2.0`. TaskNotes-aware readers MUST:
 
-`title` projects the effective title configuration from §9.13:
+1. resolve the exact local contract;
+2. enumerate every implementation in canonical type-name order;
+3. read each matching record through that implementation's projected view;
+4. validate the projected view; and
+5. retain the concrete type identity for updates.
 
-```yaml
-title:
-  storage: frontmatter
-  filename_format: custom
-  custom_filename_template: "{{priority}}-{{title}}"
-```
+Implementations MUST NOT merge type schemas into one synthetic schema. A record
+is validated by its concrete type and then by its projected contract view.
 
-`storage` determines whether the mapped title frontmatter property or file
-basename is authoritative. Consumers MUST follow the read and write precedence
-from §9.13. TaskNotes producers MAY additionally emit `uuid` as a
-`filename_format`; consumers that do not support it MUST delegate creation to
-the runtime named by `collection.path.runtime` or require an explicit path.
+When an approval, cache, or external protocol pins an implementation set, it
+MUST pin the exact contract digest and sorted implementation descriptors,
+including each implementation digest. A newly installed type is therefore not
+silently added to an existing approval.
 
-`collection.display`, `collection.path`, and `x-tasknotes.title` MUST describe
-compatible behavior. The generic collection metadata remains authoritative for
-mdbase path generation; `x-tasknotes.title` defines TaskNotes title ownership
-and rename semantics.
+Creation MUST name one concrete implementing type. If no type is selected,
+creation fails as ambiguous.
 
-## 12.9 Recurrence and materialized occurrences
+## 12.10 Precedence and consistency
 
-```yaml
-recurrence:
-  syntax: tasknotes
-  maintain_due_date_offset: false
-  reset_body_checkboxes: false
+The complete implementation is self-describing:
 
-occurrences:
-  identity_roles: [recurrenceParent, occurrenceDate]
-  default_materialization: manual
-  default_next_trigger: completion
-  past_horizon: P0D
-  future_horizon: P14D
-```
+1. the contract schema is authoritative for the portable projected view;
+2. the type schema is authoritative for persisted value shapes;
+3. `collection` is authoritative for generic mdbase behavior;
+4. `lifecycle` is authoritative for generic managed writes; and
+5. `implements[].binding` is authoritative for TaskNotes semantics.
 
-`syntax: tasknotes` selects the recurrence syntax and semantics in §4.
-`maintain_due_date_offset` and `reset_body_checkboxes` project the corresponding
-TaskNotes recurrence settings.
+Where values intentionally mirror each other, producers MUST keep them equal.
+A TaskNotes-aware consumer MUST report a configuration error instead of
+silently choosing between contradictory values.
 
-`identity_roles` MUST contain `recurrenceParent` and `occurrenceDate` for
-contract version 1. The mapped fields form the materialized occurrence identity
-key described by §2.6.6. Occurrence defaults follow §9.17 and MUST agree with
-mapped values in `collection.read_defaults` when both are present.
-
-`runtime_timezone`, when emitted, MUST be an IANA timezone and follows §9.5.1.
-Producers that intentionally use the consumer's local timezone SHOULD omit it.
-
-## 12.10 Links
-
-`collection.links` identifies link-bearing field paths and their targets.
-`x-tasknotes.links` defines accepted and canonical frontmatter serialization:
-
-```yaml
-links:
-  accepted_formats: [wikilink, markdown]
-  write_format: wikilink
-```
-
-Consumers MUST parse every listed accepted format. Canonical writes SHOULD use
-`write_format`; updates that do not modify a link SHOULD preserve its existing
-representation.
-
-## 12.11 Archive, time tracking, and templating
-
-```yaml
-archive:
-  tags_field: tags
-  archived_tag: archived
-  move_on_archive: false
-  folder: TaskNotes/Archive
-
-time_tracking:
-  auto_stop_on_complete: true
-
-templating:
-  enabled: true
-  template_path: Templates/Task.md
-  occurrence_enabled: true
-  occurrence_template_path: Templates/Occurrence.md
-```
-
-Archive semantics follow §5.12. `tags_field` MUST equal the property mapped by
-`field_roles.tags`. A consumer that implements `archive` MUST add or remove the
-configured tag and apply the move policy. A consumer that does not implement
-archive MUST preserve archive state.
-
-Time-tracking behavior follows §5.19 and §9.16. Notification preferences are
-application-local and MUST NOT be emitted in the type contract.
-
-Task templating follows §5.3.5 and §9.14. Occurrence template settings apply
-only when materializing an occurrence and the parent does not select its own
-mapped `occurrenceTemplate` value.
-
-## 12.12 Precedence and consistency
-
-The type file is a self-contained snapshot of the effective TaskNotes contract.
-The following precedence rules apply:
-
-1. `schema.value` is authoritative for persisted value shapes and legal enum
-   values.
-2. `collection` is authoritative for generic mdbase defaults, display, links,
-   and path behavior.
-3. `lifecycle` is authoritative for generic managed writes.
-4. `x-tasknotes` is authoritative for TaskNotes semantic interpretation and
-   TaskNotes-specific operation policy.
-
-Duplicated values are compatibility mirrors, not independent settings. A
-producer MUST keep them equal. A TaskNotes-aware consumer MUST report a
-configuration error rather than silently choose between contradictory values.
-
-If another configuration provider is selected, provider precedence MUST follow
-§9.2 and be disclosed by the consumer. Producers SHOULD regenerate generated
-type files whenever the effective settings represented by this binding change.
-
-## 12.13 Safe writes and forward compatibility
+## 12.11 Safe writes
 
 TaskNotes-aware consumers MUST preserve:
 
-- unknown frontmatter properties unless explicit schema replacement or
-  migration was requested;
+- unknown frontmatter properties unless explicit replacement or migration was
+  requested;
 - Markdown body content unless an operation explicitly replaces it;
-- unknown `x-tasknotes` properties; and
-- fields governed by unsupported capabilities.
+- fields governed by unsupported capabilities; and
+- unrelated type metadata and implementations.
 
-A consumer MAY use generic mdbase operations without understanding this
-extension only when those operations preserve the same data. Cross-record or
-domain operations such as completion, recurrence mutation, occurrence
-materialization, dependency updates, time tracking, and archive MUST follow the
-referenced TaskNotes semantics.
+Generic mdbase operations are safe only when they preserve the same data.
+Completion, recurrence mutation, occurrence materialization, dependency
+updates, time tracking, archive, and other domain operations MUST follow the
+TaskNotes semantics referenced by the binding.
 
-## 12.14 Complete example with custom field names
+## 12.12 Complete custom-field example
 
 ```yaml
 ---
 kind: mdbase.type
-name: task
+name: work_task
 version: 1
 schema:
   dialect: json-schema-2020-12
   value:
-    $schema: https://json-schema.org/draft/2020-12/schema
     type: object
     additionalProperties: true
     required: [summary, state, created_at]
     properties:
-      summary:
-        type: string
-        minLength: 1
-      state:
-        enum: [todo, doing, done, cancelled]
-      importance:
-        enum: [low, normal, high]
-      finished_on:
-        type: string
-        format: date
-      created_at:
-        type: string
-        format: date-time
-      updated_at:
-        type: string
-        format: date-time
+      summary: { type: string, minLength: 1 }
+      state: { enum: [todo, doing, done, cancelled] }
+      importance: { enum: [low, normal, high] }
+      created_at: { type: string, format: date-time }
       tags:
         type: array
         items: { type: string }
@@ -388,37 +310,50 @@ lifecycle:
   on_create:
     set:
       created_at: { now: true }
-      updated_at: { now: true }
-  on_update:
-    set:
-      updated_at: { now: true }
-x-tasknotes:
-  contract: tasknotes.task
-  version: 1
-  spec_version: 0.2.0
-  profiles: [core-lite]
-  capabilities: [archive]
-  field_roles:
-    title: summary
-    status: state
-    priority: importance
-    completedDate: finished_on
-    dateCreated: created_at
-    dateModified: updated_at
-    tags: tags
-  title:
-    storage: frontmatter
-    filename_format: title
-  status:
-    default: todo
-    completed_values: [done]
-    skipped_values: [cancelled]
-    default_skipped: cancelled
-  priority:
-    default: normal
-  archive:
-    tags_field: tags
-    archived_tag: archived
-    move_on_archive: false
+implements:
+  - contract: tasknotes.task
+    version: 0.2.0
+    fields:
+      title: summary
+      status: state
+      priority: importance
+      dateCreated: created_at
+      tags: tags
+    binding:
+      profiles: [core-lite]
+      capabilities: [archive]
+      title:
+        storage: frontmatter
+        filename_format: title
+      status:
+        values: [todo, doing, done, cancelled]
+        default: todo
+        completed_values: [done]
+        skipped_values: [cancelled]
+        default_skipped: cancelled
+        definitions: []
+      priority:
+        values: [low, normal, high]
+        default: normal
+        definitions: []
+      recurrence:
+        syntax: tasknotes
+        maintain_due_date_offset: false
+        reset_body_checkboxes: false
+      occurrences:
+        identity_roles: [recurrenceParent, occurrenceDate]
+        default_materialization: manual
+        default_next_trigger: completion
+      links:
+        accepted_formats: [wikilink, markdown]
+        write_format: wikilink
+      archive:
+        archived_tag: archived
+        move_on_archive: false
+      time_tracking:
+        auto_stop_on_complete: true
+      templating:
+        enabled: false
+        occurrence_enabled: false
 ---
 ```

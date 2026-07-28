@@ -5,10 +5,11 @@
 - add optional `materialized-occurrences` profile for recurrence occurrence notes, on-completion materialization, and occurrence-state reconciliation
 - add optional NLP trigger configuration so TaskNotes clients can share capture
   suggestion vocabulary
-- add a draft mdbase v0.3 type-file binding and machine-readable schema for the
-  `x-tasknotes` domain extension
+- replace the private `x-tasknotes` discovery envelope with the first-class
+  `tasknotes.task 0.2.0` mdbase data contract, portable task-view schema, and
+  implementation binding schema
 - document the precedence and consistency rules between JSON Schema,
-  `collection`, `lifecycle`, and TaskNotes-specific metadata
+  `collection`, `lifecycle`, contract field mappings, and TaskNotes behavior
 
 ## 0.1.0-draft - 2026-02-20
 

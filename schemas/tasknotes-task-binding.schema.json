@@ -1,23 +1,26 @@
 {
 	"$schema": "https://json-schema.org/draft/2020-12/schema",
-	"$id": "https://tasknotes.dev/schemas/mdbase-v0.3-x-tasknotes.schema.json",
-	"title": "TaskNotes mdbase v0.3 domain extension",
-	"description": "Draft schema for the root-level x-tasknotes object in an mdbase v0.3 task type file.",
+	"$id": "https://tasknotes.dev/schemas/tasknotes-task-binding.schema.json",
+	"title": "TaskNotes task data-contract binding",
+	"description": "Semantic configuration supplied by an mdbase type that implements tasknotes.task 0.2.0.",
 	"type": "object",
-	"required": ["contract", "version", "spec_version", "field_roles", "status"],
+	"required": [
+		"profiles",
+		"capabilities",
+		"title",
+		"status",
+		"priority",
+		"recurrence",
+		"occurrences",
+		"links",
+		"archive",
+		"time_tracking",
+		"templating"
+	],
 	"properties": {
-		"contract": {
-			"const": "tasknotes.task"
-		},
-		"version": {
-			"const": 1
-		},
-		"spec_version": {
-			"type": "string",
-			"pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$"
-		},
 		"profiles": {
 			"type": "array",
+			"minItems": 1,
 			"uniqueItems": true,
 			"items": {
 				"enum": [
@@ -47,14 +50,6 @@
 					"migration",
 					"templating"
 				]
-			}
-		},
-		"field_roles": {
-			"type": "object",
-			"minProperties": 1,
-			"additionalProperties": {
-				"type": "string",
-				"minLength": 1
 			}
 		},
 		"title": {
@@ -88,12 +83,11 @@
 		"templating": {
 			"$ref": "#/$defs/templatingPolicy"
 		},
-		"generator": {
-			"type": "object",
-			"additionalProperties": true
+		"nlp": {
+			"$ref": "#/$defs/nlpPolicy"
 		}
 	},
-	"additionalProperties": true,
+	"additionalProperties": false,
 	"$defs": {
 		"nonEmptyString": {
 			"type": "string",
@@ -131,6 +125,11 @@
 						"required": ["filename_format"]
 					},
 					"then": {
+						"properties": {
+							"custom_filename_template": {
+								"$ref": "#/$defs/nonEmptyString"
+							}
+						},
 						"required": ["custom_filename_template"]
 					}
 				}
@@ -190,8 +189,11 @@
 		},
 		"statusPolicy": {
 			"type": "object",
-			"required": ["completed_values"],
+			"required": ["values", "default", "completed_values", "definitions"],
 			"properties": {
+				"values": {
+					"$ref": "#/$defs/stringSet"
+				},
 				"default": {
 					"$ref": "#/$defs/nonEmptyString"
 				},
@@ -211,7 +213,7 @@
 					}
 				}
 			},
-			"additionalProperties": true
+			"additionalProperties": false
 		},
 		"priorityDefinition": {
 			"type": "object",
@@ -237,7 +239,11 @@
 		},
 		"priorityPolicy": {
 			"type": "object",
+			"required": ["values", "default", "definitions"],
 			"properties": {
+				"values": {
+					"$ref": "#/$defs/stringSet"
+				},
 				"default": {
 					"$ref": "#/$defs/nonEmptyString"
 				},
@@ -248,7 +254,7 @@
 					}
 				}
 			},
-			"additionalProperties": true
+			"additionalProperties": false
 		},
 		"recurrencePolicy": {
 			"type": "object",
@@ -264,7 +270,7 @@
 					"type": "boolean"
 				}
 			},
-			"additionalProperties": true
+			"additionalProperties": false
 		},
 		"occurrencePolicy": {
 			"type": "object",
@@ -286,7 +292,7 @@
 					"$ref": "#/$defs/nonEmptyString"
 				}
 			},
-			"additionalProperties": true
+			"additionalProperties": false
 		},
 		"linkPolicy": {
 			"type": "object",
@@ -304,15 +310,12 @@
 					"enum": ["wikilink", "markdown"]
 				}
 			},
-			"additionalProperties": true
+			"additionalProperties": false
 		},
 		"archivePolicy": {
 			"type": "object",
-			"required": ["tags_field", "archived_tag", "move_on_archive"],
+			"required": ["archived_tag", "move_on_archive"],
 			"properties": {
-				"tags_field": {
-					"$ref": "#/$defs/nonEmptyString"
-				},
 				"archived_tag": {
 					"$ref": "#/$defs/nonEmptyString"
 				},
@@ -323,7 +326,7 @@
 					"$ref": "#/$defs/nonEmptyString"
 				}
 			},
-			"additionalProperties": true
+			"additionalProperties": false
 		},
 		"timeTrackingPolicy": {
 			"type": "object",
@@ -333,7 +336,7 @@
 					"type": "boolean"
 				}
 			},
-			"additionalProperties": true
+			"additionalProperties": false
 		},
 		"templatingPolicy": {
 			"type": "object",
@@ -358,7 +361,36 @@
 					"enum": ["preserve", "empty"]
 				}
 			},
-			"additionalProperties": true
+			"additionalProperties": false
+		},
+		"nlpTrigger": {
+			"type": "object",
+			"required": ["property_id", "trigger", "enabled"],
+			"properties": {
+				"property_id": {
+					"$ref": "#/$defs/nonEmptyString"
+				},
+				"trigger": {
+					"$ref": "#/$defs/nonEmptyString"
+				},
+				"enabled": {
+					"type": "boolean"
+				}
+			},
+			"additionalProperties": false
+		},
+		"nlpPolicy": {
+			"type": "object",
+			"required": ["triggers"],
+			"properties": {
+				"triggers": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/nlpTrigger"
+					}
+				}
+			},
+			"additionalProperties": false
 		}
 	}
 }

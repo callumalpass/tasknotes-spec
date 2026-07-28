@@ -27,6 +27,7 @@
     "11-links.md",
     "12-mdbase-v0.3-binding.md",
     "CHANGELOG.md",
+    "mdbase",
     "schemas",
     "conformance/README.md",
     "conformance/manifest.json",
@@ -47,5 +48,9 @@
     "conformance:test:mdbase-tasknotes": "npm run conformance:generate && (cd ../mdbase-tasknotes && npm run build) && TASKNOTES_ADAPTER=./conformance/adapters/mdbase-tasknotes.adapter.mjs npm run conformance:test",
     "conformance:count": "node -e \"const fs=require('fs');const m=JSON.parse(fs.readFileSync('conformance/manifest.json','utf8'));console.log(m.totalCases)\"",
     "conformance:package": "node conformance/scripts/package-fixtures.mjs"
+  },
+  "devDependencies": {
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1"
   }
 }
