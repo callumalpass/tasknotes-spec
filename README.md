@@ -49,6 +49,8 @@ This specification provides a precise contract so independent tools can make com
 | §9 | `09-configuration.md` | effective configuration schema and provider model (`tasknotes.yaml`, TaskNotes `data.json`, etc.) |
 | §10 | `10-dependencies-and-reminders.md` | Dependency and reminder semantics |
 | §11 | `11-links.md` | Link syntax, parsing, resolution, and rename update behavior |
+| §12 | `12-mdbase-v0.3-binding.md` | `tasknotes.task` data contract and mdbase v0.3 implementation binding |
+| Schemas | `schemas/` | Machine-readable schemas for specification bindings |
 | Changelog | `CHANGELOG.md` | Spec release history |
 
 ## Conformance model
