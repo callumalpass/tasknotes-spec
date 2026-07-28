@@ -161,7 +161,7 @@ Migrations MUST NOT:
 
 ```yaml
 spec_version_from: 0.1.0-draft
-spec_version_to: 0.2.0-draft
+spec_version_to: 0.3.0-rc.1
 files_scanned: 214
 files_changed: 67
 warnings:

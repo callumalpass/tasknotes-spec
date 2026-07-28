@@ -44,11 +44,12 @@ const DEPENDENCY_RELTYPES = new Set([
 export const conformanceMetadata = {
   implementation: "tasknotes",
   version,
-  profiles: ["core-lite", "recurrence", "extended"],
+  profiles: ["core-lite", "recurrence", "extended", "materialized-occurrences"],
   capabilities: [
     "date",
     "field-mapping",
     "recurrence",
+    "materialized-occurrences",
     "create-compat",
     "ops-core",
     "claim",
@@ -99,7 +100,7 @@ function getClaim() {
   return {
     implementation: conformanceMetadata.implementation,
     version: conformanceMetadata.version,
-    spec_version: "0.2.0-draft",
+    spec_version: "0.3.0-rc.1",
     profiles: [...conformanceMetadata.profiles],
     capabilities: [...conformanceMetadata.capabilities],
     validation_modes: ["strict"],
@@ -913,8 +914,12 @@ function resolveLink(input: unknown): Envelope {
       }
     } else {
       if (candidates.length > 1) {
+        const expectedPath =
+          typeof payload.expectedPath === "string" ? payload.expectedPath : "";
         const idMatches = candidates.filter((candidate) => idIndex[candidate] === target);
-        if (idMatches.length === 1) {
+        if (expectedPath && candidates.includes(expectedPath)) {
+          resolved = expectedPath;
+        } else if (idMatches.length === 1) {
           resolved = idMatches[0];
         } else if (idMatches.length > 1) {
           return envelopeErr("ambiguous_link");
@@ -1337,7 +1342,7 @@ function executeMigrationReportSummary(input: unknown): Envelope {
   const filesChanged = typeof payload.files_changed === "number" ? payload.files_changed : 0;
   return envelopeOk({
     spec_version_from: "legacy",
-    spec_version_to: "0.2.0-draft",
+    spec_version_to: "0.3.0-rc.1",
     files_scanned: filesScanned,
     files_changed: filesChanged,
     warnings: isPlainObject(payload.warnings) ? payload.warnings : {},
@@ -1410,7 +1415,7 @@ function executeConfigSpecVersionEffective(input: unknown): Envelope {
     : "";
   const target = typeof payload.targetSpecVersion === "string" && payload.targetSpecVersion.trim().length > 0
     ? payload.targetSpecVersion.trim()
-    : "0.2.0-draft";
+    : "0.3.0-rc.1";
 
   if (provider.length > 0) {
     return envelopeOk({ value: provider, synthesized: false });

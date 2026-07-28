@@ -2,7 +2,7 @@
 
 A standalone specification for representing and operating on task data stored in markdown files with YAML frontmatter.
 
-**Version:** 0.2.0-draft
+**Version:** 0.3.0 release candidate
 **Status:** Draft
 **Canonical Source of Truth:** This specification
 

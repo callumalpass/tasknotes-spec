@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tasknotes.dev/schemas/tasknotes-task-completed.schema.json",
+  "title": "TaskNotes task-completed event data",
+  "description": "The minimal portable signal emitted when a task enters a completed status.",
+  "type": "object",
+  "required": [
+    "task_id",
+    "task_path",
+    "title",
+    "status",
+    "completed_at"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "task_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable task identity when available, otherwise the normalized task path."
+    },
+    "task_path": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Normalized vault-relative task path at the time of the transition."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The completed status entered by the task."
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When TaskNotes observed the completion transition."
+    }
+  }
+}

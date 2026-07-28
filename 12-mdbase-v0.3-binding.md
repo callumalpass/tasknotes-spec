@@ -2,7 +2,9 @@
 
 **Status:** Draft
 
-**Contract:** `tasknotes.task` `0.2.0`
+**Record contract:** `tasknotes.task` `0.3.0-rc.1`
+
+**Event contract:** `tasknotes.task.completed` `1.0.0`
 
 **Target:** mdbase `0.3.x`
 
@@ -22,11 +24,18 @@ The binding has three deliberately separate parts:
 
 The normative artifacts are:
 
-- [`mdbase/tasknotes.task.md`](mdbase/tasknotes.task.md), the mdbase contract;
+- [`mdbase/tasknotes.task.md`](mdbase/tasknotes.task.md), the record contract;
 - [`schemas/tasknotes-task.schema.json`](schemas/tasknotes-task.schema.json),
   the projected task-view schema; and
 - [`schemas/tasknotes-task-binding.schema.json`](schemas/tasknotes-task-binding.schema.json),
   the implementation binding schema.
+
+The optional event-interoperability artifacts are:
+
+- [`mdbase/tasknotes.task.completed.md`](mdbase/tasknotes.task.completed.md),
+  the event contract; and
+- [`schemas/tasknotes-task-completed.schema.json`](schemas/tasknotes-task-completed.schema.json),
+  its event-data schema.
 
 ## 12.2 The mental model
 
@@ -35,7 +44,7 @@ can implement and several applications can consume.
 
 ```text
 personal_task ─┐
-work_task ─────┼─ implements tasknotes.task 0.2.0 ── TaskNotes
+work_task ─────┼─ implements tasknotes.task 0.3.0-rc.1 ── TaskNotes
 issue_task ────┘                                  ├─ automation
                                                   └─ another task app
 ```
@@ -47,6 +56,12 @@ type because the contract does not choose storage, paths, or lifecycle policy.
 The contract version is an exact semantic version. For this draft it is also
 the tasknotes-spec version whose task semantics the contract exposes. There is
 no independent `x-tasknotes.version` or `spec_version` mirror.
+
+Record types use `implements` because they adapt persisted fields and semantic
+bindings to the `tasknotes.task` record contract. Event sources do not use a
+type file. A TaskNotes application instead registers an event-source
+declaration for `tasknotes.task.completed` with an active mdbase
+interoperability bridge.
 
 ## 12.3 Layering
 
@@ -73,7 +88,7 @@ An mdbase TaskNotes type declares one implementation:
 ```yaml
 implements:
   - contract: tasknotes.task
-    version: 0.2.0
+    version: 0.3.0-rc.1
     fields:
       title: summary
       status: state
@@ -231,7 +246,7 @@ be placed in the binding.
 ## 12.9 Multiple implementations
 
 A collection may contain any number of types implementing
-`tasknotes.task 0.2.0`. TaskNotes-aware readers MUST:
+`tasknotes.task 0.3.0-rc.1`. TaskNotes-aware readers MUST:
 
 1. resolve the exact local contract;
 2. enumerate every implementation in canonical type-name order;
@@ -250,7 +265,30 @@ silently added to an existing approval.
 Creation MUST name one concrete implementing type. If no type is selected,
 creation fails as ambiguous.
 
-## 12.10 Precedence and consistency
+## 12.10 Task-completed event
+
+An event source that claims `tasknotes.task.completed 1.0.0` MUST emit one
+CloudEvents structured event for each observed transition from a
+non-completed status to a completed status. Its `data` contains only:
+
+- `task_id`, using the stable TaskNotes ID when present and otherwise the
+  normalized path;
+- `task_path`;
+- the current `title` and completed `status`; and
+- `completed_at`, the instant when TaskNotes observed the transition.
+
+The event source MUST use the mdbase event/action interoperability profile
+`0.1`, pin the exact event-contract digest, and preserve any correlation and
+causation identifiers supplied by the mutation context. It MUST NOT include a
+complete task record merely because one is locally available. An authorized
+consumer can retrieve current state separately, avoiding stale snapshots and
+unnecessary disclosure.
+
+Contract compatibility and bridge authorization are independent. Installing
+TaskNotes or resolving this contract does not grant permission to publish or
+consume the event.
+
+## 12.11 Precedence and consistency
 
 The complete implementation is self-describing:
 
@@ -264,7 +302,7 @@ Where values intentionally mirror each other, producers MUST keep them equal.
 A TaskNotes-aware consumer MUST report a configuration error instead of
 silently choosing between contradictory values.
 
-## 12.11 Safe writes
+## 12.12 Safe writes
 
 TaskNotes-aware consumers MUST preserve:
 
@@ -279,7 +317,7 @@ Completion, recurrence mutation, occurrence materialization, dependency
 updates, time tracking, archive, and other domain operations MUST follow the
 TaskNotes semantics referenced by the binding.
 
-## 12.12 Complete custom-field example
+## 12.13 Complete custom-field example
 
 ```yaml
 ---
@@ -312,7 +350,7 @@ lifecycle:
       created_at: { now: true }
 implements:
   - contract: tasknotes.task
-    version: 0.2.0
+    version: 0.3.0-rc.1
     fields:
       title: summary
       status: state

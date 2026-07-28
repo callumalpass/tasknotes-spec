@@ -74,7 +74,7 @@ The runner locates the adapter module via the `TASKNOTES_ADAPTER` environment va
 export const metadata = {
   implementation: "my-tasknotes",
   version: "1.2.3",
-  spec_version: "0.2.0-draft",
+  spec_version: "0.3.0-rc.1",
   validation_modes: ["strict"],
   profiles: ["core-lite"],
   capabilities: [],

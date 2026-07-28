@@ -1,6 +1,6 @@
 {
   "name": "tasknotes-spec",
-  "version": "0.2.0",
+  "version": "0.3.0-rc.1",
   "description": "Specification and conformance fixtures for TaskNotes-compatible markdown task files.",
   "license": "MIT",
   "type": "module",
