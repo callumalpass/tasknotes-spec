@@ -25,10 +25,31 @@ test("publishes valid JSON Schemas for the portable task view, binding, and comp
 		validateTask({
 			title: "Ship contracts",
 			status: "open",
+			due: "2026-07-28",
+			scheduled: "2026-07-28T09:00:00+10:00",
 			dateCreated: "2026-07-28T09:00:00+10:00",
 		}),
 		true,
 		validateTask.errors
+	);
+	assert.equal(
+		validateTask({
+			status: "open",
+			due: "2026-07-28T17:00:00Z",
+			scheduled: "2026-07-28",
+			dateCreated: "2026-07-28T09:00:00Z",
+		}),
+		true,
+		validateTask.errors
+	);
+	assert.equal(
+		validateTask({
+			status: "open",
+			due: "2026-07-28 17:00",
+			dateCreated: "2026-07-28T09:00:00Z",
+		}),
+		false,
+		"due still rejects malformed datetimes"
 	);
 	assert.equal(validateTask({ status: "open" }), false);
 

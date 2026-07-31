@@ -11,8 +11,18 @@
 		"title": { "type": "string", "minLength": 1 },
 		"status": { "type": "string", "minLength": 1 },
 		"priority": { "type": "string", "minLength": 1 },
-		"due": { "type": "string", "format": "date" },
-		"scheduled": { "type": "string", "format": "date" },
+		"due": {
+			"anyOf": [
+				{ "type": "string", "format": "date" },
+				{ "type": "string", "format": "date-time" }
+			]
+		},
+		"scheduled": {
+			"anyOf": [
+				{ "type": "string", "format": "date" },
+				{ "type": "string", "format": "date-time" }
+			]
+		},
 		"contexts": {
 			"type": "array",
 			"items": { "type": "string" }
