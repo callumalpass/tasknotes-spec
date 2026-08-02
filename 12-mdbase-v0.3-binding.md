@@ -2,7 +2,7 @@
 
 **Status:** Draft
 
-**Record contract:** `tasknotes.task` `0.3.0-rc.2`
+**Record contract:** `tasknotes.task` `0.3.0-rc.3`
 
 **Event contract:** `tasknotes.task.completed` `1.0.0`
 
@@ -44,7 +44,7 @@ can implement and several applications can consume.
 
 ```text
 personal_task ─┐
-work_task ─────┼─ implements tasknotes.task 0.3.0-rc.2 ── TaskNotes
+work_task ─────┼─ implements tasknotes.task 0.3.0-rc.3 ── TaskNotes
 issue_task ────┘                                  ├─ automation
                                                   └─ another task app
 ```
@@ -88,7 +88,7 @@ An mdbase TaskNotes type declares one implementation:
 ```yaml
 implements:
   - contract: tasknotes.task
-    version: 0.3.0-rc.2
+    version: 0.3.0-rc.3
     fields:
       title: summary
       status: state
@@ -252,7 +252,7 @@ be placed in the binding.
 ## 12.9 Multiple implementations
 
 A collection may contain any number of types implementing
-`tasknotes.task 0.3.0-rc.2`. TaskNotes-aware readers MUST:
+`tasknotes.task 0.3.0-rc.3`. TaskNotes-aware readers MUST:
 
 1. resolve the exact local contract;
 2. enumerate every implementation in canonical type-name order;
@@ -356,7 +356,7 @@ lifecycle:
       created_at: { now: true }
 implements:
   - contract: tasknotes.task
-    version: 0.3.0-rc.2
+    version: 0.3.0-rc.3
     fields:
       title: summary
       status: state

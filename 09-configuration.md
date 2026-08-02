@@ -153,7 +153,7 @@ Required keys apply to the effective configuration after provider resolution.
 ## 9.5 spec_version behavior
 
 `spec_version` MUST be a semantic version string.
-Pre-release identifiers are valid (for example `0.3.0-rc.2`).
+Pre-release identifiers are valid (for example `0.3.0-rc.3`).
 
 Implementations in strict mode MUST reject unsupported major versions.
 
@@ -604,7 +604,7 @@ Rules:
 ## 9.19 Complete configuration example (`yaml_file` provider)
 
 ```yaml
-spec_version: 0.3.0-rc.2
+spec_version: 0.3.0-rc.3
 runtime_timezone: America/Los_Angeles
 
 mapping:
@@ -858,7 +858,7 @@ Default priority on create: `normal`.
 When neither `data.json` nor `tasknotes.yaml` is present, implementations MUST use the following effective configuration:
 
 ```yaml
-spec_version: 0.3.0-rc.2   # synthesized
+spec_version: 0.3.0-rc.3   # synthesized
 mapping:
   title: title
   status: status

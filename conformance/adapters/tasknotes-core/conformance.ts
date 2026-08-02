@@ -100,7 +100,7 @@ function getClaim() {
   return {
     implementation: conformanceMetadata.implementation,
     version: conformanceMetadata.version,
-    spec_version: "0.3.0-rc.2",
+    spec_version: "0.3.0-rc.3",
     profiles: [...conformanceMetadata.profiles],
     capabilities: [...conformanceMetadata.capabilities],
     validation_modes: ["strict"],
@@ -1342,7 +1342,7 @@ function executeMigrationReportSummary(input: unknown): Envelope {
   const filesChanged = typeof payload.files_changed === "number" ? payload.files_changed : 0;
   return envelopeOk({
     spec_version_from: "legacy",
-    spec_version_to: "0.3.0-rc.2",
+    spec_version_to: "0.3.0-rc.3",
     files_scanned: filesScanned,
     files_changed: filesChanged,
     warnings: isPlainObject(payload.warnings) ? payload.warnings : {},
@@ -1415,7 +1415,7 @@ function executeConfigSpecVersionEffective(input: unknown): Envelope {
     : "";
   const target = typeof payload.targetSpecVersion === "string" && payload.targetSpecVersion.trim().length > 0
     ? payload.targetSpecVersion.trim()
-    : "0.3.0-rc.2";
+    : "0.3.0-rc.3";
 
   if (provider.length > 0) {
     return envelopeOk({ value: provider, synthesized: false });

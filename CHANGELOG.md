@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.0-rc.3 - 2026-08-02
+
+- define manual ordering as an opaque string rank so clients can insert and
+  reorder tasks without renumbering an entire view
+
 ## 0.3.0-rc.2 - 2026-08-02
 
 - add first-class `attachments` as an ordered frontmatter list of portable file

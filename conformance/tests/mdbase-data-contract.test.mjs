@@ -52,6 +52,26 @@ test("publishes valid JSON Schemas for the portable task view, binding, and comp
 		"due still rejects malformed datetimes"
 	);
 	assert.equal(validateTask({ status: "open" }), false);
+	assert.equal(
+		validateTask({
+			title: "Ranked task",
+			status: "open",
+			dateCreated: "2026-08-02T09:00:00Z",
+			sortOrder: "a0V",
+		}),
+		true,
+		validateTask.errors
+	);
+	assert.equal(
+		validateTask({
+			title: "Legacy numeric rank",
+			status: "open",
+			dateCreated: "2026-08-02T09:00:00Z",
+			sortOrder: 1,
+		}),
+		false,
+		"manual order is an opaque string rank"
+	);
 
 	const binding = {
 		profiles: ["core-lite"],
@@ -117,7 +137,7 @@ test("the published contract uses one exact identity and the canonical schemas",
 	assert.match(contract, /^kind: mdbase\.contract$/m);
 	assert.match(contract, /^id: tasknotes\.task$/m);
 	assert.match(contract, /^contract_type: record$/m);
-	assert.match(contract, /^version: 0\.3\.0-rc\.2$/m);
+	assert.match(contract, /^version: 0\.3\.0-rc\.3$/m);
 	assert.match(contract, /^record_schema:$/m);
 	assert.match(contract, /ref: \.\.\/schemas\/tasknotes-task\.schema\.json/);
 	assert.match(
