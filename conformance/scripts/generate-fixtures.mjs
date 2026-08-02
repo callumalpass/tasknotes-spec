@@ -1592,10 +1592,10 @@ function buildConfigFixtures() {
   }
 
   const specVersionCases = [
-    { providerSpecVersion: "0.3.0-rc.2", targetSpecVersion: "0.3.0-rc.2", expected: "0.3.0-rc.2", synthesized: false },
-    { providerSpecVersion: "0.2.0", targetSpecVersion: "0.3.0-rc.2", expected: "0.2.0", synthesized: false },
-    { providerSpecVersion: undefined, targetSpecVersion: "0.3.0-rc.2", expected: "0.3.0-rc.2", synthesized: true },
-    { providerSpecVersion: "", targetSpecVersion: "0.3.0-rc.2", expected: "0.3.0-rc.2", synthesized: true },
+    { providerSpecVersion: "0.3.0-rc.3", targetSpecVersion: "0.3.0-rc.3", expected: "0.3.0-rc.3", synthesized: false },
+    { providerSpecVersion: "0.2.0", targetSpecVersion: "0.3.0-rc.3", expected: "0.2.0", synthesized: false },
+    { providerSpecVersion: undefined, targetSpecVersion: "0.3.0-rc.3", expected: "0.3.0-rc.3", synthesized: true },
+    { providerSpecVersion: "", targetSpecVersion: "0.3.0-rc.3", expected: "0.3.0-rc.3", synthesized: true },
     { providerSpecVersion: undefined, targetSpecVersion: "1.0.0", expected: "1.0.0", synthesized: true },
     { providerSpecVersion: "2.1.3", targetSpecVersion: "1.0.0", expected: "2.1.3", synthesized: false },
   ];

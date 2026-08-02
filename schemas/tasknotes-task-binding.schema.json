@@ -2,7 +2,7 @@
 	"$schema": "https://json-schema.org/draft/2020-12/schema",
 	"$id": "https://tasknotes.dev/schemas/tasknotes-task-binding.schema.json",
 	"title": "TaskNotes task data-contract binding",
-	"description": "Semantic configuration supplied by an mdbase type that implements tasknotes.task 0.3.0-rc.2.",
+	"description": "Semantic configuration supplied by an mdbase type that implements tasknotes.task 0.3.0-rc.3.",
 	"type": "object",
 	"required": [
 		"profiles",
