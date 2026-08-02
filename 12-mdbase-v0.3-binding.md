@@ -2,7 +2,7 @@
 
 **Status:** Draft
 
-**Record contract:** `tasknotes.task` `0.3.0-rc.1`
+**Record contract:** `tasknotes.task` `0.3.0-rc.2`
 
 **Event contract:** `tasknotes.task.completed` `1.0.0`
 
@@ -44,7 +44,7 @@ can implement and several applications can consume.
 
 ```text
 personal_task ─┐
-work_task ─────┼─ implements tasknotes.task 0.3.0-rc.1 ── TaskNotes
+work_task ─────┼─ implements tasknotes.task 0.3.0-rc.2 ── TaskNotes
 issue_task ────┘                                  ├─ automation
                                                   └─ another task app
 ```
@@ -88,7 +88,7 @@ An mdbase TaskNotes type declares one implementation:
 ```yaml
 implements:
   - contract: tasknotes.task
-    version: 0.3.0-rc.1
+    version: 0.3.0-rc.2
     fields:
       title: summary
       status: state
@@ -130,6 +130,7 @@ fields:
   title: summary
   status: state
   blockedBy: dependencies
+  attachments: files
 ```
 
 Every unconditionally required contract field MUST be mapped. Every mapped
@@ -165,6 +166,7 @@ snake-case tasknotes-spec counterparts include:
 | `occurrenceFutureHorizon` | `occurrence_future_horizon` |
 | `timeEntries` | `time_entries` |
 | `blockedBy` | `blocked_by` |
+| `attachments` | `attachments` |
 
 ## 12.6 Semantic profiles and capabilities
 
@@ -177,6 +179,7 @@ binding:
   capabilities:
     - dependencies
     - reminders
+    - attachments
     - links
     - time-tracking
     - materialized-occurrences
@@ -231,6 +234,9 @@ defined elsewhere in this specification:
 - `recurrence` follows §4;
 - `occurrences` follows §2.6.6, §4.18, §5.20, and §9.17;
 - `links` follows §11;
+- attachment membership is the portable `attachments` contract field; binary
+  MIME type, digest, byte size, revision, and timestamps remain authoritative
+  in mdbase file descriptors and are not projected into task frontmatter;
 - `archive` follows §5.12;
 - `time_tracking` follows §5.19 and §9.16;
 - `templating` follows §5.3.5 and §9.14; and
@@ -246,7 +252,7 @@ be placed in the binding.
 ## 12.9 Multiple implementations
 
 A collection may contain any number of types implementing
-`tasknotes.task 0.3.0-rc.1`. TaskNotes-aware readers MUST:
+`tasknotes.task 0.3.0-rc.2`. TaskNotes-aware readers MUST:
 
 1. resolve the exact local contract;
 2. enumerate every implementation in canonical type-name order;
@@ -350,7 +356,7 @@ lifecycle:
       created_at: { now: true }
 implements:
   - contract: tasknotes.task
-    version: 0.3.0-rc.1
+    version: 0.3.0-rc.2
     fields:
       title: summary
       status: state

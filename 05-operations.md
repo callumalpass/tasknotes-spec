@@ -361,6 +361,10 @@ Archive MUST NOT implicitly delete the task.
 
 Delete MUST remove the task file.
 
+Delete MUST NOT implicitly delete files referenced by `attachments`. An
+implementation MAY offer a separate, explicit cleanup action subject to
+§5.21.4.
+
 Optional safety behavior:
 
 - Implementations MAY perform backlink/dependency checks.
@@ -420,7 +424,7 @@ Implementation-native operation failures MUST provide structured error informati
 - message,
 - optional field/path context.
 
-For conformance adapter envelopes (§5.22), failures MAY be represented as a compact `error` string for transport compatibility, but implementations SHOULD also expose the structured fields (for example via `error_details`).
+For conformance adapter envelopes (§5.23), failures MAY be represented as a compact `error` string for transport compatibility, but implementations SHOULD also expose the structured fields (for example via `error_details`).
 
 ## 5.19 Time tracking management
 
@@ -554,9 +558,63 @@ In all cases, deleting or unmaterializing an occurrence MUST NOT silently delete
 
 If parent instance lists still refer to a deleted occurrence note's date, validators MAY report an orphan/cache warning such as `orphan_occurrence_note`.
 
-## 5.21 Operation examples
+## 5.21 Attachment operations
 
-### 5.21.1 Non-recurring complete
+These rules apply to implementations that support the `attachments`
+capability.
+
+### 5.21.1 Attach a file
+
+Attach MUST:
+
+1. durably write the binary to a collection path before publishing its task
+   reference;
+2. add one canonical reference to the mapped `attachments` list;
+3. preserve the existing list order and append new references by default;
+4. avoid duplicate normalized targets; and
+5. update `date_modified` only when membership changes.
+
+Binary write and task-frontmatter update are not assumed to be one atomic
+storage transaction. Implementations MUST make interrupted operations
+recoverable or idempotently retryable. If the binary write succeeds but the
+task update does not, the implementation MUST retain enough durable intent to
+retry or identify the unreferenced file for explicit cleanup.
+
+### 5.21.2 Detach a file
+
+Detach removes the matching reference from `attachments` and is idempotent.
+Detach MUST NOT delete the underlying file. It MUST preserve the relative order
+of all other references.
+
+### 5.21.3 Insert an attached file inline
+
+An implementation MAY offer an inline-insert operation. It MUST first satisfy
+attach semantics, then insert a Markdown link or embed into the task body.
+Removing that body markup MUST NOT detach the file; detaching MUST NOT silently
+rewrite body content unless the user explicitly requests both changes.
+
+### 5.21.4 Delete an attachment file
+
+Physical deletion MUST be a distinct, explicit action. Before deleting, an
+implementation MUST check resolvable task `attachments` lists and SHOULD check
+body links/embeds and other collection backlinks. If another reference exists,
+deletion MUST be rejected unless the caller explicitly chooses a force action
+whose affected references are disclosed.
+
+After a successful non-forced deletion, implementations MUST remove the
+current task's matching attachment reference. Failed deletion MUST leave
+frontmatter unchanged.
+
+### 5.21.5 Materialized occurrences
+
+When an occurrence note is materialized, it SHOULD inherit the parent task's
+attachment references in the same order. This copies references, not file
+bytes. Subsequent edits to either task's membership list are independent, and
+physical deletion remains governed by §5.21.4.
+
+## 5.22 Operation examples
+
+### 5.22.1 Non-recurring complete
 
 Before:
 
@@ -576,7 +634,7 @@ completedDate: 2026-02-20
 dateModified: 2026-02-20T09:05:00Z
 ```
 
-### 5.21.2 Recurring complete instance
+### 5.22.2 Recurring complete instance
 
 Before:
 
@@ -602,7 +660,7 @@ skippedInstances: []
 dateModified: 2026-02-20T08:10:00Z
 ```
 
-### 5.21.3 Recurring skip instance overriding completion
+### 5.22.3 Recurring skip instance overriding completion
 
 Before:
 
@@ -618,7 +676,7 @@ completeInstances: []
 skippedInstances: [2026-02-20]
 ```
 
-### 5.21.4 Preserve unknown fields on update
+### 5.22.4 Preserve unknown fields on update
 
 Before:
 
@@ -638,7 +696,7 @@ status: in-progress
 vendorTicket: ZX-42
 ```
 
-### 5.21.5 Add dependency
+### 5.22.5 Add dependency
 
 Before:
 
@@ -661,7 +719,7 @@ blockedBy:
     reltype: FINISHTOSTART
 ```
 
-### 5.21.6 Add reminder
+### 5.22.6 Add reminder
 
 Before:
 
@@ -688,7 +746,7 @@ reminders:
     offset: -PT1H
 ```
 
-## 5.22 Conformance operation interface
+## 5.23 Conformance operation interface
 
 The conformance suite exercises operations via the `execute(operation, input) → envelope` interface defined in the adapter contract. This section specifies the input/output contracts for each conformance-testable operation name.
 

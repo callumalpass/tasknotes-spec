@@ -240,6 +240,32 @@
     "operation": "field.default_mapping",
     "assertion": "envelope_equals",
     "input": {
+      "checkRole": "attachments"
+    },
+    "expect": {
+      "ok": true,
+      "result": {
+        "roleToField": {
+          "$contains": {
+            "attachments": "attachments"
+          }
+        },
+        "fieldToRole": {
+          "$contains": {
+            "attachments": "attachments"
+          }
+        },
+        "displayNameKey": "title"
+      }
+    }
+  },
+  {
+    "id": "field.0011",
+    "section": "§2",
+    "profile": "core-lite",
+    "operation": "field.default_mapping",
+    "assertion": "envelope_equals",
+    "input": {
       "checkRole": "timeEstimate"
     },
     "expect": {
@@ -260,7 +286,7 @@
     }
   },
   {
-    "id": "field.0011",
+    "id": "field.0012",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.default_mapping",
@@ -286,7 +312,7 @@
     }
   },
   {
-    "id": "field.0012",
+    "id": "field.0013",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.default_mapping",
@@ -312,7 +338,7 @@
     }
   },
   {
-    "id": "field.0013",
+    "id": "field.0014",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.default_mapping",
@@ -338,7 +364,7 @@
     }
   },
   {
-    "id": "field.0014",
+    "id": "field.0015",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.default_mapping",
@@ -364,7 +390,7 @@
     }
   },
   {
-    "id": "field.0015",
+    "id": "field.0016",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.default_mapping",
@@ -390,7 +416,7 @@
     }
   },
   {
-    "id": "field.0016",
+    "id": "field.0017",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.default_mapping",
@@ -416,7 +442,7 @@
     }
   },
   {
-    "id": "field.0017",
+    "id": "field.0018",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.default_mapping",
@@ -442,7 +468,7 @@
     }
   },
   {
-    "id": "field.0018",
+    "id": "field.0019",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -484,6 +510,10 @@
         "custom_projects": {
           "type": "string",
           "tn_role": "projects"
+        },
+        "custom_attachments": {
+          "type": "string",
+          "tn_role": "attachments"
         },
         "custom_timeEstimate": {
           "type": "string",
@@ -539,7 +569,7 @@
     }
   },
   {
-    "id": "field.0019",
+    "id": "field.0020",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -581,6 +611,10 @@
         "custom_projects": {
           "type": "string",
           "tn_role": "projects"
+        },
+        "custom_attachments": {
+          "type": "string",
+          "tn_role": "attachments"
         },
         "custom_timeEstimate": {
           "type": "string",
@@ -636,7 +670,7 @@
     }
   },
   {
-    "id": "field.0020",
+    "id": "field.0021",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -678,6 +712,10 @@
         "custom_projects": {
           "type": "string",
           "tn_role": "projects"
+        },
+        "custom_attachments": {
+          "type": "string",
+          "tn_role": "attachments"
         },
         "custom_timeEstimate": {
           "type": "string",
@@ -733,7 +771,7 @@
     }
   },
   {
-    "id": "field.0021",
+    "id": "field.0022",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -775,6 +813,10 @@
         "custom_projects": {
           "type": "string",
           "tn_role": "projects"
+        },
+        "custom_attachments": {
+          "type": "string",
+          "tn_role": "attachments"
         },
         "custom_timeEstimate": {
           "type": "string",
@@ -830,7 +872,7 @@
     }
   },
   {
-    "id": "field.0022",
+    "id": "field.0023",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -872,6 +914,10 @@
         "custom_projects": {
           "type": "string",
           "tn_role": "projects"
+        },
+        "custom_attachments": {
+          "type": "string",
+          "tn_role": "attachments"
         },
         "custom_timeEstimate": {
           "type": "string",
@@ -927,7 +973,7 @@
     }
   },
   {
-    "id": "field.0023",
+    "id": "field.0024",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -969,6 +1015,10 @@
         "custom_projects": {
           "type": "string",
           "tn_role": "projects"
+        },
+        "custom_attachments": {
+          "type": "string",
+          "tn_role": "attachments"
         },
         "custom_timeEstimate": {
           "type": "string",
@@ -1024,7 +1074,7 @@
     }
   },
   {
-    "id": "field.0024",
+    "id": "field.0025",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -1066,6 +1116,10 @@
         "custom_projects": {
           "type": "string",
           "tn_role": "projects"
+        },
+        "custom_attachments": {
+          "type": "string",
+          "tn_role": "attachments"
         },
         "custom_timeEstimate": {
           "type": "string",
@@ -1121,7 +1175,7 @@
     }
   },
   {
-    "id": "field.0025",
+    "id": "field.0026",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -1163,6 +1217,10 @@
         "custom_projects": {
           "type": "string",
           "tn_role": "projects"
+        },
+        "custom_attachments": {
+          "type": "string",
+          "tn_role": "attachments"
         },
         "custom_timeEstimate": {
           "type": "string",
@@ -1218,7 +1276,7 @@
     }
   },
   {
-    "id": "field.0026",
+    "id": "field.0027",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -1260,6 +1318,10 @@
         "custom_projects": {
           "type": "string",
           "tn_role": "projects"
+        },
+        "custom_attachments": {
+          "type": "string",
+          "tn_role": "attachments"
         },
         "custom_timeEstimate": {
           "type": "string",
@@ -1315,7 +1377,7 @@
     }
   },
   {
-    "id": "field.0027",
+    "id": "field.0028",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -1357,6 +1419,111 @@
         "custom_projects": {
           "type": "string",
           "tn_role": "projects"
+        },
+        "custom_attachments": {
+          "type": "string",
+          "tn_role": "attachments"
+        },
+        "custom_timeEstimate": {
+          "type": "string",
+          "tn_role": "timeEstimate"
+        },
+        "custom_dateCreated": {
+          "type": "string",
+          "tn_role": "dateCreated"
+        },
+        "custom_dateModified": {
+          "type": "string",
+          "tn_role": "dateModified"
+        },
+        "custom_recurrence": {
+          "type": "string",
+          "tn_role": "recurrence"
+        },
+        "custom_recurrenceAnchor": {
+          "type": "string",
+          "tn_role": "recurrenceAnchor"
+        },
+        "custom_completeInstances": {
+          "type": "string",
+          "tn_role": "completeInstances"
+        },
+        "custom_skippedInstances": {
+          "type": "string",
+          "tn_role": "skippedInstances"
+        },
+        "custom_timeEntries": {
+          "type": "string",
+          "tn_role": "timeEntries"
+        }
+      },
+      "displayNameKey": "custom_title",
+      "checkRole": "attachments"
+    },
+    "expect": {
+      "ok": true,
+      "result": {
+        "roleToField": {
+          "$contains": {
+            "attachments": "custom_attachments"
+          }
+        },
+        "fieldToRole": {
+          "$contains": {
+            "custom_attachments": "attachments"
+          }
+        },
+        "displayNameKey": "custom_title"
+      }
+    }
+  },
+  {
+    "id": "field.0029",
+    "section": "§2",
+    "profile": "core-lite",
+    "operation": "field.build_mapping",
+    "assertion": "envelope_equals",
+    "input": {
+      "fields": {
+        "custom_title": {
+          "type": "string",
+          "tn_role": "title"
+        },
+        "custom_status": {
+          "type": "string",
+          "tn_role": "status"
+        },
+        "custom_priority": {
+          "type": "string",
+          "tn_role": "priority"
+        },
+        "custom_due": {
+          "type": "string",
+          "tn_role": "due"
+        },
+        "custom_scheduled": {
+          "type": "string",
+          "tn_role": "scheduled"
+        },
+        "custom_completedDate": {
+          "type": "string",
+          "tn_role": "completedDate"
+        },
+        "custom_tags": {
+          "type": "string",
+          "tn_role": "tags"
+        },
+        "custom_contexts": {
+          "type": "string",
+          "tn_role": "contexts"
+        },
+        "custom_projects": {
+          "type": "string",
+          "tn_role": "projects"
+        },
+        "custom_attachments": {
+          "type": "string",
+          "tn_role": "attachments"
         },
         "custom_timeEstimate": {
           "type": "string",
@@ -1412,7 +1579,7 @@
     }
   },
   {
-    "id": "field.0028",
+    "id": "field.0030",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -1454,6 +1621,10 @@
         "custom_projects": {
           "type": "string",
           "tn_role": "projects"
+        },
+        "custom_attachments": {
+          "type": "string",
+          "tn_role": "attachments"
         },
         "custom_timeEstimate": {
           "type": "string",
@@ -1509,7 +1680,7 @@
     }
   },
   {
-    "id": "field.0029",
+    "id": "field.0031",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -1551,6 +1722,10 @@
         "custom_projects": {
           "type": "string",
           "tn_role": "projects"
+        },
+        "custom_attachments": {
+          "type": "string",
+          "tn_role": "attachments"
         },
         "custom_timeEstimate": {
           "type": "string",
@@ -1606,7 +1781,7 @@
     }
   },
   {
-    "id": "field.0030",
+    "id": "field.0032",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -1648,6 +1823,10 @@
         "custom_projects": {
           "type": "string",
           "tn_role": "projects"
+        },
+        "custom_attachments": {
+          "type": "string",
+          "tn_role": "attachments"
         },
         "custom_timeEstimate": {
           "type": "string",
@@ -1703,7 +1882,7 @@
     }
   },
   {
-    "id": "field.0031",
+    "id": "field.0033",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -1745,6 +1924,10 @@
         "custom_projects": {
           "type": "string",
           "tn_role": "projects"
+        },
+        "custom_attachments": {
+          "type": "string",
+          "tn_role": "attachments"
         },
         "custom_timeEstimate": {
           "type": "string",
@@ -1800,7 +1983,7 @@
     }
   },
   {
-    "id": "field.0032",
+    "id": "field.0034",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -1842,6 +2025,10 @@
         "custom_projects": {
           "type": "string",
           "tn_role": "projects"
+        },
+        "custom_attachments": {
+          "type": "string",
+          "tn_role": "attachments"
         },
         "custom_timeEstimate": {
           "type": "string",
@@ -1897,7 +2084,7 @@
     }
   },
   {
-    "id": "field.0033",
+    "id": "field.0035",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -1939,6 +2126,10 @@
         "custom_projects": {
           "type": "string",
           "tn_role": "projects"
+        },
+        "custom_attachments": {
+          "type": "string",
+          "tn_role": "attachments"
         },
         "custom_timeEstimate": {
           "type": "string",
@@ -1994,7 +2185,7 @@
     }
   },
   {
-    "id": "field.0034",
+    "id": "field.0036",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -2036,6 +2227,10 @@
         "custom_projects": {
           "type": "string",
           "tn_role": "projects"
+        },
+        "custom_attachments": {
+          "type": "string",
+          "tn_role": "attachments"
         },
         "custom_timeEstimate": {
           "type": "string",
@@ -2091,7 +2286,7 @@
     }
   },
   {
-    "id": "field.0035",
+    "id": "field.0037",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -2134,7 +2329,7 @@
     }
   },
   {
-    "id": "field.0036",
+    "id": "field.0038",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -2177,7 +2372,7 @@
     }
   },
   {
-    "id": "field.0037",
+    "id": "field.0039",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -2220,7 +2415,7 @@
     }
   },
   {
-    "id": "field.0038",
+    "id": "field.0040",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -2263,7 +2458,7 @@
     }
   },
   {
-    "id": "field.0039",
+    "id": "field.0041",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -2306,7 +2501,7 @@
     }
   },
   {
-    "id": "field.0040",
+    "id": "field.0042",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -2349,7 +2544,7 @@
     }
   },
   {
-    "id": "field.0041",
+    "id": "field.0043",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -2387,7 +2582,7 @@
     }
   },
   {
-    "id": "field.0042",
+    "id": "field.0044",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -2417,7 +2612,7 @@
     }
   },
   {
-    "id": "field.0043",
+    "id": "field.0045",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -2446,7 +2641,7 @@
     }
   },
   {
-    "id": "field.0044",
+    "id": "field.0046",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.is_completed_status",
@@ -2477,7 +2672,7 @@
     }
   },
   {
-    "id": "field.0045",
+    "id": "field.0047",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.is_completed_status",
@@ -2508,7 +2703,7 @@
     }
   },
   {
-    "id": "field.0046",
+    "id": "field.0048",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.is_completed_status",
@@ -2539,7 +2734,7 @@
     }
   },
   {
-    "id": "field.0047",
+    "id": "field.0049",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.is_completed_status",
@@ -2567,7 +2762,7 @@
     }
   },
   {
-    "id": "field.0048",
+    "id": "field.0050",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.is_completed_status",
@@ -2595,7 +2790,7 @@
     }
   },
   {
-    "id": "field.0049",
+    "id": "field.0051",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.is_completed_status",
@@ -2623,7 +2818,7 @@
     }
   },
   {
-    "id": "field.0050",
+    "id": "field.0052",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.is_completed_status",
@@ -2650,7 +2845,7 @@
     }
   },
   {
-    "id": "field.0051",
+    "id": "field.0053",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.is_completed_status",
@@ -2677,7 +2872,7 @@
     }
   },
   {
-    "id": "field.0052",
+    "id": "field.0054",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.is_completed_status",
@@ -2704,7 +2899,7 @@
     }
   },
   {
-    "id": "field.0053",
+    "id": "field.0055",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.default_completed_status",
@@ -2734,7 +2929,7 @@
     }
   },
   {
-    "id": "field.0054",
+    "id": "field.0056",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.default_completed_status",
@@ -2761,7 +2956,7 @@
     }
   },
   {
-    "id": "field.0055",
+    "id": "field.0057",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.default_completed_status",
@@ -2783,140 +2978,6 @@
       "ok": true,
       "result": {
         "value": "done"
-      }
-    }
-  },
-  {
-    "id": "field.0056",
-    "section": "§2",
-    "profile": "core-lite",
-    "operation": "field.normalize",
-    "assertion": "envelope_equals",
-    "input": {
-      "fields": {
-        "myTitle": {
-          "tn_role": "title"
-        },
-        "myStatus": {
-          "tn_role": "status"
-        },
-        "myDue": {
-          "tn_role": "due"
-        },
-        "myTags": {
-          "tn_role": "tags"
-        },
-        "myContexts": {
-          "tn_role": "contexts"
-        },
-        "myProjects": {
-          "tn_role": "projects"
-        },
-        "myCreated": {
-          "tn_role": "dateCreated"
-        },
-        "myModified": {
-          "tn_role": "dateModified"
-        }
-      },
-      "frontmatter": {
-        "myTitle": "Plan workshop",
-        "myStatus": "open",
-        "myDue": "2026-02-20",
-        "myTags": [
-          "work",
-          "planning"
-        ],
-        "myContexts": [
-          "office"
-        ],
-        "myProjects": [
-          "[[projects/demo]]"
-        ],
-        "myCreated": "2026-02-19T10:00:00Z",
-        "myModified": "2026-02-19T10:05:00Z",
-        "vendorField": "ZX-42",
-        "nested": {
-          "a": 1
-        }
-      },
-      "checkKey": "title"
-    },
-    "expect": {
-      "ok": true,
-      "result": {
-        "normalized": {
-          "$contains": {
-            "title": "Plan workshop"
-          }
-        }
-      }
-    }
-  },
-  {
-    "id": "field.0057",
-    "section": "§2",
-    "profile": "core-lite",
-    "operation": "field.normalize",
-    "assertion": "envelope_equals",
-    "input": {
-      "fields": {
-        "myTitle": {
-          "tn_role": "title"
-        },
-        "myStatus": {
-          "tn_role": "status"
-        },
-        "myDue": {
-          "tn_role": "due"
-        },
-        "myTags": {
-          "tn_role": "tags"
-        },
-        "myContexts": {
-          "tn_role": "contexts"
-        },
-        "myProjects": {
-          "tn_role": "projects"
-        },
-        "myCreated": {
-          "tn_role": "dateCreated"
-        },
-        "myModified": {
-          "tn_role": "dateModified"
-        }
-      },
-      "frontmatter": {
-        "myTitle": "Plan workshop",
-        "myStatus": "open",
-        "myDue": "2026-02-20",
-        "myTags": [
-          "work",
-          "planning"
-        ],
-        "myContexts": [
-          "office"
-        ],
-        "myProjects": [
-          "[[projects/demo]]"
-        ],
-        "myCreated": "2026-02-19T10:00:00Z",
-        "myModified": "2026-02-19T10:05:00Z",
-        "vendorField": "ZX-42",
-        "nested": {
-          "a": 1
-        }
-      },
-      "checkKey": "status"
-    },
-    "expect": {
-      "ok": true,
-      "result": {
-        "normalized": {
-          "$contains": {
-            "status": "open"
-          }
-        }
       }
     }
   },
@@ -2946,6 +3007,9 @@
         "myProjects": {
           "tn_role": "projects"
         },
+        "myAttachments": {
+          "tn_role": "attachments"
+        },
         "myCreated": {
           "tn_role": "dateCreated"
         },
@@ -2967,6 +3031,9 @@
         "myProjects": [
           "[[projects/demo]]"
         ],
+        "myAttachments": [
+          "[[Attachments/brief.png]]"
+        ],
         "myCreated": "2026-02-19T10:00:00Z",
         "myModified": "2026-02-19T10:05:00Z",
         "vendorField": "ZX-42",
@@ -2974,14 +3041,14 @@
           "a": 1
         }
       },
-      "checkKey": "due"
+      "checkKey": "title"
     },
     "expect": {
       "ok": true,
       "result": {
         "normalized": {
           "$contains": {
-            "due": "2026-02-20"
+            "title": "Plan workshop"
           }
         }
       }
@@ -3013,6 +3080,9 @@
         "myProjects": {
           "tn_role": "projects"
         },
+        "myAttachments": {
+          "tn_role": "attachments"
+        },
         "myCreated": {
           "tn_role": "dateCreated"
         },
@@ -3034,6 +3104,9 @@
         "myProjects": [
           "[[projects/demo]]"
         ],
+        "myAttachments": [
+          "[[Attachments/brief.png]]"
+        ],
         "myCreated": "2026-02-19T10:00:00Z",
         "myModified": "2026-02-19T10:05:00Z",
         "vendorField": "ZX-42",
@@ -3041,14 +3114,14 @@
           "a": 1
         }
       },
-      "checkKey": "dateCreated"
+      "checkKey": "status"
     },
     "expect": {
       "ok": true,
       "result": {
         "normalized": {
           "$contains": {
-            "dateCreated": "2026-02-19T10:00:00Z"
+            "status": "open"
           }
         }
       }
@@ -3080,6 +3153,9 @@
         "myProjects": {
           "tn_role": "projects"
         },
+        "myAttachments": {
+          "tn_role": "attachments"
+        },
         "myCreated": {
           "tn_role": "dateCreated"
         },
@@ -3101,6 +3177,9 @@
         "myProjects": [
           "[[projects/demo]]"
         ],
+        "myAttachments": [
+          "[[Attachments/brief.png]]"
+        ],
         "myCreated": "2026-02-19T10:00:00Z",
         "myModified": "2026-02-19T10:05:00Z",
         "vendorField": "ZX-42",
@@ -3108,14 +3187,14 @@
           "a": 1
         }
       },
-      "checkKey": "dateModified"
+      "checkKey": "due"
     },
     "expect": {
       "ok": true,
       "result": {
         "normalized": {
           "$contains": {
-            "dateModified": "2026-02-19T10:05:00Z"
+            "due": "2026-02-20"
           }
         }
       }
@@ -3147,6 +3226,9 @@
         "myProjects": {
           "tn_role": "projects"
         },
+        "myAttachments": {
+          "tn_role": "attachments"
+        },
         "myCreated": {
           "tn_role": "dateCreated"
         },
@@ -3168,6 +3250,230 @@
         "myProjects": [
           "[[projects/demo]]"
         ],
+        "myAttachments": [
+          "[[Attachments/brief.png]]"
+        ],
+        "myCreated": "2026-02-19T10:00:00Z",
+        "myModified": "2026-02-19T10:05:00Z",
+        "vendorField": "ZX-42",
+        "nested": {
+          "a": 1
+        }
+      },
+      "checkKey": "dateCreated"
+    },
+    "expect": {
+      "ok": true,
+      "result": {
+        "normalized": {
+          "$contains": {
+            "dateCreated": "2026-02-19T10:00:00Z"
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": "field.0062",
+    "section": "§2",
+    "profile": "core-lite",
+    "operation": "field.normalize",
+    "assertion": "envelope_equals",
+    "input": {
+      "fields": {
+        "myTitle": {
+          "tn_role": "title"
+        },
+        "myStatus": {
+          "tn_role": "status"
+        },
+        "myDue": {
+          "tn_role": "due"
+        },
+        "myTags": {
+          "tn_role": "tags"
+        },
+        "myContexts": {
+          "tn_role": "contexts"
+        },
+        "myProjects": {
+          "tn_role": "projects"
+        },
+        "myAttachments": {
+          "tn_role": "attachments"
+        },
+        "myCreated": {
+          "tn_role": "dateCreated"
+        },
+        "myModified": {
+          "tn_role": "dateModified"
+        }
+      },
+      "frontmatter": {
+        "myTitle": "Plan workshop",
+        "myStatus": "open",
+        "myDue": "2026-02-20",
+        "myTags": [
+          "work",
+          "planning"
+        ],
+        "myContexts": [
+          "office"
+        ],
+        "myProjects": [
+          "[[projects/demo]]"
+        ],
+        "myAttachments": [
+          "[[Attachments/brief.png]]"
+        ],
+        "myCreated": "2026-02-19T10:00:00Z",
+        "myModified": "2026-02-19T10:05:00Z",
+        "vendorField": "ZX-42",
+        "nested": {
+          "a": 1
+        }
+      },
+      "checkKey": "dateModified"
+    },
+    "expect": {
+      "ok": true,
+      "result": {
+        "normalized": {
+          "$contains": {
+            "dateModified": "2026-02-19T10:05:00Z"
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": "field.0063",
+    "section": "§2",
+    "profile": "core-lite",
+    "operation": "field.normalize",
+    "assertion": "envelope_equals",
+    "input": {
+      "fields": {
+        "myTitle": {
+          "tn_role": "title"
+        },
+        "myStatus": {
+          "tn_role": "status"
+        },
+        "myDue": {
+          "tn_role": "due"
+        },
+        "myTags": {
+          "tn_role": "tags"
+        },
+        "myContexts": {
+          "tn_role": "contexts"
+        },
+        "myProjects": {
+          "tn_role": "projects"
+        },
+        "myAttachments": {
+          "tn_role": "attachments"
+        },
+        "myCreated": {
+          "tn_role": "dateCreated"
+        },
+        "myModified": {
+          "tn_role": "dateModified"
+        }
+      },
+      "frontmatter": {
+        "myTitle": "Plan workshop",
+        "myStatus": "open",
+        "myDue": "2026-02-20",
+        "myTags": [
+          "work",
+          "planning"
+        ],
+        "myContexts": [
+          "office"
+        ],
+        "myProjects": [
+          "[[projects/demo]]"
+        ],
+        "myAttachments": [
+          "[[Attachments/brief.png]]"
+        ],
+        "myCreated": "2026-02-19T10:00:00Z",
+        "myModified": "2026-02-19T10:05:00Z",
+        "vendorField": "ZX-42",
+        "nested": {
+          "a": 1
+        }
+      },
+      "checkKey": "attachments"
+    },
+    "expect": {
+      "ok": true,
+      "result": {
+        "normalized": {
+          "$contains": {
+            "attachments": [
+              "[[Attachments/brief.png]]"
+            ]
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": "field.0064",
+    "section": "§2",
+    "profile": "core-lite",
+    "operation": "field.normalize",
+    "assertion": "envelope_equals",
+    "input": {
+      "fields": {
+        "myTitle": {
+          "tn_role": "title"
+        },
+        "myStatus": {
+          "tn_role": "status"
+        },
+        "myDue": {
+          "tn_role": "due"
+        },
+        "myTags": {
+          "tn_role": "tags"
+        },
+        "myContexts": {
+          "tn_role": "contexts"
+        },
+        "myProjects": {
+          "tn_role": "projects"
+        },
+        "myAttachments": {
+          "tn_role": "attachments"
+        },
+        "myCreated": {
+          "tn_role": "dateCreated"
+        },
+        "myModified": {
+          "tn_role": "dateModified"
+        }
+      },
+      "frontmatter": {
+        "myTitle": "Plan workshop",
+        "myStatus": "open",
+        "myDue": "2026-02-20",
+        "myTags": [
+          "work",
+          "planning"
+        ],
+        "myContexts": [
+          "office"
+        ],
+        "myProjects": [
+          "[[projects/demo]]"
+        ],
+        "myAttachments": [
+          "[[Attachments/brief.png]]"
+        ],
         "myCreated": "2026-02-19T10:00:00Z",
         "myModified": "2026-02-19T10:05:00Z",
         "vendorField": "ZX-42",
@@ -3183,198 +3489,6 @@
         "normalized": {
           "$contains": {
             "vendorField": "ZX-42"
-          }
-        }
-      }
-    }
-  },
-  {
-    "id": "field.0062",
-    "section": "§2",
-    "profile": "core-lite",
-    "operation": "field.denormalize",
-    "assertion": "envelope_equals",
-    "input": {
-      "fields": {
-        "myTitle": {
-          "tn_role": "title"
-        },
-        "myStatus": {
-          "tn_role": "status"
-        },
-        "myDue": {
-          "tn_role": "due"
-        },
-        "myTags": {
-          "tn_role": "tags"
-        },
-        "myContexts": {
-          "tn_role": "contexts"
-        },
-        "myProjects": {
-          "tn_role": "projects"
-        },
-        "myCreated": {
-          "tn_role": "dateCreated"
-        },
-        "myModified": {
-          "tn_role": "dateModified"
-        }
-      },
-      "roleData": {
-        "title": "Plan workshop",
-        "status": "open",
-        "due": "2026-02-20",
-        "tags": [
-          "work",
-          "planning"
-        ],
-        "contexts": [
-          "office"
-        ],
-        "projects": [
-          "[[projects/demo]]"
-        ],
-        "dateCreated": "2026-02-19T10:00:00Z",
-        "dateModified": "2026-02-19T10:05:00Z",
-        "vendorField": "ZX-42"
-      },
-      "checkKey": "myTitle"
-    },
-    "expect": {
-      "ok": true,
-      "result": {
-        "denormalized": {
-          "$contains": {
-            "myTitle": "Plan workshop"
-          }
-        }
-      }
-    }
-  },
-  {
-    "id": "field.0063",
-    "section": "§2",
-    "profile": "core-lite",
-    "operation": "field.denormalize",
-    "assertion": "envelope_equals",
-    "input": {
-      "fields": {
-        "myTitle": {
-          "tn_role": "title"
-        },
-        "myStatus": {
-          "tn_role": "status"
-        },
-        "myDue": {
-          "tn_role": "due"
-        },
-        "myTags": {
-          "tn_role": "tags"
-        },
-        "myContexts": {
-          "tn_role": "contexts"
-        },
-        "myProjects": {
-          "tn_role": "projects"
-        },
-        "myCreated": {
-          "tn_role": "dateCreated"
-        },
-        "myModified": {
-          "tn_role": "dateModified"
-        }
-      },
-      "roleData": {
-        "title": "Plan workshop",
-        "status": "open",
-        "due": "2026-02-20",
-        "tags": [
-          "work",
-          "planning"
-        ],
-        "contexts": [
-          "office"
-        ],
-        "projects": [
-          "[[projects/demo]]"
-        ],
-        "dateCreated": "2026-02-19T10:00:00Z",
-        "dateModified": "2026-02-19T10:05:00Z",
-        "vendorField": "ZX-42"
-      },
-      "checkKey": "myStatus"
-    },
-    "expect": {
-      "ok": true,
-      "result": {
-        "denormalized": {
-          "$contains": {
-            "myStatus": "open"
-          }
-        }
-      }
-    }
-  },
-  {
-    "id": "field.0064",
-    "section": "§2",
-    "profile": "core-lite",
-    "operation": "field.denormalize",
-    "assertion": "envelope_equals",
-    "input": {
-      "fields": {
-        "myTitle": {
-          "tn_role": "title"
-        },
-        "myStatus": {
-          "tn_role": "status"
-        },
-        "myDue": {
-          "tn_role": "due"
-        },
-        "myTags": {
-          "tn_role": "tags"
-        },
-        "myContexts": {
-          "tn_role": "contexts"
-        },
-        "myProjects": {
-          "tn_role": "projects"
-        },
-        "myCreated": {
-          "tn_role": "dateCreated"
-        },
-        "myModified": {
-          "tn_role": "dateModified"
-        }
-      },
-      "roleData": {
-        "title": "Plan workshop",
-        "status": "open",
-        "due": "2026-02-20",
-        "tags": [
-          "work",
-          "planning"
-        ],
-        "contexts": [
-          "office"
-        ],
-        "projects": [
-          "[[projects/demo]]"
-        ],
-        "dateCreated": "2026-02-19T10:00:00Z",
-        "dateModified": "2026-02-19T10:05:00Z",
-        "vendorField": "ZX-42"
-      },
-      "checkKey": "myDue"
-    },
-    "expect": {
-      "ok": true,
-      "result": {
-        "denormalized": {
-          "$contains": {
-            "myDue": "2026-02-20"
           }
         }
       }
@@ -3406,6 +3520,9 @@
         "myProjects": {
           "tn_role": "projects"
         },
+        "myAttachments": {
+          "tn_role": "attachments"
+        },
         "myCreated": {
           "tn_role": "dateCreated"
         },
@@ -3427,18 +3544,21 @@
         "projects": [
           "[[projects/demo]]"
         ],
+        "attachments": [
+          "[[Attachments/brief.png]]"
+        ],
         "dateCreated": "2026-02-19T10:00:00Z",
         "dateModified": "2026-02-19T10:05:00Z",
         "vendorField": "ZX-42"
       },
-      "checkKey": "myCreated"
+      "checkKey": "myTitle"
     },
     "expect": {
       "ok": true,
       "result": {
         "denormalized": {
           "$contains": {
-            "myCreated": "2026-02-19T10:00:00Z"
+            "myTitle": "Plan workshop"
           }
         }
       }
@@ -3470,6 +3590,9 @@
         "myProjects": {
           "tn_role": "projects"
         },
+        "myAttachments": {
+          "tn_role": "attachments"
+        },
         "myCreated": {
           "tn_role": "dateCreated"
         },
@@ -3491,18 +3614,21 @@
         "projects": [
           "[[projects/demo]]"
         ],
+        "attachments": [
+          "[[Attachments/brief.png]]"
+        ],
         "dateCreated": "2026-02-19T10:00:00Z",
         "dateModified": "2026-02-19T10:05:00Z",
         "vendorField": "ZX-42"
       },
-      "checkKey": "myModified"
+      "checkKey": "myStatus"
     },
     "expect": {
       "ok": true,
       "result": {
         "denormalized": {
           "$contains": {
-            "myModified": "2026-02-19T10:05:00Z"
+            "myStatus": "open"
           }
         }
       }
@@ -3534,6 +3660,9 @@
         "myProjects": {
           "tn_role": "projects"
         },
+        "myAttachments": {
+          "tn_role": "attachments"
+        },
         "myCreated": {
           "tn_role": "dateCreated"
         },
@@ -3555,6 +3684,219 @@
         "projects": [
           "[[projects/demo]]"
         ],
+        "attachments": [
+          "[[Attachments/brief.png]]"
+        ],
+        "dateCreated": "2026-02-19T10:00:00Z",
+        "dateModified": "2026-02-19T10:05:00Z",
+        "vendorField": "ZX-42"
+      },
+      "checkKey": "myDue"
+    },
+    "expect": {
+      "ok": true,
+      "result": {
+        "denormalized": {
+          "$contains": {
+            "myDue": "2026-02-20"
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": "field.0068",
+    "section": "§2",
+    "profile": "core-lite",
+    "operation": "field.denormalize",
+    "assertion": "envelope_equals",
+    "input": {
+      "fields": {
+        "myTitle": {
+          "tn_role": "title"
+        },
+        "myStatus": {
+          "tn_role": "status"
+        },
+        "myDue": {
+          "tn_role": "due"
+        },
+        "myTags": {
+          "tn_role": "tags"
+        },
+        "myContexts": {
+          "tn_role": "contexts"
+        },
+        "myProjects": {
+          "tn_role": "projects"
+        },
+        "myAttachments": {
+          "tn_role": "attachments"
+        },
+        "myCreated": {
+          "tn_role": "dateCreated"
+        },
+        "myModified": {
+          "tn_role": "dateModified"
+        }
+      },
+      "roleData": {
+        "title": "Plan workshop",
+        "status": "open",
+        "due": "2026-02-20",
+        "tags": [
+          "work",
+          "planning"
+        ],
+        "contexts": [
+          "office"
+        ],
+        "projects": [
+          "[[projects/demo]]"
+        ],
+        "attachments": [
+          "[[Attachments/brief.png]]"
+        ],
+        "dateCreated": "2026-02-19T10:00:00Z",
+        "dateModified": "2026-02-19T10:05:00Z",
+        "vendorField": "ZX-42"
+      },
+      "checkKey": "myCreated"
+    },
+    "expect": {
+      "ok": true,
+      "result": {
+        "denormalized": {
+          "$contains": {
+            "myCreated": "2026-02-19T10:00:00Z"
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": "field.0069",
+    "section": "§2",
+    "profile": "core-lite",
+    "operation": "field.denormalize",
+    "assertion": "envelope_equals",
+    "input": {
+      "fields": {
+        "myTitle": {
+          "tn_role": "title"
+        },
+        "myStatus": {
+          "tn_role": "status"
+        },
+        "myDue": {
+          "tn_role": "due"
+        },
+        "myTags": {
+          "tn_role": "tags"
+        },
+        "myContexts": {
+          "tn_role": "contexts"
+        },
+        "myProjects": {
+          "tn_role": "projects"
+        },
+        "myAttachments": {
+          "tn_role": "attachments"
+        },
+        "myCreated": {
+          "tn_role": "dateCreated"
+        },
+        "myModified": {
+          "tn_role": "dateModified"
+        }
+      },
+      "roleData": {
+        "title": "Plan workshop",
+        "status": "open",
+        "due": "2026-02-20",
+        "tags": [
+          "work",
+          "planning"
+        ],
+        "contexts": [
+          "office"
+        ],
+        "projects": [
+          "[[projects/demo]]"
+        ],
+        "attachments": [
+          "[[Attachments/brief.png]]"
+        ],
+        "dateCreated": "2026-02-19T10:00:00Z",
+        "dateModified": "2026-02-19T10:05:00Z",
+        "vendorField": "ZX-42"
+      },
+      "checkKey": "myModified"
+    },
+    "expect": {
+      "ok": true,
+      "result": {
+        "denormalized": {
+          "$contains": {
+            "myModified": "2026-02-19T10:05:00Z"
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": "field.0070",
+    "section": "§2",
+    "profile": "core-lite",
+    "operation": "field.denormalize",
+    "assertion": "envelope_equals",
+    "input": {
+      "fields": {
+        "myTitle": {
+          "tn_role": "title"
+        },
+        "myStatus": {
+          "tn_role": "status"
+        },
+        "myDue": {
+          "tn_role": "due"
+        },
+        "myTags": {
+          "tn_role": "tags"
+        },
+        "myContexts": {
+          "tn_role": "contexts"
+        },
+        "myProjects": {
+          "tn_role": "projects"
+        },
+        "myAttachments": {
+          "tn_role": "attachments"
+        },
+        "myCreated": {
+          "tn_role": "dateCreated"
+        },
+        "myModified": {
+          "tn_role": "dateModified"
+        }
+      },
+      "roleData": {
+        "title": "Plan workshop",
+        "status": "open",
+        "due": "2026-02-20",
+        "tags": [
+          "work",
+          "planning"
+        ],
+        "contexts": [
+          "office"
+        ],
+        "projects": [
+          "[[projects/demo]]"
+        ],
+        "attachments": [
+          "[[Attachments/brief.png]]"
+        ],
         "dateCreated": "2026-02-19T10:00:00Z",
         "dateModified": "2026-02-19T10:05:00Z",
         "vendorField": "ZX-42"
@@ -3573,7 +3915,79 @@
     }
   },
   {
-    "id": "field.0068",
+    "id": "field.0071",
+    "section": "§2",
+    "profile": "core-lite",
+    "operation": "field.denormalize",
+    "assertion": "envelope_equals",
+    "input": {
+      "fields": {
+        "myTitle": {
+          "tn_role": "title"
+        },
+        "myStatus": {
+          "tn_role": "status"
+        },
+        "myDue": {
+          "tn_role": "due"
+        },
+        "myTags": {
+          "tn_role": "tags"
+        },
+        "myContexts": {
+          "tn_role": "contexts"
+        },
+        "myProjects": {
+          "tn_role": "projects"
+        },
+        "myAttachments": {
+          "tn_role": "attachments"
+        },
+        "myCreated": {
+          "tn_role": "dateCreated"
+        },
+        "myModified": {
+          "tn_role": "dateModified"
+        }
+      },
+      "roleData": {
+        "title": "Plan workshop",
+        "status": "open",
+        "due": "2026-02-20",
+        "tags": [
+          "work",
+          "planning"
+        ],
+        "contexts": [
+          "office"
+        ],
+        "projects": [
+          "[[projects/demo]]"
+        ],
+        "attachments": [
+          "[[Attachments/brief.png]]"
+        ],
+        "dateCreated": "2026-02-19T10:00:00Z",
+        "dateModified": "2026-02-19T10:05:00Z",
+        "vendorField": "ZX-42"
+      },
+      "checkKey": "myAttachments"
+    },
+    "expect": {
+      "ok": true,
+      "result": {
+        "denormalized": {
+          "$contains": {
+            "myAttachments": [
+              "[[Attachments/brief.png]]"
+            ]
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": "field.0072",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.resolve_display_title",
@@ -3600,7 +4014,7 @@
     }
   },
   {
-    "id": "field.0069",
+    "id": "field.0073",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.resolve_display_title",
@@ -3626,7 +4040,7 @@
     }
   },
   {
-    "id": "field.0070",
+    "id": "field.0074",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.resolve_display_title",
@@ -3652,7 +4066,7 @@
     }
   },
   {
-    "id": "field.0071",
+    "id": "field.0075",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.resolve_display_title",
@@ -3676,7 +4090,7 @@
     }
   },
   {
-    "id": "field.0072",
+    "id": "field.0076",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.resolve_display_title",
@@ -3700,7 +4114,7 @@
     }
   },
   {
-    "id": "field.0073",
+    "id": "field.0077",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.resolve_display_title",
@@ -3726,7 +4140,7 @@
     }
   },
   {
-    "id": "field.0074",
+    "id": "field.0078",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.resolve_display_title",
@@ -3753,7 +4167,7 @@
     }
   },
   {
-    "id": "field.0075",
+    "id": "field.0079",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.resolve_display_title",
@@ -3779,7 +4193,7 @@
     }
   },
   {
-    "id": "field.0076",
+    "id": "field.0080",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -3804,7 +4218,7 @@
     }
   },
   {
-    "id": "field.0077",
+    "id": "field.0081",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -3829,7 +4243,7 @@
     }
   },
   {
-    "id": "field.0078",
+    "id": "field.0082",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -3854,7 +4268,7 @@
     }
   },
   {
-    "id": "field.0079",
+    "id": "field.0083",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -3879,7 +4293,7 @@
     }
   },
   {
-    "id": "field.0080",
+    "id": "field.0084",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -3904,7 +4318,7 @@
     }
   },
   {
-    "id": "field.0081",
+    "id": "field.0085",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -3929,7 +4343,7 @@
     }
   },
   {
-    "id": "field.0082",
+    "id": "field.0086",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -3954,7 +4368,7 @@
     }
   },
   {
-    "id": "field.0083",
+    "id": "field.0087",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -3979,7 +4393,7 @@
     }
   },
   {
-    "id": "field.0084",
+    "id": "field.0088",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -4004,7 +4418,32 @@
     }
   },
   {
-    "id": "field.0085",
+    "id": "field.0089",
+    "section": "§2",
+    "profile": "core-lite",
+    "operation": "field.build_mapping",
+    "assertion": "envelope_equals",
+    "input": {
+      "fields": {
+        "attachments": {
+          "type": "string"
+        }
+      },
+      "checkRole": "attachments"
+    },
+    "expect": {
+      "ok": true,
+      "result": {
+        "roleToField": {
+          "$contains": {
+            "attachments": "attachments"
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": "field.0090",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -4029,7 +4468,7 @@
     }
   },
   {
-    "id": "field.0086",
+    "id": "field.0091",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -4054,7 +4493,7 @@
     }
   },
   {
-    "id": "field.0087",
+    "id": "field.0092",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -4079,7 +4518,7 @@
     }
   },
   {
-    "id": "field.0088",
+    "id": "field.0093",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -4104,7 +4543,7 @@
     }
   },
   {
-    "id": "field.0089",
+    "id": "field.0094",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -4129,7 +4568,7 @@
     }
   },
   {
-    "id": "field.0090",
+    "id": "field.0095",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -4154,7 +4593,7 @@
     }
   },
   {
-    "id": "field.0091",
+    "id": "field.0096",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -4179,7 +4618,7 @@
     }
   },
   {
-    "id": "field.0092",
+    "id": "field.0097",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -4204,7 +4643,7 @@
     }
   },
   {
-    "id": "field.0093",
+    "id": "field.0098",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -4234,7 +4673,7 @@
     }
   },
   {
-    "id": "field.0094",
+    "id": "field.0099",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -4264,7 +4703,7 @@
     }
   },
   {
-    "id": "field.0095",
+    "id": "field.0100",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -4294,7 +4733,7 @@
     }
   },
   {
-    "id": "field.0096",
+    "id": "field.0101",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -4324,7 +4763,7 @@
     }
   },
   {
-    "id": "field.0097",
+    "id": "field.0102",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.build_mapping",
@@ -4354,7 +4793,7 @@
     }
   },
   {
-    "id": "field.0098",
+    "id": "field.0103",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.normalize",
@@ -4383,7 +4822,7 @@
     }
   },
   {
-    "id": "field.0099",
+    "id": "field.0104",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.denormalize",
@@ -4412,7 +4851,7 @@
     }
   },
   {
-    "id": "field.0100",
+    "id": "field.0105",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.normalize",
@@ -4441,7 +4880,7 @@
     }
   },
   {
-    "id": "field.0101",
+    "id": "field.0106",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.denormalize",
@@ -4470,7 +4909,7 @@
     }
   },
   {
-    "id": "field.0102",
+    "id": "field.0107",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.normalize",
@@ -4499,7 +4938,7 @@
     }
   },
   {
-    "id": "field.0103",
+    "id": "field.0108",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.denormalize",
@@ -4528,7 +4967,7 @@
     }
   },
   {
-    "id": "field.0104",
+    "id": "field.0109",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.normalize",
@@ -4557,7 +4996,7 @@
     }
   },
   {
-    "id": "field.0105",
+    "id": "field.0110",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.denormalize",
@@ -4586,7 +5025,7 @@
     }
   },
   {
-    "id": "field.0106",
+    "id": "field.0111",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.normalize",
@@ -4615,7 +5054,7 @@
     }
   },
   {
-    "id": "field.0107",
+    "id": "field.0112",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.denormalize",
@@ -4644,7 +5083,7 @@
     }
   },
   {
-    "id": "field.0108",
+    "id": "field.0113",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.normalize",
@@ -4673,7 +5112,7 @@
     }
   },
   {
-    "id": "field.0109",
+    "id": "field.0114",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.denormalize",
@@ -4702,7 +5141,7 @@
     }
   },
   {
-    "id": "field.0110",
+    "id": "field.0115",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.normalize",
@@ -4737,7 +5176,7 @@
     }
   },
   {
-    "id": "field.0111",
+    "id": "field.0116",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.denormalize",
@@ -4772,7 +5211,7 @@
     }
   },
   {
-    "id": "field.0112",
+    "id": "field.0117",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.normalize",
@@ -4805,7 +5244,7 @@
     }
   },
   {
-    "id": "field.0113",
+    "id": "field.0118",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.denormalize",
@@ -4838,7 +5277,7 @@
     }
   },
   {
-    "id": "field.0114",
+    "id": "field.0119",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.normalize",
@@ -4871,7 +5310,7 @@
     }
   },
   {
-    "id": "field.0115",
+    "id": "field.0120",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.denormalize",
@@ -4904,7 +5343,73 @@
     }
   },
   {
-    "id": "field.0116",
+    "id": "field.0121",
+    "section": "§2",
+    "profile": "core-lite",
+    "operation": "field.normalize",
+    "assertion": "envelope_equals",
+    "input": {
+      "fields": {
+        "mapped_attachments": {
+          "type": "string",
+          "tn_role": "attachments"
+        }
+      },
+      "frontmatter": {
+        "mapped_attachments": [
+          "[[Attachments/roadmap.png]]"
+        ]
+      },
+      "checkKey": "attachments"
+    },
+    "expect": {
+      "ok": true,
+      "result": {
+        "normalized": {
+          "$contains": {
+            "attachments": [
+              "[[Attachments/roadmap.png]]"
+            ]
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": "field.0122",
+    "section": "§2",
+    "profile": "core-lite",
+    "operation": "field.denormalize",
+    "assertion": "envelope_equals",
+    "input": {
+      "fields": {
+        "mapped_attachments": {
+          "type": "string",
+          "tn_role": "attachments"
+        }
+      },
+      "roleData": {
+        "attachments": [
+          "[[Attachments/roadmap.png]]"
+        ]
+      },
+      "checkKey": "mapped_attachments"
+    },
+    "expect": {
+      "ok": true,
+      "result": {
+        "denormalized": {
+          "$contains": {
+            "mapped_attachments": [
+              "[[Attachments/roadmap.png]]"
+            ]
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": "field.0123",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.normalize",
@@ -4933,7 +5438,7 @@
     }
   },
   {
-    "id": "field.0117",
+    "id": "field.0124",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.denormalize",
@@ -4962,7 +5467,7 @@
     }
   },
   {
-    "id": "field.0118",
+    "id": "field.0125",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.normalize",
@@ -4991,7 +5496,7 @@
     }
   },
   {
-    "id": "field.0119",
+    "id": "field.0126",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.denormalize",
@@ -5020,7 +5525,7 @@
     }
   },
   {
-    "id": "field.0120",
+    "id": "field.0127",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.normalize",
@@ -5049,7 +5554,7 @@
     }
   },
   {
-    "id": "field.0121",
+    "id": "field.0128",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.denormalize",
@@ -5078,7 +5583,7 @@
     }
   },
   {
-    "id": "field.0122",
+    "id": "field.0129",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.normalize",
@@ -5107,7 +5612,7 @@
     }
   },
   {
-    "id": "field.0123",
+    "id": "field.0130",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.denormalize",
@@ -5136,7 +5641,7 @@
     }
   },
   {
-    "id": "field.0124",
+    "id": "field.0131",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.normalize",
@@ -5165,7 +5670,7 @@
     }
   },
   {
-    "id": "field.0125",
+    "id": "field.0132",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.denormalize",
@@ -5194,7 +5699,7 @@
     }
   },
   {
-    "id": "field.0126",
+    "id": "field.0133",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.normalize",
@@ -5227,7 +5732,7 @@
     }
   },
   {
-    "id": "field.0127",
+    "id": "field.0134",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.denormalize",
@@ -5260,7 +5765,7 @@
     }
   },
   {
-    "id": "field.0128",
+    "id": "field.0135",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.normalize",
@@ -5293,7 +5798,7 @@
     }
   },
   {
-    "id": "field.0129",
+    "id": "field.0136",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.denormalize",
@@ -5326,7 +5831,7 @@
     }
   },
   {
-    "id": "field.0130",
+    "id": "field.0137",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.normalize",
@@ -5365,7 +5870,7 @@
     }
   },
   {
-    "id": "field.0131",
+    "id": "field.0138",
     "section": "§2",
     "profile": "core-lite",
     "operation": "field.denormalize",
@@ -5397,6 +5902,41 @@
                 "startTime": "2026-08-19T10:00:00Z",
                 "endTime": "2026-08-19T10:30:00Z"
               }
+            ]
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": "field.0139",
+    "section": "§5.21",
+    "profile": "core-lite",
+    "operation": "field.normalize",
+    "assertion": "envelope_equals",
+    "input": {
+      "fields": {
+        "files": {
+          "type": "list",
+          "tn_role": "attachments"
+        }
+      },
+      "frontmatter": {
+        "files": [
+          "[[Attachments/receipt.jpg]]",
+          "[[Attachments/photo.png]]"
+        ]
+      },
+      "checkKey": "attachments"
+    },
+    "expect": {
+      "ok": true,
+      "result": {
+        "normalized": {
+          "$contains": {
+            "attachments": [
+              "[[Attachments/receipt.jpg]]",
+              "[[Attachments/photo.png]]"
             ]
           }
         }

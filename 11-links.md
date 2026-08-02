@@ -2,13 +2,14 @@
 
 ## 11.1 Purpose
 
-This section defines link syntax, parsing, resolution, and write-format semantics for link-bearing task fields — primarily `projects` and `blocked_by.uid`.
+This section defines link syntax, parsing, resolution, and write-format semantics for link-bearing task fields — primarily `projects`, `blocked_by.uid`, and `attachments`.
 Alignment with Obsidian and other ecosystems is informative context only; normative conformance is defined entirely by this section.
 
 Applicability:
 
 - Implementations claiming profile `extended` (§7.3.5) MUST conform to this section for supported link-bearing roles.
 - Implementations claiming profile `materialized-occurrences` (§7.3.4) MUST conform to this section for `recurrence_parent` links, but are not required to support unrelated extended link-bearing roles solely because of that profile.
+- Implementations supporting the `attachments` role MUST conform to this section for attachment references regardless of profile.
 - Implementations that claim neither `extended` nor `materialized-occurrences` MAY treat link-shaped strings as opaque data and are not required to implement §11 behavior.
 
 ---
@@ -126,6 +127,7 @@ For simple wikilink names (no path separator):
 1. **Define the search scope:**
    - For `blocked_by.uid`: scope to files matching `task_detection` (task files only)
    - For `projects`: scope to all markdown files in the collection unless narrowed by explicit configuration
+   - For `attachments`: scope to all non-directory files in the collection
 
 2. **ID match pass:** search scoped files for semantic role `id` (§2.6.5) equal to the name.
    - Implementations MAY treat literal frontmatter key `id` as compatibility input when semantic mapping for `id` is unavailable.
@@ -227,6 +229,9 @@ Rules:
 - Do NOT include the alias component in dependency `uid` writes.
 - Do NOT include the anchor component in dependency `uid` writes.
 - Preserve the alias component in `projects` entries when the alias was provided by the user.
+- For `attachments`, always write a path-qualified collection-relative target
+  with its file extension, for example `[[Attachments/01K1-photo.jpg]]`.
+  Attachment writes MUST NOT include an alias or anchor.
 
 ### Markdown link format (`links.use_markdown_format=true`)
 
@@ -289,13 +294,34 @@ For unresolved-target severity, `dependencies.unresolved_target_severity` contro
 
 The canonical write form for `uid` values is specified in §11.6.
 
+### 11.8.3 `attachments`
+
+Attachment references MUST resolve to files, not directories. Canonical
+attachment targets MUST be collection-relative, path-qualified, and retain an
+explicit file extension. This avoids ambiguous simple-name lookup, makes the
+frontmatter portable without a media-specific extension search policy, and
+preserves the actual filename.
+
+Readers MUST accept wikilinks, Markdown links, and bare paths. They MAY accept
+simple-name or extensionless values as non-canonical compatibility input, but
+canonical writes MUST resolve and replace them with an explicit path and
+extension. Aliases and anchors are not part of attachment identity and MUST be
+removed on canonical writes.
+
+The normalized resolved collection path defines attachment identity for
+duplicate detection. Implementations MUST preserve list order and MUST reject
+duplicates after path normalization. Unresolved attachment targets use the
+configured `unresolved_link_target` severity; offline-capable clients SHOULD
+distinguish a known-but-not-locally-cached file from a genuinely unresolved
+target.
+
 ---
 
 ## 11.9 Rename and reference updates
 
 If an implementation supports reference updates on rename (i.e. claims the `rename` capability):
 
-1. It MUST update resolvable references in `blocked_by.uid` and `projects` link fields.
+1. It MUST update resolvable references in `blocked_by.uid`, `projects`, and `attachments` link fields.
 2. It SHOULD update links in body content.
 3. It SHOULD preserve the original link format when possible.
 4. It MUST preserve alias and anchor components where valid for the target field. For `blocked_by.uid`, alias and anchor are non-canonical and MUST be removed on write (§11.6).

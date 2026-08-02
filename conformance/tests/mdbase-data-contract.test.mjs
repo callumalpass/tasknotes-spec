@@ -117,7 +117,7 @@ test("the published contract uses one exact identity and the canonical schemas",
 	assert.match(contract, /^kind: mdbase\.contract$/m);
 	assert.match(contract, /^id: tasknotes\.task$/m);
 	assert.match(contract, /^contract_type: record$/m);
-	assert.match(contract, /^version: 0\.3\.0-rc\.1$/m);
+	assert.match(contract, /^version: 0\.3\.0-rc\.2$/m);
 	assert.match(contract, /^record_schema:$/m);
 	assert.match(contract, /ref: \.\.\/schemas\/tasknotes-task\.schema\.json/);
 	assert.match(

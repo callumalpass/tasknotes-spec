@@ -211,11 +211,80 @@ function validateTimezone(_hours, minutes) {
   return minutes >= 0 && minutes <= 59;
 }
 
+// ../tasknotes/src/utils/tasknotesLogger.ts
+function getTagValue(tag) {
+  const value = typeof tag === "function" ? tag() : tag;
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : null;
+}
+function getLogMessage(tag, message, metadata = {}) {
+  const parts = ["TaskNotes"];
+  const tagValue = getTagValue(tag);
+  if (tagValue) {
+    parts.push(tagValue);
+  }
+  if (metadata.category) {
+    parts.push(metadata.category);
+  }
+  if (metadata.operation) {
+    parts.push(metadata.operation);
+  }
+  return `${parts.map((part) => `[${part}]`).join("")} ${message}`;
+}
+function emitLog(sink, method, tag, message, metadata) {
+  const args = [getLogMessage(tag, message, metadata)];
+  if (metadata?.details) {
+    args.push(metadata.details);
+  }
+  if (metadata?.error !== void 0) {
+    args.push(metadata.error);
+  }
+  sink[method](...args);
+}
+function createTaskNotesLogger(options = {}) {
+  const sink = options.sink ?? console;
+  const isDebugEnabled = options.isDebugEnabled ?? (() => false);
+  return {
+    debug(message, metadata) {
+      if (!isDebugEnabled()) {
+        return;
+      }
+      emitLog(sink, "debug", options.tag, message, metadata);
+    },
+    info(message, metadata) {
+      emitLog(sink, "info", options.tag, message, metadata);
+    },
+    warn(message, metadata) {
+      emitLog(sink, "warn", options.tag, message, metadata);
+    },
+    error(message, metadata) {
+      emitLog(sink, "error", options.tag, message, metadata);
+    },
+    child(tag) {
+      const parentTag = options.tag;
+      return createTaskNotesLogger({
+        ...options,
+        tag: () => {
+          const parent = getTagValue(parentTag);
+          const child = getTagValue(tag);
+          return [parent, child].filter(Boolean).join("/");
+        }
+      });
+    }
+  };
+}
+
 // ../tasknotes/src/utils/dateUtils.ts
-function parseDate2(dateString) {
+var tasknotesLogger = createTaskNotesLogger({ tag: "Utils/DateUtils" });
+function parseDateToLocalInternal(dateString) {
   if (!dateString) {
     const error = new Error("Date string cannot be empty");
-    console.error("Date parsing error:", { dateString, error: error.message });
+    tasknotesLogger.error("Date parsing error:", {
+      category: "validation",
+      operation: "date-parsing",
+      details: { dateString },
+      error: error.message
+    });
     throw error;
   }
   const trimmed = dateString.trim();
@@ -225,13 +294,14 @@ function parseDate2(dateString) {
     );
     if (dateWithDayNameMatch) {
       const dateOnly = dateWithDayNameMatch[1];
-      return parseDate2(dateOnly);
+      return parseDateToLocalInternal(dateOnly);
     }
     if (trimmed.startsWith("T") && /^T\d{2}:\d{2}(:\d{2})?/.test(trimmed)) {
       const error = new Error(`Invalid date format - time without date: ${dateString}`);
-      console.warn("Date parsing error - incomplete time format:", {
-        original: dateString,
-        trimmed,
+      tasknotesLogger.warn("Date parsing error - incomplete time format:", {
+        category: "validation",
+        operation: "date-parsing-incomplete-time-format",
+        details: { original: dateString, trimmed },
         error: error.message
       });
       throw error;
@@ -242,12 +312,10 @@ function parseDate2(dateString) {
       const weekNum = parseInt(week, 10);
       if (isNaN(yearNum) || isNaN(weekNum)) {
         const error = new Error(`Invalid numeric values in ISO week format: ${dateString}`);
-        console.warn("Date parsing error - invalid ISO week numbers:", {
-          original: dateString,
-          year,
-          week,
-          yearNum,
-          weekNum
+        tasknotesLogger.warn("Date parsing error - invalid ISO week numbers:", {
+          category: "validation",
+          operation: "date-parsing-invalid-iso-week-numbers",
+          details: { original: dateString, year, week, yearNum, weekNum }
         });
         throw error;
       }
@@ -255,9 +323,10 @@ function parseDate2(dateString) {
         const error = new Error(
           `Invalid week number in ISO week format: ${dateString} (week must be 1-53)`
         );
-        console.warn("Date parsing error - week number out of range:", {
-          original: dateString,
-          weekNum,
+        tasknotesLogger.warn("Date parsing error - week number out of range:", {
+          category: "validation",
+          operation: "date-parsing-week-number-out-of-range",
+          details: { original: dateString, weekNum },
           error: error.message
         });
         throw error;
@@ -272,12 +341,16 @@ function parseDate2(dateString) {
         const error = new Error(
           `Failed to calculate date from ISO week format: ${dateString}`
         );
-        console.error("Date parsing error - ISO week calculation failed:", {
-          original: dateString,
-          yearNum,
-          weekNum,
-          jan4: jan4.toISOString(),
-          targetWeekMonday: targetWeekMonday.toString()
+        tasknotesLogger.error("Date parsing error - ISO week calculation failed:", {
+          category: "validation",
+          operation: "date-parsing-iso-week-calculation",
+          details: {
+            original: dateString,
+            yearNum,
+            weekNum,
+            jan4: jan4.toISOString(),
+            targetWeekMonday: targetWeekMonday.toString()
+          }
         });
         throw error;
       }
@@ -288,9 +361,10 @@ function parseDate2(dateString) {
       const parsed = parseISO(isoFormat);
       if (!isValid(parsed)) {
         const error = new Error(`Invalid space-separated datetime: ${dateString}`);
-        console.warn("Date parsing error - space-separated datetime invalid:", {
-          original: dateString,
-          converted: isoFormat,
+        tasknotesLogger.warn("Date parsing error - space-separated datetime invalid:", {
+          category: "validation",
+          operation: "date-parsing-space-separated-datetime-invalid",
+          details: { original: dateString, converted: isoFormat },
           error: error.message
         });
         throw error;
@@ -301,9 +375,10 @@ function parseDate2(dateString) {
       const parsed = parseISO(trimmed);
       if (!isValid(parsed)) {
         const error = new Error(`Invalid timezone-aware date: ${dateString}`);
-        console.warn("Date parsing error - timezone-aware format invalid:", {
-          original: dateString,
-          trimmed,
+        tasknotesLogger.warn("Date parsing error - timezone-aware format invalid:", {
+          category: "validation",
+          operation: "date-parsing-timezone-aware-format-invalid",
+          details: { original: dateString, trimmed },
           error: error.message
         });
         throw error;
@@ -315,10 +390,10 @@ function parseDate2(dateString) {
         const error = new Error(
           `Invalid date-only string: ${dateString} (expected format: yyyy-MM-dd)`
         );
-        console.warn("Date parsing error - date-only format invalid:", {
-          original: dateString,
-          trimmed,
-          expectedFormat: "yyyy-MM-dd",
+        tasknotesLogger.warn("Date parsing error - date-only format invalid:", {
+          category: "validation",
+          operation: "date-parsing-date-only-format-invalid",
+          details: { original: dateString, trimmed, expectedFormat: "yyyy-MM-dd" },
           error: error.message
         });
         throw error;
@@ -327,11 +402,10 @@ function parseDate2(dateString) {
       const parsed = new Date(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10));
       if (!isValid(parsed) || parsed.getFullYear() !== parseInt(year, 10) || parsed.getMonth() !== parseInt(month, 10) - 1 || parsed.getDate() !== parseInt(day, 10)) {
         const error = new Error(`Invalid date values: ${dateString}`);
-        console.warn("Date parsing error - invalid date values:", {
-          original: dateString,
-          year,
-          month,
-          day,
+        tasknotesLogger.warn("Date parsing error - invalid date values:", {
+          category: "validation",
+          operation: "date-parsing-invalid-date-values",
+          details: { original: dateString, year, month, day },
           error: error.message
         });
         throw error;
@@ -345,11 +419,15 @@ function parseDate2(dateString) {
     const wrappedError = new Error(
       `Unexpected error parsing date "${dateString}": ${error instanceof Error ? error.message : String(error)}`
     );
-    console.error("Unexpected date parsing error:", {
-      original: dateString,
-      trimmed,
-      error: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : void 0
+    tasknotesLogger.error("Unexpected date parsing error:", {
+      category: "validation",
+      operation: "unexpected-date-parsing",
+      details: {
+        original: dateString,
+        trimmed,
+        stack: error instanceof Error ? error.stack : void 0
+      },
+      error: error instanceof Error ? error.message : String(error)
     });
     throw wrappedError;
   }
@@ -357,7 +435,12 @@ function parseDate2(dateString) {
 function parseDateToUTC(dateString) {
   if (!dateString) {
     const error = new Error("Date string cannot be empty");
-    console.error("Date parsing error:", { dateString, error: error.message });
+    tasknotesLogger.error("Date parsing error:", {
+      category: "validation",
+      operation: "date-parsing",
+      details: { dateString },
+      error: error.message
+    });
     throw error;
   }
   const trimmed = dateString.trim();
@@ -387,19 +470,25 @@ function parseDateToUTC(dateString) {
       }
       return parsed;
     }
-    return parseDateToLocal(trimmed);
+    return parseDateToLocalInternal(trimmed);
   } catch (error) {
     const wrappedError = new Error(`Failed to parse date to UTC: ${trimmed}`);
-    console.error("Date parsing error:", {
-      dateString,
-      trimmed,
-      error: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : void 0
+    tasknotesLogger.error("Date parsing error:", {
+      category: "validation",
+      operation: "date-parsing",
+      details: {
+        dateString,
+        trimmed,
+        stack: error instanceof Error ? error.stack : void 0
+      },
+      error: error instanceof Error ? error.message : String(error)
     });
     throw wrappedError;
   }
 }
-var parseDateToLocal = parseDate2;
+function parseDateToLocal(dateString) {
+  return parseDateToLocalInternal(dateString);
+}
 function isSameDateSafe(date1, date2) {
   try {
     const date1Part = getDatePart(date1);
@@ -408,7 +497,12 @@ function isSameDateSafe(date1, date2) {
     const d2 = parseDateToUTC(date2Part);
     return d1.getTime() === d2.getTime();
   } catch (error) {
-    console.error("Error comparing dates:", { date1, date2, error });
+    tasknotesLogger.error("Error comparing dates:", {
+      category: "validation",
+      operation: "comparing-dates",
+      details: { date1, date2 },
+      error
+    });
     return false;
   }
 }
@@ -420,7 +514,12 @@ function isBeforeDateSafe(date1, date2) {
     const d2 = parseDateToUTC(date2Part);
     return d1.getTime() < d2.getTime();
   } catch (error) {
-    console.error("Error comparing dates for before:", { date1, date2, error });
+    tasknotesLogger.error("Error comparing dates for before:", {
+      category: "validation",
+      operation: "comparing-dates",
+      details: { date1, date2 },
+      error
+    });
     return false;
   }
 }
@@ -448,14 +547,23 @@ function getDatePart(dateString) {
     const parsed = parseDateToUTC(dateString);
     return formatDateForStorage(parsed);
   } catch (error) {
-    console.error("Error extracting date part:", { dateString, error });
+    tasknotesLogger.error("Error extracting date part:", {
+      category: "validation",
+      operation: "extracting-date-part",
+      details: { dateString },
+      error
+    });
     return dateString;
   }
 }
 function formatDateForStorage(date) {
   try {
     if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
-      console.warn("formatDateForStorage received invalid date:", date);
+      tasknotesLogger.warn("formatDateForStorage received invalid date:", {
+        category: "validation",
+        operation: "formatdateforstorage-received-invalid-date",
+        details: { value: date }
+      });
       return "";
     }
     const year = date.getUTCFullYear();
@@ -463,7 +571,12 @@ function formatDateForStorage(date) {
     const day = String(date.getUTCDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   } catch (error) {
-    console.error("Error formatting date for storage:", { date, error });
+    tasknotesLogger.error("Error formatting date for storage:", {
+      category: "validation",
+      operation: "formatting-date-storage",
+      details: { date },
+      error
+    });
     return "";
   }
 }

@@ -425,7 +425,7 @@ export async function execute(operation, input) {
       return envelopeOk({
         implementation: metadata.implementation,
         version: metadata.version,
-        spec_version: "0.3.0-rc.1",
+        spec_version: "0.3.0-rc.2",
         profiles: [...metadata.profiles],
         capabilities: [...metadata.capabilities],
         validation_modes: ["strict"],

@@ -61,6 +61,7 @@ Implementations conforming beyond minimal scope SHOULD support:
 | `tags` | list<string> | free tags |
 | `contexts` | list<string> | commonly prefixed with `@` |
 | `projects` | list<link-or-string> | project references, see §11 |
+| `attachments` | list<link-or-string> | ordered file references owned by the task, see §2.6.7 and §11.8.3 |
 | `time_estimate` | integer >= 0 | minutes |
 | `time_entries` | list<object> | see §2.6 |
 | `recurrence` | string | tasknotes recurrence string; see §4 |
@@ -127,6 +128,7 @@ Implementations SHOULD accept these aliases on read for interoperability:
 | `time_entries` | `timeEntries` | `time_entries` |
 | `time_estimate` | `timeEstimate` | `time_estimate` |
 | `blocked_by` | `blockedBy` | `blocked_by` |
+| `attachments` | `attachments` | — |
 
 This table is compatibility guidance, not a requirement to choose camelCase or snake_case as canonical.
 
@@ -205,6 +207,26 @@ Within a resolved parent task, at most one materialized occurrence note SHOULD e
 
 Materialized occurrence notes MAY also use normal task roles such as `status`, `completed_date`, `scheduled`, `due`, `time_entries`, `reminders`, `contexts`, `projects`, and body content.
 For dates where a materialized occurrence note exists, its own task state is authoritative as defined in §4.18.3.
+
+### 2.6.7 attachments
+
+`attachments` is the authoritative task-membership list for files associated
+with a task. It MUST be represented as an ordered list of non-empty
+link-or-string values. Each value MUST identify one collection file and MUST
+follow the parsing, resolution, and canonical-write rules in §11.8.3.
+
+The list itself intentionally contains references only. MIME type, byte size,
+content digest, storage revision, timestamps, and other binary metadata belong
+to the collection's file descriptor or filesystem metadata and MUST NOT be
+duplicated into canonical task frontmatter.
+
+The Markdown body MAY embed or link an attached file for inline presentation,
+but body links and embeds do not add or remove task membership. A file is a task
+attachment if and only if it appears in the mapped `attachments` list.
+
+Readers MAY accept a single scalar reference as compatibility input and
+normalize it to a one-item list. Canonical writes MUST use a list, preserve its
+order, and MUST NOT contain empty or duplicate normalized targets.
 
 ## 2.7 Unknown fields
 

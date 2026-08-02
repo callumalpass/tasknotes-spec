@@ -449,6 +449,7 @@ function buildFieldFixtures() {
     "tags",
     "contexts",
     "projects",
+	"attachments",
     "timeEstimate",
     "dateCreated",
     "dateModified",
@@ -638,6 +639,7 @@ function buildFieldFixtures() {
     myTags: { tn_role: "tags" },
     myContexts: { tn_role: "contexts" },
     myProjects: { tn_role: "projects" },
+    myAttachments: { tn_role: "attachments" },
     myCreated: { tn_role: "dateCreated" },
     myModified: { tn_role: "dateModified" },
   };
@@ -649,6 +651,7 @@ function buildFieldFixtures() {
     myTags: ["work", "planning"],
     myContexts: ["office"],
     myProjects: ["[[projects/demo]]"],
+    myAttachments: ["[[Attachments/brief.png]]"],
     myCreated: "2026-02-19T10:00:00Z",
     myModified: "2026-02-19T10:05:00Z",
     vendorField: "ZX-42",
@@ -661,6 +664,7 @@ function buildFieldFixtures() {
     ["due", "2026-02-20"],
     ["dateCreated", "2026-02-19T10:00:00Z"],
     ["dateModified", "2026-02-19T10:05:00Z"],
+    ["attachments", ["[[Attachments/brief.png]]"]],
     ["vendorField", "ZX-42"],
   ];
 
@@ -682,6 +686,7 @@ function buildFieldFixtures() {
     tags: ["work", "planning"],
     contexts: ["office"],
     projects: ["[[projects/demo]]"],
+    attachments: ["[[Attachments/brief.png]]"],
     dateCreated: "2026-02-19T10:00:00Z",
     dateModified: "2026-02-19T10:05:00Z",
     vendorField: "ZX-42",
@@ -694,6 +699,7 @@ function buildFieldFixtures() {
     ["myCreated", "2026-02-19T10:00:00Z"],
     ["myModified", "2026-02-19T10:05:00Z"],
     ["vendorField", "ZX-42"],
+    ["myAttachments", ["[[Attachments/brief.png]]"]],
   ];
 
   for (const [key, value] of denormalizeChecks) {
@@ -836,6 +842,7 @@ function buildFieldFixtures() {
     tags: ["planning", "team"],
     contexts: ["office"],
     projects: ["[[projects/ops]]"],
+    attachments: ["[[Attachments/roadmap.png]]"],
     timeEstimate: "PT45M",
     dateCreated: "2026-08-19T10:00:00Z",
     dateModified: "2026-08-19T11:00:00Z",
@@ -875,6 +882,33 @@ function buildFieldFixtures() {
       expect: { ok: true, result: { denormalized: { $contains: { [fieldName]: value } } } },
     });
   }
+
+  w.add({
+    section: "§5.21",
+    profile: "core-lite",
+    operation: "field.normalize",
+    assertion: "envelope_equals",
+    input: {
+      fields: { files: { type: "list", tn_role: "attachments" } },
+      frontmatter: {
+        files: ["[[Attachments/receipt.jpg]]", "[[Attachments/photo.png]]"],
+      },
+      checkKey: "attachments",
+    },
+    expect: {
+      ok: true,
+      result: {
+        normalized: {
+          $contains: {
+            attachments: [
+              "[[Attachments/receipt.jpg]]",
+              "[[Attachments/photo.png]]",
+            ],
+          },
+        },
+      },
+    },
+  });
 
   return w.list();
 }
@@ -1558,10 +1592,10 @@ function buildConfigFixtures() {
   }
 
   const specVersionCases = [
-    { providerSpecVersion: "0.3.0-rc.1", targetSpecVersion: "0.3.0-rc.1", expected: "0.3.0-rc.1", synthesized: false },
-    { providerSpecVersion: "0.2.0", targetSpecVersion: "0.3.0-rc.1", expected: "0.2.0", synthesized: false },
-    { providerSpecVersion: undefined, targetSpecVersion: "0.3.0-rc.1", expected: "0.3.0-rc.1", synthesized: true },
-    { providerSpecVersion: "", targetSpecVersion: "0.3.0-rc.1", expected: "0.3.0-rc.1", synthesized: true },
+    { providerSpecVersion: "0.3.0-rc.2", targetSpecVersion: "0.3.0-rc.2", expected: "0.3.0-rc.2", synthesized: false },
+    { providerSpecVersion: "0.2.0", targetSpecVersion: "0.3.0-rc.2", expected: "0.2.0", synthesized: false },
+    { providerSpecVersion: undefined, targetSpecVersion: "0.3.0-rc.2", expected: "0.3.0-rc.2", synthesized: true },
+    { providerSpecVersion: "", targetSpecVersion: "0.3.0-rc.2", expected: "0.3.0-rc.2", synthesized: true },
     { providerSpecVersion: undefined, targetSpecVersion: "1.0.0", expected: "1.0.0", synthesized: true },
     { providerSpecVersion: "2.1.3", targetSpecVersion: "1.0.0", expected: "2.1.3", synthesized: false },
   ];
@@ -2996,7 +3030,7 @@ function buildOperationFixtures() {
       },
     },
     {
-      section: "§5.21",
+      section: "§5.22",
       operation: "op.mutate_with_validation",
       input: {
         strict: true,
