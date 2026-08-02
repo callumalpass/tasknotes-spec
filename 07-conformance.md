@@ -115,7 +115,7 @@ Example:
 
 ```text
 Implementation: example-task-cli v1.4.0
-Spec: tasknotes-spec 0.3.0-rc.1
+Spec: tasknotes-spec 0.3.0-rc.2
 Profiles: core-lite, recurrence, templating
 Validation modes: strict, permissive
 Known deviations: none
@@ -214,7 +214,7 @@ Output:
   "result": {
     "implementation": "my-tool",
     "version": "1.0.0",
-    "spec_version": "0.3.0-rc.1",
+    "spec_version": "0.3.0-rc.2",
     "validation_modes": ["strict"],
     "profiles": ["core-lite", "recurrence"],
     "capabilities": ["dependencies", "links"]

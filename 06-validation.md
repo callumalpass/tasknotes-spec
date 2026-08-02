@@ -43,13 +43,14 @@ A conforming validator MUST implement checks required by the claimed profile(s):
 | 9 | `blocked_by` entries conform to §10.2 (shape, enum, duplicates, self-reference). | `extended` |
 | 10 | `reminders` entries conform to §10.3 (shape, type-specific fields, unique ids). | `extended` |
 | 11 | relative reminders have resolvable base fields or produce configured error/warning behavior. | `extended` |
-| 12 | link-bearing fields (`projects`, `blocked_by.uid`) conform to §11 parsing/resolution and traversal safety. | `extended` |
+| 12 | link-bearing fields (`projects`, `blocked_by.uid`, and supported `attachments`) conform to §11 parsing/resolution and traversal safety. | `extended`, or any implementation supporting `attachments` |
 | 13 | templating configuration is valid when provided (`templating` schema and enums). | `templating` |
 | 14 | create-time template failures obey configured failure mode (`error` vs fallback). | `templating` |
 | 15 | semantic `id` (when present) is a non-empty string; duplicate collection-level IDs SHOULD be reported when detectable. | any profile that supports semantic `id` |
 | 16 | materialized occurrence notes contain valid `recurrence_parent` and `occurrence_date` roles. | `materialized-occurrences` |
 | 17 | no duplicate materialized occurrence notes exist for the same resolved `(recurrence_parent, occurrence_date)` pair. | `materialized-occurrences` |
 | 18 | materialization policy values and rolling horizons conform to §4.18 and §9.17. | `materialized-occurrences` |
+| 19 | `attachments` is a list of non-empty, unique normalized file references with explicit extensions. | any implementation supporting `attachments` |
 
 ## 6.5 Unknown field policy
 
@@ -104,6 +105,8 @@ Issues SHOULD include:
 | `ambiguous_link` | warning | link resolves to multiple candidates |
 | `path_traversal` | error | resolved path escapes collection root |
 | `unresolved_link_target` | warning | link target cannot be resolved |
+| `invalid_attachment_reference` | error | attachment reference is empty, lacks an explicit extension, or targets a directory |
+| `duplicate_attachment_reference` | error | attachment list repeats the same normalized target |
 | `invalid_task_id` | error | semantic `id` is empty or invalid type |
 | `duplicate_task_id` | warning | duplicate semantic `id` detected in collection scope |
 | `alias_conflict_ignored` | warning | alias key ignored due to canonical conflict |

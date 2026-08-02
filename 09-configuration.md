@@ -153,7 +153,7 @@ Required keys apply to the effective configuration after provider resolution.
 ## 9.5 spec_version behavior
 
 `spec_version` MUST be a semantic version string.
-Pre-release identifiers are valid (for example `0.3.0-rc.1`).
+Pre-release identifiers are valid (for example `0.3.0-rc.2`).
 
 Implementations in strict mode MUST reject unsupported major versions.
 
@@ -206,6 +206,7 @@ mapping:
   time_entries: timeEntries
   blocked_by: blockedBy
   reminders: reminders
+  attachments: attachments
 ```
 
 ## 9.7 task_detection schema
@@ -603,7 +604,7 @@ Rules:
 ## 9.19 Complete configuration example (`yaml_file` provider)
 
 ```yaml
-spec_version: 0.3.0-rc.1
+spec_version: 0.3.0-rc.2
 runtime_timezone: America/Los_Angeles
 
 mapping:
@@ -612,6 +613,7 @@ mapping:
   priority: priority
   due: due
   scheduled: scheduled
+  attachments: attachments
   completed_date: completedDate
   date_created: dateCreated
   date_modified: dateModified
@@ -856,7 +858,7 @@ Default priority on create: `normal`.
 When neither `data.json` nor `tasknotes.yaml` is present, implementations MUST use the following effective configuration:
 
 ```yaml
-spec_version: 0.3.0-rc.1   # synthesized
+spec_version: 0.3.0-rc.2   # synthesized
 mapping:
   title: title
   status: status
@@ -865,6 +867,7 @@ mapping:
   scheduled: scheduled
   contexts: contexts
   projects: projects
+  attachments: attachments
   time_estimate: timeEstimate
   completed_date: completedDate
   date_created: dateCreated

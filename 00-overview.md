@@ -33,7 +33,7 @@ The tasknotes plugin is the primary reference for how this spec was derived, but
 
 ## 0.1 Status and authority
 
-This document is part of `tasknotes-spec` version `0.3.0-rc.1`.
+This document is part of `tasknotes-spec` version `0.3.0-rc.2`.
 
 This specification is normative for implementations that claim conformance.
 No single implementation is normative; implementations are expected to conform to the specification.

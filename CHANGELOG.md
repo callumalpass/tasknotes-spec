@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0-rc.2 - 2026-08-02
+
+- add first-class `attachments` as an ordered frontmatter list of portable file
+  links, with explicit membership, canonical-path, reference-safety, and
+  materialized-occurrence semantics
+- expose attachment references in the `tasknotes.task` mdbase contract while
+  leaving binary metadata authoritative in the file store
+
 ## 0.3.0-rc.1 - 2026-07-28
 
 - adopt the discriminated first-class mdbase contract shape for
