@@ -596,14 +596,21 @@ rewrite body content unless the user explicitly requests both changes.
 ### 5.21.4 Delete an attachment file
 
 Physical deletion MUST be a distinct, explicit action. Before deleting, an
-implementation MUST check resolvable task `attachments` lists and SHOULD check
-body links/embeds and other collection backlinks. If another reference exists,
-deletion MUST be rejected unless the caller explicitly chooses a force action
-whose affected references are disclosed.
+implementation MUST check authoritative, current task `attachments` lists and
+SHOULD check body links/embeds and other collection backlinks. A stale or
+offline replica is not sufficient evidence that a file is unreferenced. If the
+binary authority and record authority can change independently, the check and
+delete MUST use an authority-provided transaction or equivalent precondition
+that closes the race. An implementation MUST NOT offer physical deletion when
+it cannot establish that guarantee; detach remains available and leaves a safe
+orphan. If another reference exists, deletion MUST be rejected unless the
+caller explicitly chooses a force action whose affected references are
+disclosed.
 
 After a successful non-forced deletion, implementations MUST remove the
 current task's matching attachment reference. Failed deletion MUST leave
-frontmatter unchanged.
+frontmatter unchanged. An accepted local outbox entry is not a successful
+physical deletion until the binary authority acknowledges it.
 
 ### 5.21.5 Materialized occurrences
 

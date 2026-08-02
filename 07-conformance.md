@@ -147,6 +147,8 @@ Implementations SHOULD expose machine-readable capability metadata, including:
 - supported mapping aliases
 - templating support flags and effective templating failure mode
 - dependency and reminder support flags
+- attachment membership, reference normalization, and host-provided binary
+  operation flags (including whether physical deletion is available)
 - time-tracking support flags, including active-session policy and auto-stop-on-complete behavior
 - materialized occurrence support flags, including materialization mode, next trigger, and rolling bounds
 - configured natural-language capture triggers when the optional `nlp` block is
@@ -171,6 +173,7 @@ Conformance claims MUST indicate whether `permissive` mode is also supported.
 | double-brace portable variable support | - | - | required | optional | optional |
 | recurrence-string validation | - | required | optional | required via companion `recurrence` claim | required |
 | link parsing/resolution (§11) | - | - | optional | required for `recurrence_parent` only | required |
+| attachment membership and ops (§5.21) | optional via `attachments` capability | optional via `attachments` capability | optional via `attachments` capability | optional via `attachments` capability | optional via `attachments` capability |
 | dependency schema and ops | - | - | optional | optional | required |
 | reminder schema and ops | - | - | optional | optional | required |
 | time tracking start/stop/edit semantics (§5.19) | - | - | optional | optional | required |
@@ -282,6 +285,7 @@ The following capability tokens are defined by this specification. Implementatio
 |---|---|---|
 | `dependencies` | `extended` | Supports `blocked_by`, dependency operations, and dependency validation |
 | `reminders` | `extended` | Supports `reminders`, reminder operations, and reminder validation |
+| `attachments` | optional extension under any profile | Treats the mapped `attachments` list as authoritative membership; validates and normalizes its collection-file references; and implements §5.21 attachment operations using host-owned binary storage. A claim MUST separately disclose which host file actions are available; it does not by itself promise physical deletion where the host cannot perform an authoritative reference check. |
 | `links` | `extended` | Supports link parsing and resolution (§11) |
 | `time-tracking` | `extended` | Supports time-tracking management operations (§5.19) |
 | `materialized-occurrences` | `materialized-occurrences` | Supports recurrence materialization and materialized occurrence operations (§4.18, §5.20) |
