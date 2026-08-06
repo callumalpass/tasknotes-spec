@@ -136,7 +136,6 @@ Required keys apply to the effective configuration after provider resolution.
 
 | Key | Type | Description |
 |---|---|---|
-| `runtime_timezone` | string | IANA timezone for day-level semantics |
 | `task_detection` | object | task file identification rules |
 | `defaults` | object | role defaults used during create |
 | `status` | object | status set and completed-value semantics |
@@ -160,13 +159,6 @@ Implementations in strict mode MUST reject unsupported major versions.
 If permissive mode is implemented, permissive mode MAY proceed with warning when major version differs.
 
 If a provider does not supply `spec_version` (for example TaskNotes `data.json`), implementations MUST synthesize an effective `spec_version` matching their target `tasknotes-spec` version and SHOULD disclose that it was synthesized.
-
-### 9.5.1 runtime_timezone behavior
-
-If `runtime_timezone` is configured, it MUST be a valid IANA timezone identifier and MUST be used for day-level semantics.
-
-If `runtime_timezone` is absent, implementations MUST use system local timezone.
-The effective timezone MUST be discoverable.
 
 ## 9.6 mapping schema
 
@@ -605,7 +597,6 @@ Rules:
 
 ```yaml
 spec_version: 0.3.0-rc.3
-runtime_timezone: America/Los_Angeles
 
 mapping:
   title: title

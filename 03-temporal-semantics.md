@@ -110,8 +110,15 @@ Implementations MAY use different internal representations as long as all normat
 
 For day-level semantics, the active runtime timezone is:
 
-1. configured collection `runtime_timezone` if provided, otherwise
-2. the process/system local timezone.
+1. the caller-provided temporal execution context, when present
+2. the collection authority's configured timezone
+3. the process/system local timezone.
+
+The timezone is runtime context, not TaskNotes type-binding configuration. A
+remote caller SHOULD send its current IANA timezone for interactive operations;
+a headless authority SHOULD use its durable collection timezone. Every
+operation MUST resolve this precedence once and use one effective timezone for
+all day-level semantics in that operation.
 
 Implementations MUST make the effective timezone discoverable.
 
