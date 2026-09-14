@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0-rc.4 - Unreleased
+
+- Add optional portable person-ID `assignees` to the task record contract.
+- Define exact identity matching, unresolved-reference preservation, explicit
+  clearing, and recurrence inheritance without granting collection access.
+- Published rc.3 contract artifacts remain unchanged; implementations must
+  explicitly opt into rc.4 field mappings.
+
 ## 0.3.0-rc.3 - 2026-08-02
 
 - define manual ordering as an opaque string rank so clients can insert and
