@@ -2,12 +2,13 @@
 
 **Status:** Draft
 
-**Record contract:** `tasknotes.task` `0.3.0-rc.4`
+**Record contract:** `tasknotes.task` `0.3.0-rc.5`
 
-This revision adds optional `assignees`: exact stable `mdbase.person` IDs, not
-account subjects or file links. Existing assignments survive person deletion or
-membership removal. Assignment and editable person identity associations never
-grant collection access. See [the contract](mdbase/tasknotes.task.md).
+This revision adds optional `assignees`: links to records implementing
+`mdbase.person`, resolved by ordinary mdbase link resolution. Unresolved links
+survive person deletion or membership removal. Assignment and editable person
+identity associations never grant collection access. See
+[the contract](mdbase/tasknotes.task.md).
 
 **Event contract:** `tasknotes.task.completed` `1.0.0`
 
@@ -49,7 +50,7 @@ can implement and several applications can consume.
 
 ```text
 personal_task ─┐
-work_task ─────┼─ implements tasknotes.task 0.3.0-rc.4 ── TaskNotes
+work_task ─────┼─ implements tasknotes.task 0.3.0-rc.5 ── TaskNotes
 issue_task ────┘                                  ├─ automation
                                                   └─ another task app
 ```
@@ -93,7 +94,7 @@ An mdbase TaskNotes type declares one implementation:
 ```yaml
 implements:
   - contract: tasknotes.task
-    version: 0.3.0-rc.4
+    version: 0.3.0-rc.5
     fields:
       title: summary
       status: state
@@ -257,7 +258,7 @@ be placed in the binding.
 ## 12.9 Multiple implementations
 
 A collection may contain any number of types implementing
-`tasknotes.task 0.3.0-rc.4`. TaskNotes-aware readers MUST:
+`tasknotes.task 0.3.0-rc.5`. TaskNotes-aware readers MUST:
 
 1. resolve the exact local contract;
 2. enumerate every implementation in canonical type-name order;
@@ -361,7 +362,7 @@ lifecycle:
       created_at: { now: true }
 implements:
   - contract: tasknotes.task
-    version: 0.3.0-rc.4
+    version: 0.3.0-rc.5
     fields:
       title: summary
       status: state

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0-rc.5 - Unreleased
+
+- Make `assignees` links to `mdbase.person` records, declared in
+  `collection.links` and resolved by mdbase link resolution, replacing the
+  person-ID assignments of rc.4. This matches how projects are linked and lets
+  person notes show their assigned tasks as backlinks.
+
 ## 0.3.0-rc.4 - Unreleased
 
 - Add optional portable person-ID `assignees` to the task record contract.
