@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.3.0-rc.5 - Unreleased
+
+- Make `assignees` links to `mdbase.person` records, declared in
+  `collection.links` and resolved by mdbase link resolution, replacing the
+  person-ID assignments of rc.4. This matches how projects are linked and lets
+  person notes show their assigned tasks as backlinks.
+
+## 0.3.0-rc.4 - Unreleased
+
+- Add optional portable person-ID `assignees` to the task record contract.
+- Define exact identity matching, unresolved-reference preservation, explicit
+  clearing, and recurrence inheritance without granting collection access.
+- Published rc.3 contract artifacts remain unchanged; implementations must
+  explicitly opt into rc.4 field mappings.
+
 ## 0.3.0-rc.3 - 2026-08-02
 
 - define manual ordering as an opaque string rank so clients can insert and
