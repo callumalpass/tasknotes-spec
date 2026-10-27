@@ -91,7 +91,6 @@ test("publishes valid JSON Schemas for the portable task view, binding, and comp
 		recurrence: {
 			syntax: "tasknotes",
 			maintain_due_date_offset: false,
-			reset_body_checkboxes: false,
 		},
 		occurrences: {
 			identity_roles: ["recurrenceParent", "occurrenceDate"],
@@ -100,16 +99,28 @@ test("publishes valid JSON Schemas for the portable task view, binding, and comp
 		},
 		links: {
 			accepted_formats: ["wikilink", "markdown"],
-			write_format: "wikilink",
 		},
 		archive: {
 			archived_tag: "archived",
-			move_on_archive: false,
 		},
-		time_tracking: { auto_stop_on_complete: true },
-		templating: { enabled: false, occurrence_enabled: false },
 	};
 	assert.equal(validateBinding(binding), true, validateBinding.errors);
+	assert.equal(
+		validateBinding({
+			...binding,
+			time_tracking: { auto_stop_on_complete: true },
+		}),
+		false,
+		"app behaviour lives in the tasknotes.settings record, not the binding"
+	);
+	assert.equal(
+		validateBinding({
+			...binding,
+			archive: { archived_tag: "archived", move_on_archive: false },
+		}),
+		false,
+		"archive moves are app behaviour"
+	);
 	assert.equal(
 		validateBinding({ ...binding, contract: "tasknotes.task" }),
 		false,
@@ -137,7 +148,7 @@ test("the published contract uses one exact identity and the canonical schemas",
 	assert.match(contract, /^kind: mdbase\.contract$/m);
 	assert.match(contract, /^id: tasknotes\.task$/m);
 	assert.match(contract, /^contract_type: record$/m);
-	assert.match(contract, /^version: 0\.3\.0-rc\.3$/m);
+	assert.match(contract, /^version: 0\.3\.0-rc\.6$/m);
 	assert.match(contract, /^record_schema:$/m);
 	assert.match(contract, /ref: \.\.\/schemas\/tasknotes-task\.schema\.json/);
 	assert.match(
