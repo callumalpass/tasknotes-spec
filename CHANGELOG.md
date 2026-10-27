@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.0-rc.6 - Unreleased
+
+- Move app behaviour out of the `tasknotes.task` binding into the collection's
+  TaskNotes settings record (`_settings/dev.tasknotes.md`, contract
+  `tasknotes.settings` 1.0.0): `nlp`, `templating`, `time_tracking`,
+  `archive.move_on_archive`, `archive.folder`, `recurrence.reset_body_checkboxes`,
+  `links.write_format`, and each status definition's `next_status`,
+  `exclude_from_cycle`, `auto_archive` and `auto_archive_delay_minutes`.
+- Readers take each moved setting from the record, then from an rc.5 binding,
+  then its default, so a collection still on rc.5 keeps its behaviour.
+
 ## 0.3.0-rc.5 - Unreleased
 
 - Make `assignees` links to `mdbase.person` records, declared in

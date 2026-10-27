@@ -2,13 +2,19 @@
 
 **Status:** Draft
 
-**Record contract:** `tasknotes.task` `0.3.0-rc.5`
+**Record contract:** `tasknotes.task` `0.3.0-rc.6`
 
 This revision adds optional `assignees`: links to records implementing
 `mdbase.person`, resolved by ordinary mdbase link resolution. Unresolved links
 survive person deletion or membership removal. Assignment and editable person
 identity associations never grant collection access. See
 [the contract](mdbase/tasknotes.task.md).
+
+rc.6 moves app behaviour out of the binding into the collection's TaskNotes
+settings record (§12.8.1): natural-language triggers, templating, archive moves,
+time-tracking auto-stop, body-checkbox reset on recurrence, the link write
+format, and each status's next status, cycle exclusion and auto-archive. The
+binding keeps what gives task records their meaning.
 
 **Event contract:** `tasknotes.task.completed` `1.0.0`
 
@@ -50,7 +56,7 @@ can implement and several applications can consume.
 
 ```text
 personal_task ─┐
-work_task ─────┼─ implements tasknotes.task 0.3.0-rc.5 ── TaskNotes
+work_task ─────┼─ implements tasknotes.task 0.3.0-rc.6 ── TaskNotes
 issue_task ────┘                                  ├─ automation
                                                   └─ another task app
 ```
@@ -94,7 +100,7 @@ An mdbase TaskNotes type declares one implementation:
 ```yaml
 implements:
   - contract: tasknotes.task
-    version: 0.3.0-rc.5
+    version: 0.3.0-rc.6
     fields:
       title: summary
       status: state
@@ -227,8 +233,9 @@ The following consistency rules apply:
   and
 - definition semantics MUST agree with completed/skipped membership.
 
-Status and priority labels, colors, and icons are presentation hints. Status
-cycle, completion, skipping, auto-archive, and priority weight are semantic.
+Status and priority labels, colors, and icons are presentation hints.
+Completion, skipping, order and priority weight are semantic. Status cycling
+and auto-archive are app behaviour and live in the settings record (§12.8.1).
 
 ## 12.8 Title, recurrence, links, and operations
 
@@ -237,16 +244,13 @@ defined elsewhere in this specification:
 
 - `title` follows §9.13 and MUST agree with `collection.display` and
   `collection.path`;
-- `recurrence` follows §4;
+- `recurrence` follows §4 (`syntax` and `maintain_due_date_offset`);
 - `occurrences` follows §2.6.6, §4.18, §5.20, and §9.17;
-- `links` follows §11;
+- `links` follows §11 (`accepted_formats`);
 - attachment membership is the portable `attachments` contract field; binary
   MIME type, digest, byte size, revision, and timestamps remain authoritative
-  in mdbase file descriptors and are not projected into task frontmatter;
-- `archive` follows §5.12;
-- `time_tracking` follows §5.19 and §9.16;
-- `templating` follows §5.3.5 and §9.14; and
-- optional `nlp` triggers follow §9.18.
+  in mdbase file descriptors and are not projected into task frontmatter; and
+- `archive` follows §5.12 (`archived_tag`).
 
 Archive always operates on the portable `tags` contract field, so the binding
 does not repeat a record-specific `tags_field`. The implementation's `fields`
@@ -255,10 +259,37 @@ map determines the actual frontmatter property.
 Application-local notification preferences and generator bookkeeping MUST NOT
 be placed in the binding.
 
+### 12.8.1 App settings record
+
+App behaviour that every TaskNotes client honours, but that does not change what
+a task record means, lives in one record at `_settings/dev.tasknotes.md`. The
+record implements `mdbase.app-settings` 1.0.0 and `tasknotes.settings` 1.0.0
+(both published in mdbase-contracts) with `app: dev.tasknotes`,
+`scope: collection` and `settings_version: 1`. Its flat frontmatter holds:
+
+| Field | Was in the rc.5 binding |
+| --- | --- |
+| `nlp_triggers` | `nlp.triggers` |
+| `template_enabled`, `template_path` | `templating.enabled`, `templating.template_path` |
+| `occurrence_template_enabled`, `occurrence_template_path` | `templating.occurrence_enabled`, `templating.occurrence_template_path` |
+| `template_failure_mode`, `template_unknown_variable_policy` | `templating.failure_mode`, `templating.unknown_variable_policy` |
+| `move_on_archive`, `archive_folder` | `archive.move_on_archive`, `archive.folder` |
+| `auto_stop_time_tracking_on_complete` | `time_tracking.auto_stop_on_complete` |
+| `reset_body_checkboxes_on_recurrence` | `recurrence.reset_body_checkboxes` |
+| `link_write_format` | `links.write_format` |
+| `status_behavior.<value>` | `status.definitions[].next_status`, `exclude_from_cycle`, `auto_archive`, `auto_archive_delay_minutes` |
+
+Clients MUST read each setting from the record first, then from an
+implementation of an earlier contract version that still carries it in its
+binding, then use the default. A missing record means defaults; clients MUST
+NOT create or rewrite the record on read. A status without a
+`status_behavior` entry has no next status, no auto-archive (delay 5 minutes),
+and is excluded from the cycle exactly when it is a skipped status.
+
 ## 12.9 Multiple implementations
 
 A collection may contain any number of types implementing
-`tasknotes.task 0.3.0-rc.5`. TaskNotes-aware readers MUST:
+`tasknotes.task 0.3.0-rc.6`. TaskNotes-aware readers MUST:
 
 1. resolve the exact local contract;
 2. enumerate every implementation in canonical type-name order;
@@ -362,7 +393,7 @@ lifecycle:
       created_at: { now: true }
 implements:
   - contract: tasknotes.task
-    version: 0.3.0-rc.5
+    version: 0.3.0-rc.6
     fields:
       title: summary
       status: state
@@ -389,21 +420,13 @@ implements:
       recurrence:
         syntax: tasknotes
         maintain_due_date_offset: false
-        reset_body_checkboxes: false
       occurrences:
         identity_roles: [recurrenceParent, occurrenceDate]
         default_materialization: manual
         default_next_trigger: completion
       links:
         accepted_formats: [wikilink, markdown]
-        write_format: wikilink
       archive:
         archived_tag: archived
-        move_on_archive: false
-      time_tracking:
-        auto_stop_on_complete: true
-      templating:
-        enabled: false
-        occurrence_enabled: false
 ---
 ```
