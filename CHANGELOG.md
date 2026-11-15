@@ -1,6 +1,9 @@
 # Changelog
 
-## 0.3.0-rc.6 - Unreleased
+## 0.3.0 - 2026-11-15
+
+- Promote the package to stable semver without changing the published
+  `tasknotes.task` 0.3.0-rc.6 record contract or its schemas.
 
 - Move app behaviour out of the `tasknotes.task` binding into the collection's
   TaskNotes settings record (`_settings/dev.tasknotes.md`, contract
@@ -11,35 +14,21 @@
 - Readers take each moved setting from the record, then from an rc.5 binding,
   then its default, so a collection still on rc.5 keeps its behaviour.
 
-## 0.3.0-rc.5 - Unreleased
-
 - Make `assignees` links to `mdbase.person` records, declared in
   `collection.links` and resolved by mdbase link resolution, replacing the
   person-ID assignments of rc.4. This matches how projects are linked and lets
   person notes show their assigned tasks as backlinks.
 
-## 0.3.0-rc.4 - Unreleased
-
-- Add optional portable person-ID `assignees` to the task record contract.
 - Define exact identity matching, unresolved-reference preservation, explicit
   clearing, and recurrence inheritance without granting collection access.
-- Published rc.3 contract artifacts remain unchanged; implementations must
-  explicitly opt into rc.4 field mappings.
-
-## 0.3.0-rc.3 - 2026-08-02
-
 - define manual ordering as an opaque string rank so clients can insert and
   reorder tasks without renumbering an entire view
-
-## 0.3.0-rc.2 - 2026-08-02
 
 - add first-class `attachments` as an ordered frontmatter list of portable file
   links, with explicit membership, canonical-path, reference-safety, and
   materialized-occurrence semantics
 - expose attachment references in the `tasknotes.task` mdbase contract while
   leaving binary metadata authoritative in the file store
-
-## 0.3.0-rc.1 - 2026-07-28
 
 - adopt the discriminated first-class mdbase contract shape for
   `tasknotes.task`, including explicit `contract_type: record`
