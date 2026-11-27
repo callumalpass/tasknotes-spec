@@ -163,7 +163,8 @@ Trigger instant MUST be computed as follows:
 1. If `type=absolute`, trigger = `absoluteTime` instant.
 2. If `type=relative`,
    - resolve base field from `relatedTo`,
-   - if base is datetime: use that instant,
+   - if base is an instant: use it directly,
+   - if base is a floating datetime: resolve it under §3.6.3,
    - if base is date: convert to local datetime at configured `reminders.date_only_anchor_time`,
    - trigger = base + `offset`.
 

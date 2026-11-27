@@ -2,9 +2,9 @@
 kind: mdbase.contract
 contract_type: record
 id: tasknotes.task
-version: 0.3.0-rc.6
+version: 0.3.0-rc.7
 name: TaskNotes task
-description: Portable task data and behavior defined by tasknotes-spec 0.3.0-rc.6.
+description: Portable task data and behavior defined by tasknotes-spec.
 record_schema:
   dialect: json-schema-2020-12
   ref: ../schemas/tasknotes-task.schema.json
@@ -21,6 +21,11 @@ the `binding` object supplies what task records mean, such as status and
 priority vocabularies. App behaviour that does not change that meaning, such as
 templates, archive moves and status cycling, lives in the collection's
 `tasknotes.settings` record at `_settings/dev.tasknotes.md`.
+
+`due` and `scheduled` accept dates, instants, and floating datetimes.
+`dateCreated` and `dateModified` accept instants and floating datetimes.
+See [chapter 03](../03-temporal-semantics.md) for canonical writes and
+resolution using the collection's `settings.timezone`.
 
 `assignees` is an optional unique list of links to records implementing
 `mdbase.person`, for example `"[[Alex Rivera]]"` or `"[[people/alex-rivera]]"`.

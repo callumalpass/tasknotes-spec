@@ -50,9 +50,11 @@ Canonical form: `YYYY-MM-DD`.
 
 ## 1.11 Datetime value
 
-A **datetime value** represents an instant in time.
+An **instant** is a point in time written as an RFC 3339 datetime with an
+offset. Its canonical form uses UTC with trailing `Z`.
 
-Canonical form: ISO 8601 UTC with trailing `Z`.
+A **floating datetime** is a calendar day and local clock time without an
+offset. The field's role determines which datetime form is canonical (§3).
 
 ## 1.12 Target date
 

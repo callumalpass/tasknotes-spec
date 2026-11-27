@@ -8,8 +8,9 @@ This section defines how implementations MUST interpret, compare, and serialize 
 
 Implementations MUST support:
 
-1. **Date values**: calendar day without time or timezone.
-2. **Datetime values**: instant in time.
+1. **Date values** represent calendar days without a time or timezone.
+2. **Floating (local) datetime values** represent calendar days and clock times without an offset. They use the mdbase `local-date-time` format.
+3. **Instant values** represent points in time. They use RFC 3339 `date-time` with `Z` or a numeric offset.
 
 ## 3.3 Canonical serialization
 
@@ -21,17 +22,21 @@ Canonical date serialization is:
 YYYY-MM-DD
 ```
 
-### 3.3.2 Datetime
+### 3.3.2 Instant
 
-Canonical datetime serialization is UTC ISO 8601 with `Z`, for example:
+Canonical instant serialization uses UTC with `Z`, for example:
 
 ```text
 2026-02-20T13:45:00Z
 ```
 
-Canonical datetime writes MUST use second precision (`YYYY-MM-DDTHH:MM:SSZ`) and MUST NOT include fractional seconds.
-Implementations MAY accept alternative inbound datetime forms but MUST normalize outbound canonical writes.
-If an accepted inbound datetime includes fractional seconds, writers MUST normalize deterministically by truncating fractional precision to whole seconds.
+Canonical instant writes MUST use second precision (`YYYY-MM-DDTHH:MM:SSZ`) and MUST truncate fractional seconds.
+
+### 3.3.3 Floating datetime
+
+Canonical timed `due` and `scheduled` writes MUST use `YYYY-MM-DDTHH:MM`,
+with optional `:SS` and optional fractional seconds after `:SS`. For example,
+write `2026-02-20T09:00` for a task due at 09:00 in the collection's time zone.
 
 ## 3.4 Parsing requirements
 
@@ -44,17 +49,22 @@ Date parsing MUST reject invalid calendar dates.
 
 ### 3.4.2 Datetime parsing
 
-Datetime parsing MUST reject malformed values.
-In strict mode, datetime parsing MUST reject ambiguous local datetimes without offset (for example `2026-02-20T09:00:00` with no timezone offset).
-In permissive mode, implementations MAY accept such values only under an explicitly documented compatibility policy and SHOULD emit a warning.
+Datetime parsing MUST reject invalid calendar and clock values, such as
+`2026-02-30T09:00` and `2026-02-20T24:00`. A floating datetime MUST use `T`
+and the syntax in §3.3.3 without a `Z` or numeric offset. An instant MUST use
+the RFC 3339 offset form.
 
 ### 3.4.3 Mixed input tolerance
 
-Implementations MAY accept both date and datetime values for roles like `due` and `scheduled` if configured to do so. The accepted form MUST be documented.
+Readers MUST accept dates, floating datetimes, and instants for `due` and
+`scheduled`. Readers MUST accept instants and floating datetimes for
+`date_created`, `date_modified`, and `time_entries` timestamps. Date-only
+values are invalid for those timestamp roles in strict mode.
 
 ### 3.4.4 Inbound acceptance matrix
 
-To avoid ambiguity, conforming parsers MUST follow this matrix.
+Conforming parsers MUST follow this matrix for roles that accept the form's
+value class (§3.4.3).
 
 Date forms:
 
@@ -67,14 +77,15 @@ Datetime forms:
 
 | Form | Example | Strict | Permissive |
 |---|---|---|---|
-| Canonical UTC | `2026-02-20T09:00:00Z` | accept | accept |
-| ISO with explicit offset | `2026-02-20T09:00:00+10:00` | accept | accept |
-| ISO with fractional seconds | `2026-02-20T09:00:00.250Z` | accept (normalize to second precision on write) | accept (normalize to second precision on write) |
-| Offset-less local datetime | `2026-02-20T09:00:00` | reject (`invalid_datetime_value`) | MAY accept only under documented compatibility policy; SHOULD emit warning |
+| UTC instant | `2026-02-20T09:00:00Z` | accept | accept |
+| Instant with numeric offset | `2026-02-20T09:00:00+10:00` | accept | accept |
+| Instant with fractional seconds | `2026-02-20T09:00:00.250Z` | accept | accept |
+| Floating datetime | `2026-02-20T09:00`, `2026-02-20T09:00:00`, `2026-02-20T09:00:00.250` | accept for the roles listed in §3.4.3; reject for instant-only roles (`invalid_datetime_value`) | accept for the roles listed in §3.4.3; for instant-only roles MAY accept under documented compatibility policy and SHOULD emit a warning |
 | Space-separated datetime | `2026-02-20 09:00:00` | reject (`invalid_datetime_value`) | MAY accept only under documented compatibility policy; SHOULD emit warning |
 | Basic datetime (no separators) | `20260220T090000Z` | reject (`invalid_datetime_value`) | MAY accept only under documented compatibility policy; SHOULD emit warning |
 
-When permissive-mode compatibility accepts a non-canonical form, canonical writes MUST still follow §3.3.
+Canonical writes MUST follow the serialization for the field's role in §3.3,
+including when permissive mode accepts a legacy form.
 
 ## 3.5 Day semantics vs instant semantics
 
@@ -82,9 +93,11 @@ When permissive-mode compatibility accepts a non-canonical form, canonical write
 
 Date roles represent days, not instants, and MUST NOT be timezone-shifted.
 
-### 3.5.2 Datetime roles
+### 3.5.2 Instant roles
 
-Datetime roles represent instants and MUST preserve instant equality through normalization.
+Instant roles MUST preserve the instant when normalizing, subject to the
+whole-second precision of canonical writes (§3.3.2). Resolve accepted
+floating inputs under §3.6.3 before normalizing them.
 
 Example:
 
@@ -128,6 +141,30 @@ When calculating day-level concepts (for example overdue/day grouping/calendar d
 
 This requirement prevents off-by-one day drift in positive and negative UTC offsets.
 
+### 3.6.3 Resolving floating datetimes
+
+To resolve a stored floating datetime to an instant, use the collection's
+IANA time zone in `settings.timezone`. In a daylight-saving overlap, choose
+the earlier instant. In a gap, move the clock time forward by the length of
+the gap. This follows RFC 5545 and Temporal's `compatible` disambiguation.
+For example, in `America/New_York`, `2026-11-01T01:30` resolves to
+`2026-11-01T05:30:00Z`, and `2026-03-08T02:30` resolves to
+`2026-03-08T07:30:00Z`. Resolution leaves the stored value intact.
+
+At an mdbase date-time location, if `settings.timezone` is missing, mdbase
+MUST keep a floating value as a string and emit a warning that the collection
+needs a time zone. mdbase MUST NOT substitute the runtime zone. Fields such
+as `due` and `scheduled` that allow both dates and datetimes remain strings
+in mdbase queries. TaskNotes resolves their timed values when it needs an
+instant, for example to schedule a relative reminder.
+
+Outside mdbase typing, a vault client without a configured collection zone
+MAY use its documented vault or device zone. When `settings.timezone` is
+set, the vault client MUST use it to resolve stored floating datetimes.
+Without a collection zone or an applicable vault fallback, the floating
+value remains unresolved for operations that require an instant.
+The active runtime timezone in §3.6.1 governs day-level evaluation.
+
 ## 3.7 Comparison rules
 
 ### 3.7.1 Date-to-date
@@ -136,7 +173,8 @@ Compare by calendar day ordering.
 
 ### 3.7.2 Datetime-to-datetime
 
-Compare by instant ordering.
+For instant-level comparisons, resolve floating values under §3.6.3 and
+compare by instant ordering.
 
 ### 3.7.3 Date-to-datetime
 
@@ -147,12 +185,16 @@ If compared, implementations MUST document coercion policy. Recommended policy:
 
 ## 3.8 due and scheduled semantics
 
-`due` and `scheduled` MAY be either date or datetime by configuration.
+`due` and `scheduled` represent calendar days or local clock times. New or
+explicitly changed timed values MUST be written as floating datetimes.
+Previously stored instants remain valid on read. When writing a timed value
+from an instant, use its calendar date and clock time in the collection's
+zone or the applicable vault fallback (§3.6.3).
 
 Implementations MUST:
 
-- preserve stored granularity unless explicit conversion is requested,
-- avoid silently converting date to datetime during unrelated writes,
+- preserve existing values on unrelated writes,
+- preserve date-only or timed granularity unless explicit conversion is requested,
 - require documented explicit policy for date-to-datetime conversion operations,
 - apply consistent coercion policy in filters and status calculations.
 
@@ -167,19 +209,24 @@ For non-recurring completion, writers MUST set `completed_date` using §5 semant
 
 ## 3.10 Created/modified timestamps
 
-`date_created` and `date_modified` are datetime roles.
+`date_created` and `date_modified` (`dateCreated` and `dateModified` in the
+portable view) are instant roles. Readers MUST also accept floating values,
+such as a value saved by the Obsidian properties editor, and resolve them
+under §3.6.3 when an instant is needed.
 
 Writers MUST:
 
-- set both on create,
-- update `date_modified` on successful mutating operations that change persisted state,
+- set both on create using the canonical instant format,
+- update `date_modified` in canonical instant form on successful mutating operations that change persisted state,
 - preserve `date_created` unless explicit migration/edit operation changes it.
 
 ## 3.11 time_entries semantics
 
 ### 3.11.1 Timestamp format
 
-`time_entries.startTime` and `time_entries.endTime` MUST be datetime instants in canonical form on write.
+`time_entries.startTime` and `time_entries.endTime` MUST use the canonical
+instant format on write. Readers MUST also accept floating values and
+resolve them under §3.6.3 before validating ranges or calculating durations.
 
 ### 3.11.2 Range validity
 
@@ -206,11 +253,11 @@ Implementations MUST document which derived view is used by each reporting surfa
 
 ## 3.12 reminder temporal semantics
 
-Reminder time fields are governed by §10.3 and MUST follow canonical datetime and duration formats from this section.
+Reminder time fields are governed by §10.3 and MUST follow the canonical instant and duration formats from this section.
 
 Rules:
 
-- `reminders[].absoluteTime` MUST be a canonical datetime on write.
+- `reminders[].absoluteTime` MUST be a canonical instant on write.
 - `reminders[].offset` MUST be a valid ISO 8601 duration string.
 - relative reminder base conversion for date-only values MUST use `reminders.date_only_anchor_time` from §9, or `00:00` local time if unset.
 
@@ -256,19 +303,21 @@ priority: high
 
 Non-conforming behavior would silently rewrite `due` to a datetime.
 
-## 3.15 Example: canonical datetime write
+## 3.15 Example: canonical writes by role
 
-Input:
+Input in a collection with `settings.timezone` set to `Europe/Paris`:
 
 ```yaml
+due: 2026-02-20T08:00:00Z
 timeEntries:
   - startTime: 2026-02-20T09:30:00+01:00
-    endTime: 2026-02-20T10:00:00+01:00
+    endTime: 2026-02-20T10:00:00
 ```
 
-Canonical write:
+Canonical serialization when explicitly writing these values:
 
 ```yaml
+due: 2026-02-20T09:00
 timeEntries:
   - startTime: 2026-02-20T08:30:00Z
     endTime: 2026-02-20T09:00:00Z
