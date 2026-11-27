@@ -52,7 +52,10 @@ With warning:
 
 ## 8.5 Temporal normalization migration
 
-If historical writes include mixed datetime styles, migration SHOULD normalize to canonical UTC ISO `Z` for datetime roles while preserving date-only roles as dates.
+If historical writes include mixed datetime styles, migration SHOULD use the
+canonical form for each role (§3.3). Preserve date-only values as dates, write
+timed `due` and `scheduled` values as floating datetimes, and write instant
+roles in UTC with `Z`.
 
 Example:
 

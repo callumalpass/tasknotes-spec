@@ -2,7 +2,7 @@
 	"$schema": "https://json-schema.org/draft/2020-12/schema",
 	"$id": "https://tasknotes.dev/schemas/tasknotes-task.schema.json",
 	"title": "TaskNotes portable task view",
-	"description": "The storage-neutral record view exposed by the tasknotes.task 0.3.0-rc.6 record contract.",
+	"description": "The storage-neutral record view exposed by the tasknotes.task 0.3.0-rc.7 record contract.",
 	"type": "object",
 	"required": ["status", "dateCreated"],
 	"additionalProperties": false,
@@ -14,13 +14,15 @@
 		"due": {
 			"anyOf": [
 				{ "type": "string", "format": "date" },
-				{ "type": "string", "format": "date-time" }
+				{ "type": "string", "format": "date-time" },
+				{ "type": "string", "format": "local-date-time" }
 			]
 		},
 		"scheduled": {
 			"anyOf": [
 				{ "type": "string", "format": "date" },
-				{ "type": "string", "format": "date-time" }
+				{ "type": "string", "format": "date-time" },
+				{ "type": "string", "format": "local-date-time" }
 			]
 		},
 		"contexts": {
@@ -44,8 +46,18 @@
 		},
 		"timeEstimate": { "type": "integer", "minimum": 0 },
 		"completedDate": { "type": "string", "format": "date" },
-		"dateCreated": { "type": "string", "format": "date-time" },
-		"dateModified": { "type": "string", "format": "date-time" },
+		"dateCreated": {
+			"anyOf": [
+				{ "type": "string", "format": "date-time" },
+				{ "type": "string", "format": "local-date-time" }
+			]
+		},
+		"dateModified": {
+			"anyOf": [
+				{ "type": "string", "format": "date-time" },
+				{ "type": "string", "format": "local-date-time" }
+			]
+		},
 		"recurrence": { "type": "string" },
 		"recurrenceAnchor": {
 			"enum": ["scheduled", "completion"]

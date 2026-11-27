@@ -200,7 +200,7 @@ Deterministic expansion context:
 
 - date/time variable expansion MUST use the active runtime timezone from §3.6.
 - locale-sensitive variables (`monthName`, `monthNameShort`, `dayName`, `dayNameShort`, `time12`) MUST use English locale outputs for portability (`January`, `Jan`, `Monday`, `Mon`, `AM`/`PM`).
-- template-generated datetime-like outputs used in frontmatter MUST normalize to second precision when written as canonical datetime roles (§3.3.2).
+- template-generated temporal values written to frontmatter MUST use the canonical form for the field's role (§3.3).
 
 Failure behavior:
 

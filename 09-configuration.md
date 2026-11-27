@@ -590,7 +590,7 @@ compatibility:
 Rules:
 
 - Compatibility flags MUST default to conservative behavior in new collections.
-- `legacy_local_datetime_input=true` MAY relax strict parsing for offset-less datetimes only in permissive mode; strict mode parsing rules in §3.4.2 still apply.
+- `legacy_local_datetime_input=true` MAY allow floating datetimes for instant-only roles in permissive mode (§3.4.4). Roles that accept floating datetimes in strict mode (§3.4.3) do so regardless of this flag.
 - Enabled compatibility flags SHOULD be disclosed in conformance output (§7).
 
 ## 9.19 Complete configuration example (`yaml_file` provider)

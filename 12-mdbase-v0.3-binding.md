@@ -2,9 +2,13 @@
 
 **Status:** Draft
 
-**Record contract:** `tasknotes.task` `0.3.0-rc.6`
+**Record contract:** `tasknotes.task` `0.3.0-rc.7`
 
-This revision adds optional `assignees`: links to records implementing
+rc.7 adds `local-date-time` to `due`, `scheduled`, `dateCreated`, and
+`dateModified`. See §3 for canonical writes and resolution using the
+collection's `settings.timezone`.
+
+The contract supports optional `assignees` links to records implementing
 `mdbase.person`, resolved by ordinary mdbase link resolution. Unresolved links
 survive person deletion or membership removal. Assignment and editable person
 identity associations never grant collection access. See
@@ -56,7 +60,7 @@ can implement and several applications can consume.
 
 ```text
 personal_task ─┐
-work_task ─────┼─ implements tasknotes.task 0.3.0-rc.6 ── TaskNotes
+work_task ─────┼─ implements tasknotes.task 0.3.0-rc.7 ── TaskNotes
 issue_task ────┘                                  ├─ automation
                                                   └─ another task app
 ```
@@ -100,7 +104,7 @@ An mdbase TaskNotes type declares one implementation:
 ```yaml
 implements:
   - contract: tasknotes.task
-    version: 0.3.0-rc.6
+    version: 0.3.0-rc.7
     fields:
       title: summary
       status: state
@@ -289,7 +293,7 @@ and is excluded from the cycle exactly when it is a skipped status.
 ## 12.9 Multiple implementations
 
 A collection may contain any number of types implementing
-`tasknotes.task 0.3.0-rc.6`. TaskNotes-aware readers MUST:
+`tasknotes.task 0.3.0-rc.7`. TaskNotes-aware readers MUST:
 
 1. resolve the exact local contract;
 2. enumerate every implementation in canonical type-name order;
@@ -377,7 +381,10 @@ schema:
       summary: { type: string, minLength: 1 }
       state: { enum: [todo, doing, done, cancelled] }
       importance: { enum: [low, normal, high] }
-      created_at: { type: string, format: date-time }
+      created_at:
+        anyOf:
+          - { type: string, format: date-time }
+          - { type: string, format: local-date-time }
       tags:
         type: array
         items: { type: string }
@@ -393,7 +400,7 @@ lifecycle:
       created_at: { now: true }
 implements:
   - contract: tasknotes.task
-    version: 0.3.0-rc.6
+    version: 0.3.0-rc.7
     fields:
       title: summary
       status: state

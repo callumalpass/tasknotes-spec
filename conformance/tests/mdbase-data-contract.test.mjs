@@ -11,9 +11,20 @@ async function schema(name) {
 	);
 }
 
-test("publishes valid JSON Schemas for the portable task view, binding, and completion event", async () => {
+function mdbaseValidator() {
 	const ajv = new Ajv2020({ allErrors: true, strict: true });
 	addFormats(ajv);
+	const validateDate = ajv.compile({ type: "string", format: "date" });
+	const localDateTime = /^(\d{4}-\d{2}-\d{2})T(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?$/;
+	ajv.addFormat("local-date-time", (value) => {
+		const parts = localDateTime.exec(value);
+		return parts !== null && validateDate(parts[1]);
+	});
+	return ajv;
+}
+
+test("publishes valid JSON Schemas for the portable task view, binding, and completion event", async () => {
+	const ajv = mdbaseValidator();
 	const taskSchema = await schema("tasknotes-task.schema.json");
 	const bindingSchema = await schema("tasknotes-task-binding.schema.json");
 	const completedSchema = await schema("tasknotes-task-completed.schema.json");
@@ -140,6 +151,35 @@ test("publishes valid JSON Schemas for the portable task view, binding, and comp
 	assert.equal(validateCompleted({ task_path: "Tasks/Ship contracts.md" }), false);
 });
 
+test("the portable task view accepts mdbase floating datetimes for the documented roles", async () => {
+	const validate = mdbaseValidator().compile(await schema("tasknotes-task.schema.json"));
+	const task = { status: "open", dateCreated: "2026-07-28T09:00:00Z" };
+	const valid = [
+		"2026-07-28T09:00",
+		"2026-07-28T09:00:00",
+		"2028-02-29T09:00:00.250",
+	];
+	const invalid = [
+		"2026-02-30T09:00",
+		"2026-07-28T24:00",
+		"2026-07-28T09:60",
+		"2026-07-28T09:00.250",
+		"2026-07-28 09:00:00",
+	];
+	for (const field of ["due", "scheduled", "dateCreated", "dateModified"]) {
+		for (const value of valid) {
+			assert.equal(validate({ ...task, [field]: value }), true, `${field}: ${value}`);
+		}
+		for (const value of invalid) {
+			assert.equal(validate({ ...task, [field]: value }), false, `${field}: ${value}`);
+		}
+	}
+	for (const field of ["dateCreated", "dateModified"]) {
+		assert.equal(validate({ ...task, [field]: "2026-07-28" }), false, field);
+	}
+	assert.equal(validate({ ...task, completedDate: "2026-07-28T09:00" }), false);
+});
+
 test("the published contract uses one exact identity and the canonical schemas", async () => {
 	const contract = await readFile(
 		new URL("../../mdbase/tasknotes.task.md", import.meta.url),
@@ -148,7 +188,7 @@ test("the published contract uses one exact identity and the canonical schemas",
 	assert.match(contract, /^kind: mdbase\.contract$/m);
 	assert.match(contract, /^id: tasknotes\.task$/m);
 	assert.match(contract, /^contract_type: record$/m);
-	assert.match(contract, /^version: 0\.3\.0-rc\.6$/m);
+	assert.match(contract, /^version: 0\.3\.0-rc\.7$/m);
 	assert.match(contract, /^record_schema:$/m);
 	assert.match(contract, /ref: \.\.\/schemas\/tasknotes-task\.schema\.json/);
 	assert.match(
